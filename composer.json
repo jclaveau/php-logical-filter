@@ -1,0 +1,33 @@
+{
+    "name": "jclaveau/php-custom-filter",
+    "description": "A class to gather filter parameters into one object and handle them easily.",
+    "license": "MIT",
+    "keywords": ["filter", "custom", "rules", "object parameter"],
+    "authors": [
+        {
+            "name": "Jean Claveau",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4" : {
+            "JClaveau\\CustomFilter\\" : "src"
+        }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/jclaveau/php-visibility-violator",
+            "no-api": true
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "5.*",
+        "jclaveau/php-visibility-violator": "dev-master",
+        "evert/phpdoc-md": "~0.2.0",
+        "phpdocumentor/phpdocumentor": "~2.8.0"
+    },
+    "require": {
+        "php": ">=5.4.0"
+    }
+}

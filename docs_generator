@@ -1,0 +1,5 @@
+# phpdoc command
+vendor/bin/phpdoc  -d src -t docs/phpdoc --template="xml"
+
+# Next, run phpdocmd:
+vendor/bin/phpdocmd docs/phpdoc/structure.xml docs

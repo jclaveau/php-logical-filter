@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpunit backupGlobals="false"
+         defaultTestSuite="unit"
+         backupStaticAttributes="true"
+         colors="true">
+    <!--
+        bootstrap="./tests/bootstrap_phpunit.php"
+        backupGlobals="false" is required to don't loose $link as link_identifier
+        backupStaticAttributes="false"
+        syntaxCheck="false"
+    -->
+
+    <testsuites>
+        <testsuite name="unit">
+            <directory>./tests</directory>
+        </testsuite>
+    </testsuites>
+
+
+    <filter>
+        <!-- /!\ whitelist will exclude every outside class from coverage -->
+        <whitelist>
+            <directory suffix=".php">./src</directory>
+            <directory suffix=".php">./tests</directory>
+        </whitelist>
+        <!--blacklist>
+            <directory>./vendor</directory>
+            <directory>./tests/coverage</directory>
+        </blacklist-->
+    </filter>
+
+    <logging>
+        <log type="coverage-clover" target="clover.xml"/>
+        <log type="coverage-html" target="tests_coverage/" charset="UTF-8" yui="true" />
+    </logging>
+</phpunit>
