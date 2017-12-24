@@ -1,6 +1,10 @@
 <?php
 namespace JClaveau\CustomFilter;
 
+use JClaveau\CustomFilter\Rule\AbstractOperationRule;
+use JClaveau\CustomFilter\Rule\AndRule;
+use JClaveau\CustomFilter\Rule\OrRule;
+
 /**
  * addRule
  * resolve
@@ -14,14 +18,14 @@ class Filter
     /** @var  AndRule $rules */
     protected $rules;
 
-    /** @var  array<OrRule> $rules */
+    /** @var  OrRule $optimizedRules */
     // protected $optimizedRules = [];
 
     /**
      */
     public function __construct()
     {
-        $this->rules = new Rule\AndRule;
+        $this->rules = new AndRule;
     }
 
     /**
@@ -57,11 +61,118 @@ class Filter
      *
      * @return $this
      */
-    public function addRule($field, $type, $values)
+    public function addSimpleRule($field, $type, $values)
+    {
+        $this->rules->addOperand( self::generateSimpleRule(
+            $field, $type, $values
+        ) );
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param string $field
+     * @param string $type
+     * @param mixed  $value
+     *
+     * @return $this
+     */
+    public static function generateSimpleRule($field, $type, $values)
     {
         $ruleClass = self::getRuleClass($type);
 
-        $this->rules->addOperand( new $ruleClass( $field, $values ) );
+        return new $ruleClass( $field, $values );
+    }
+
+    /**
+     * Transforms an array gathering different rules representing
+     * atomic and operation rules into a tree of Rules added to the
+     * current Filter.
+     *
+     * @param array $rules_composition
+     *
+     * @return $this
+     */
+    public function addCompositeRule(array $rules_composition)
+    {
+        $this->addCompositeRule_recursion(
+            $rules_composition,
+            $this->rules
+        );
+
+        return $this;
+    }
+
+    /**
+     * Recursion auxiliary of addCompositeRule.
+     *
+     * @param array $rules_composition
+     *
+     * @return $this
+     */
+    private function addCompositeRule_recursion(
+        array $rules_composition,
+        AbstractOperationRule $recursion_position
+    ) {
+        if (    count($rules_composition) == 3
+            &&  !in_array('and', $rules_composition)
+            &&  !in_array('or',  $rules_composition)
+        ) {
+            $operand_left  = $rules_composition[0];
+            $operation     = $rules_composition[1];
+            $operand_right = $rules_composition[2];
+
+            $rule = self::generateSimpleRule(
+                $operand_left, $operation, $operand_right
+            );
+            $recursion_position->addOperand( $rule );
+        }
+        else {
+            if (in_array('and', $rules_composition)) {
+                $rule = new AndRule();
+                $operator = 'and';
+            }
+            elseif (in_array('or', $rules_composition)) {
+                $rule = new OrRule();
+                $operator = 'or';
+            }
+            else {
+                throw new \Exception("Unhandled operation");
+            }
+
+            $recursion_position->addOperand( $rule );
+
+            $operands_descriptions = array_filter(
+                $rules_composition,
+                function ($operand) use ($operator) {
+                    return $operand !== $operator;
+                }
+            );
+
+            $remaining_operations = array_filter(
+                $operands_descriptions,
+                function($operand) {
+                    return !is_array($operand);
+                }
+            );
+
+            if ($remaining_operations) {
+                throw new \InvalidArgumentException(
+                    "Mixing different operations in the same rule level not implemented: \n"
+                    . implode(', ', $remaining_operations)."\n"
+                    . 'in ' . var_export($rules_composition, true)
+                );
+            }
+
+            foreach ($operands_descriptions as $operands_description) {
+                $this->addCompositeRule_recursion(
+                    $operands_description,
+                    $rule
+                );
+            }
+
+        }
 
         return $this;
     }
@@ -126,14 +237,19 @@ class Filter
 
     /**
      * Retrieve the rules for a given field
+     *
+     * @todo simplify / optimize / extract rules related to the given field
+     *
      */
     public function getFieldRules($field)
     {
-        if (!isset($this->rules[$field])) {
-            return null;
-        }
 
-        return $this->rules[$field];
+
+        // if (!isset($this->rules[$field])) {
+            // return null;
+        // }
+
+        // return $this->rules[$field];
     }
 
     /**

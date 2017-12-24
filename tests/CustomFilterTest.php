@@ -13,14 +13,14 @@ class CustomFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_addRule()
+    public function test_addSimpleRule()
     {
         $filter = new Filter();
 
-        $filter->addRule('field', 'in', ['a', 'b', 'c']);
+        $filter->addSimpleRule('field', 'in', ['a', 'b', 'c']);
         // $filter->addRule('field', 'not_in', ['a', 'b', 'c']);
-        $filter->addRule('field', 'above', 3);
-        $filter->addRule('field', 'below', 5);
+        $filter->addSimpleRule('field', 'above', 3);
+        $filter->addSimpleRule('field', 'below', 5);
 
         $rules = VisibilityViolator::getHiddenProperty(
             $filter,
@@ -40,11 +40,34 @@ class CustomFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
+    public function test_addOrRule()
+    {
+        $filter = new Filter();
+
+        $filter->addCompositeRule([
+            ['field', 'in', ['a', 'b', 'c']],
+            'or',
+            ['field', 'equal', 'e']
+        ]);
+
+        $this->assertEquals(
+            new Rule\AndRule([
+                new Rule\OrRule([
+                    new Rule\InRule('field', ['a', 'b', 'c']),
+                    new Rule\EqualRule('field', 'e')
+                ]),
+            ]),
+            $filter->getRules()
+        );
+    }
+
+    /**
+     */
     public function test_getRules()
     {
         $filter = new Filter();
 
-        $filter->addRule('field', 'in', ['a', 'b', 'c']);
+        $filter->addSimpleRule('field', 'in', ['a', 'b', 'c']);
 
         $this->assertEquals(
             new Rule\AndRule([
@@ -52,6 +75,13 @@ class CustomFilterTest extends \PHPUnit_Framework_TestCase
             ]),
             $filter->getRules()
         );
+    }
+
+    /**
+     * @todo
+     */
+    public function test_removeNegations()
+    {
     }
 
     /**/
