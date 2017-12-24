@@ -11,8 +11,18 @@ namespace JClaveau\CustomFilter;
  */
 class Filter
 {
-    /** @var array $rules */
-    protected $rules = [];
+    /** @var  AndRule $rules */
+    protected $rules;
+
+    /** @var  array<OrRule> $rules */
+    // protected $optimizedRules = [];
+
+    /**
+     */
+    public function __construct()
+    {
+        $this->rules = new Rule\AndRule;
+    }
 
     /**
      * @param  string rule name
@@ -37,23 +47,21 @@ class Filter
     }
 
     /**
-     * Add a constraint for the given field (a list a allowed values)
+     * Add a constraint for the given field (a list a allowed values).
+     * We create an And rule that will gather all the possible combinations
+     * of rules that will be applied to the given field.
      *
      * @param string $field
      * @param string $type
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return $this
      */
     public function addRule($field, $type, $values)
     {
-        if (!isset($this->rules[$field])) {
-            $this->rules[$field] = [];
-        }
-
         $ruleClass = self::getRuleClass($type);
 
-        $this->rules[$field][] = new $ruleClass( $values );
+        $this->rules->addOperand( new $ruleClass( $field, $values ) );
 
         return $this;
     }
@@ -61,12 +69,14 @@ class Filter
     /**
      * Remove a constraint for the given field (a list a allowed values)
      *
+     * $todo absurd?
+     *
      * @param string $field
      * @param string $type
      * @param mixed $value
      *
      * @return $this
-     */
+     * /
     public function removeRule($field, $type, $values)
     {
         if (!isset($this->rules[$field]))
@@ -79,7 +89,7 @@ class Filter
                 continue;
             }
 
-            $rule->removeValue($values);
+            $rule->removeOperand($values);
         }
 
         return $this;
@@ -87,6 +97,14 @@ class Filter
 
     /**
      * Reset all the constraints applied to the given field
+     *
+     * @todo   check if the ability of removing the rules by "type" is
+     *         useful.
+     *
+     * @param  string $field
+     * @param  string $type
+     *
+     * @return Filter $this
      */
     public function resetRule($field, $type=null)
     {
@@ -145,7 +163,8 @@ class Filter
      */
     public function simplify()
     {
-
+        // remove negations
+        // $this->rules
 
         // make combinations due to every OR constraint
 

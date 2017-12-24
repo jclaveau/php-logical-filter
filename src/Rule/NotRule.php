@@ -24,6 +24,9 @@ class NotRule extends AbstractOperationRule
      * Transforms all composite rules in the tree of operands into
      * atomic rules.
      *
+     * @todo use get_class instead of instanceof to avoid order issue
+     *       in the conditions.
+     *
      * @return array
      */
     // public function toAtomicRules()
@@ -31,17 +34,20 @@ class NotRule extends AbstractOperationRule
     {
         $operand = $this->operands[0];
 
+        if (!$operand instanceof AbstractOperationRule)
+            $field = $operand->getField();
+
         if ($operand instanceof AboveRule) {
             $new_rule = new OrRule([
-                new BelowRule($operand->getMinimum()),
-                new EqualRule($operand->getMinimum()),
+                new BelowRule($field, $operand->getMinimum()),
+                new EqualRule($field, $operand->getMinimum()),
             ]);
         }
         elseif ($operand instanceof BelowRule) {
             // ! (v >  a) : v <= a : (v < a || a = v)
             $new_rule = new OrRule([
-                new AboveRule($operand->getMaximum()),
-                new EqualRule($operand->getMaximum()),
+                new AboveRule($field, $operand->getMaximum()),
+                new EqualRule($field, $operand->getMaximum()),
             ]);
         }
         elseif ($operand instanceof NotRule) {
@@ -51,9 +57,19 @@ class NotRule extends AbstractOperationRule
         elseif ($operand instanceof EqualRule) {
             // ! (v =  a) : (v < a) || (v > a)
             $new_rule = new OrRule([
-                new AboveRule($operand->getValue()),
-                new BelowRule($operand->getValue()),
+                new AboveRule($field, $operand->getValue()),
+                new BelowRule($field, $operand->getValue()),
             ]);
+        }
+        elseif ($operand instanceof InRule) {
+            // ! in [A, B, C] : !B && !A && !C
+            // In rule must remain before OrRule as it extends it
+            $possibilities = $operand->getPossibilities();
+
+            foreach ($possibilities as $i => $possibility)
+                $possibilities[$i] = new NotRule($possibility);
+
+            $new_rule = new AndRule($possibilities);
         }
         elseif ($operand instanceof AndRule) {
             // ! (B && A) : (!B && A) || (B && !A) || (!B && !A)
@@ -69,26 +85,18 @@ class NotRule extends AbstractOperationRule
 
             $new_rule = new OrRule([
                 new AndRule([
-                    $child_operands[0],
-                    new NotRule($child_operands[1]),
+                    $child_operands[0]->copy(),
+                    new NotRule($child_operands[1]->copy()),
                 ]),
                 new AndRule([
-                    new NotRule($child_operands[0]),
-                    $child_operands[1],
+                    new NotRule($child_operands[0]->copy()),
+                    $child_operands[1]->copy(),
                 ]),
                 new AndRule([
-                    new NotRule($child_operands[0]),
-                    new NotRule($child_operands[1]),
+                    new NotRule($child_operands[0]->copy()),
+                    new NotRule($child_operands[1]->copy()),
                 ]),
             ]);
-        }
-        elseif ($operand instanceof InRule) {
-            // ! in [A, B, C] : !B && !A && !C
-            $possibilities = $operand->getPossibilities();
-            foreach ($possibilities as $i => $possibility)
-                $possibilities[$i] = new NotRule($possibility);
-
-            $new_rule = new AndRule($possibilities);
         }
         elseif ($operand instanceof OrRule) {
             // ! (B || A) : !B && !A
@@ -102,15 +110,15 @@ class NotRule extends AbstractOperationRule
             }
 
             $new_rule = new AndRule([
-                new NotRule($child_operands[0]),
-                new NotRule($child_operands[1]),
+                new NotRule($child_operands[0]->copy()),
+                new NotRule($child_operands[1]->copy()),
             ]);
         }
         elseif ($operand instanceof NotNullRule) {
-            $new_rule = new NullRule();
+            $new_rule = new NullRule($field);
         }
         elseif ($operand instanceof NullRule) {
-            $new_rule = new NotNullRule();
+            $new_rule = new NotNullRule($field);
         }
         else {
             throw new \ErrorException(

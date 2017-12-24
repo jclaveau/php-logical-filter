@@ -10,8 +10,10 @@ class EqualRule extends AbstractAtomicRule
     protected $value;
 
     /**
+     * @param string $field The field to apply the rule on.
+     * @param array  $value The value the field can equal to.
      */
-    public function __construct( $value )
+    public function __construct( $field, $value )
     {
         if (is_null($value)) {
             throw new \InvalidArgumentException(
@@ -19,6 +21,7 @@ class EqualRule extends AbstractAtomicRule
             );
         }
 
+        $this->field = $field;
         $this->value = $value;
     }
 

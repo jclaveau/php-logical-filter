@@ -27,14 +27,15 @@ class CustomFilterTest extends \PHPUnit_Framework_TestCase
             'rules'
         );
 
-        $this->assertEquals([
-            'field' => [
-                new Rule\InRule(['a', 'b', 'c']),
+        $this->assertEquals(
+            new Rule\AndRule([
+                new Rule\InRule('field', ['a', 'b', 'c']),
                 // new NotInRule(['a', 'b', 'c']),
-                new Rule\AboveRule(3),
-                new Rule\BelowRule(5),
-            ]
-        ], $rules);
+                new Rule\AboveRule('field', 3),
+                new Rule\BelowRule('field', 5)
+            ]),
+            $rules
+        );
     }
 
     /**
@@ -45,11 +46,12 @@ class CustomFilterTest extends \PHPUnit_Framework_TestCase
 
         $filter->addRule('field', 'in', ['a', 'b', 'c']);
 
-        $this->assertEquals([
-            'field' => [
-                new Rule\InRule(['a', 'b', 'c'])
-            ]
-        ], $filter->getRules());
+        $this->assertEquals(
+            new Rule\AndRule([
+                new Rule\InRule('field', ['a', 'b', 'c'])
+            ]),
+            $filter->getRules()
+        );
     }
 
     /**/

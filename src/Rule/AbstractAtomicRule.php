@@ -8,9 +8,15 @@ namespace JClaveau\CustomFilter\Rule;
  * + equal
  * + above
  * + below
+ *
+ *
+ * Atomic rules are namable
  */
 abstract class AbstractAtomicRule extends AbstractRule
 {
+    /** @var string $field The field to apply the rule on */
+    protected $field;
+
     /**
      * @throws ErrorException If not overloaded
      */
@@ -19,6 +25,14 @@ abstract class AbstractAtomicRule extends AbstractRule
         throw new \ErrorException(
             'This method MUST be overloaded by the inheriting class'
         );
+    }
+
+    /**
+     * @return string $field
+     */
+    public final function getField()
+    {
+        return $this->field;
     }
 
     /**

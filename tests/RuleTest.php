@@ -11,90 +11,88 @@ class RuleTest extends \PHPUnit_Framework_TestCase
     {
         // NullRule
         $rule = new NotRule(
-            new NullRule
+            new NullRule('field')
         );
         $new_rule = $rule->negateOperand();
-        $this->assertEquals(new NotNullRule(), $new_rule);
+        $this->assertEquals(new NotNullRule('field'), $new_rule);
 
 
         // NotNullRule
         $rule = new NotRule(
-            new NotNullRule
+            new NotNullRule('field')
         );
         $new_rule = $rule->negateOperand();
-        $this->assertEquals(new NullRule(), $new_rule);
+        $this->assertEquals(new NullRule('field'), $new_rule);
 
 
         // AboveRule
         $rule = new NotRule(
-            new AboveRule(3)
+            new AboveRule('field', 3)
         );
         $new_rule = $rule->negateOperand();
         $this->assertEquals(new OrRule([
-            new BelowRule(3),
-            new EqualRule(3)
+            new BelowRule('field', 3),
+            new EqualRule('field', 3)
         ]), $new_rule);
 
 
         // BelowRule
         $rule = new NotRule(
-            new BelowRule(3)
+            new BelowRule('field', 3)
         );
         $new_rule = $rule->negateOperand();
         $this->assertEquals(new OrRule([
-            new AboveRule(3),
-            new EqualRule(3)
+            new AboveRule('field', 3),
+            new EqualRule('field', 3)
         ]), $new_rule);
 
 
         // NotRule
         $rule = new NotRule(
-            new NotRule(new BelowRule(3))
+            new NotRule(new BelowRule('field', 3))
         );
         $new_rule = $rule->negateOperand();
-        $this->assertEquals(new BelowRule(3), $new_rule);
+        $this->assertEquals(new BelowRule('field', 3), $new_rule);
 
 
         // EqualRule
         $rule = new NotRule(
-            new EqualRule(3)
+            new EqualRule('field', 3)
         );
         $new_rule = $rule->negateOperand();
-        // var_dump($new_rule);
-        // exit;
         $this->assertEquals(new OrRule([
-            new AboveRule(3),
-            new BelowRule(3),
+            new AboveRule('field', 3),
+            new BelowRule('field', 3),
         ]), $new_rule);
 
 
         // AndRule (2 operands only)
         $rule = new NotRule(
             new AndRule([
-                new EqualRule(3),
-                new AboveRule(10),
+                new EqualRule('field', 3),
+                new AboveRule('field', 10),
             ])
         );
         $new_rule = $rule->negateOperand();
         $this->assertEquals(new OrRule([
             new AndRule([
-                new EqualRule(3),
+                new EqualRule('field', 3),
                 new NotRule(
-                    new AboveRule(10)
+                    new AboveRule('field', 10)
                 ),
             ]),
             new AndRule([
                 new NotRule(
-                    new EqualRule(3)
+                    new EqualRule('field', 3)
                 ),
-                new AboveRule(10)
+                new AboveRule('field', 10)
             ]),
             new AndRule([
                 new NotRule(
-                    new EqualRule(3)
+                    new EqualRule('field', 3)
                 ),
                 new NotRule(
-                    new AboveRule(10)
+                    new AboveRule('field', 10)
                 ),
             ]),
         ]), $new_rule);
@@ -103,34 +101,48 @@ class RuleTest extends \PHPUnit_Framework_TestCase
         // OrRule (2 operands only)
         $rule = new NotRule(
             new OrRule([
-                new EqualRule(3),
-                new AboveRule(10),
+                new EqualRule('field', 3),
+                new AboveRule('field', 10),
             ])
         );
-        $new_rule = $rule->negateOperand();
-        $this->assertEquals(new AndRule([
-            new NotRule(
-                new EqualRule(3)
-            ),
-            new NotRule(
-                new AboveRule(10)
-            ),
-        ]), $new_rule);
 
+        $new_rule = $rule->negateOperand();
+        $expected = new AndRule([
+            new NotRule(
+                new EqualRule('field', 3)
+            ),
+            new NotRule(
+                new AboveRule('field', 10)
+            ),
+        ]);
+
+        $this->assertEquals($expected, $new_rule);
 
         // InRule
         $rule = new NotRule(
-            new InRule([3, 10])
+            new InRule('field', [3, 10])
         );
         $new_rule = $rule->negateOperand();
-        $this->assertEquals(new AndRule([
+        $expected = new AndRule([
             new NotRule(
-                new EqualRule(3)
+                new EqualRule('field', 3)
             ),
             new NotRule(
-                new EqualRule(10)
+                new EqualRule('field', 10)
             ),
-        ]), $new_rule);
+        ]);
+
+        // var_dump('$new_rule');
+        // var_dump($new_rule);
+
+        // var_dump('$expected');
+        // var_dump($expected);
+
+        // var_dump('$expected == $new_rule');
+        // var_dump($expected == $new_rule);
+        // exit;
+
+        $this->assertEquals($expected, $new_rule);
 
     }
 

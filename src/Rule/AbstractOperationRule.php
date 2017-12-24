@@ -12,14 +12,17 @@ abstract class AbstractOperationRule extends AbstractRule
     /**
      * This property should never be null.
      *
-     * @var array<AbstractRule> $parts
+     * @var array<AbstractRule> $operands
      */
-    protected $operands;
+    protected $operands = [];
 
     /**
      */
-    public function __construct( array $operands )
+    public function __construct( array $operands=null )
     {
+        if (!$operands)
+            return;
+
         if (!array_filter($operands, function($operand) {
             return $operand instanceof AbstractRule;
         })) {
@@ -29,6 +32,19 @@ abstract class AbstractOperationRule extends AbstractRule
         }
 
         $this->operands = $operands;
+    }
+
+    /**
+     * Adds an operand to the logical operation (&& or ||).
+     *
+     * @param  AbstractRule $new_operand
+     *
+     * @return $this
+     */
+    public function addOperand( AbstractRule $new_operand )
+    {
+        $this->operands[] = $new_operand;
+        return $this;
     }
 
     /**

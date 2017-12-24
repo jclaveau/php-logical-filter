@@ -4,6 +4,14 @@ namespace JClaveau\CustomFilter\Rule;
 class NotNullRule extends AbstractAtomicRule
 {
     /**
+     * @param string $field The field that should not be null.
+     */
+    public function __construct( $field )
+    {
+        $this->field = $field;
+    }
+
+    /**
      * @return $this
      */
     public function combineWith( NotNullRule $other_rule )

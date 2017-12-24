@@ -7,20 +7,13 @@ namespace JClaveau\CustomFilter\Rule;
 class InRule extends OrRule
 {
     /**
+     * @param string $field         The field to apply the rule on.
+     * @param array  $possibilities The values the field can belong to.
      */
-    public function __construct( array $possibilities )
+    public function __construct( $field, array $possibilities )
     {
-        foreach ($possibilities as $i => $possibility) {
-            if ($possibility instanceof AbstractRule) {
-                throw new \InvalidArgumentException(
-                    '$possibilities must be an array of non rules'
-                );
-            }
-
-            $possibilities[$i] = new EqualRule($possibility);
-        }
-
-        $this->operands = $possibilities;
+        $this->field = $field;
+        $this->addPossibilities( $possibilities );
     }
 
     /**
@@ -42,6 +35,29 @@ class InRule extends OrRule
     public function getPossibilities()
     {
         return $this->operands;
+    }
+
+    /**
+     * @return array
+     *
+     * @param  array possibilities
+     *
+     * @return InRule $this
+     */
+    public function addPossibilities(array $possibilities)
+    {
+        foreach ($possibilities as $possibility) {
+            if ($possibility instanceof AbstractRule) {
+                throw new \InvalidArgumentException(
+                    "A possibility cannot be a rule: "
+                    . var_exprot($possibility, true)
+                );
+            }
+
+            $this->operands[] = new EqualRule($this->field, $possibility);
+        }
+
+        return $this;
     }
 
     /**

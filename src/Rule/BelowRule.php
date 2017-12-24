@@ -10,8 +10,10 @@ class BelowRule extends AbstractAtomicRule
     protected $maximum;
 
     /**
+     * @param string $field The field to apply the rule on.
+     * @param array  $value The value the field can below to.
      */
-    public function __construct( $maximum )
+    public function __construct( $field, $maximum )
     {
         if (!is_scalar($maximum)) {
             throw new \InvalidArgumentException(
@@ -19,6 +21,7 @@ class BelowRule extends AbstractAtomicRule
             );
         }
 
+        $this->field   = $field;
         $this->maximum = $maximum;
     }
 

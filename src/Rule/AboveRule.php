@@ -10,8 +10,10 @@ class AboveRule extends AbstractAtomicRule
     protected $minimum;
 
     /**
+     * @param string $field The field to apply the rule on.
+     * @param array  $value The value the field can above to.
      */
-    public function __construct( $minimum )
+    public function __construct( $field, $minimum )
     {
         if (!is_scalar($minimum)) {
             throw new \InvalidArgumentException(
@@ -19,6 +21,7 @@ class AboveRule extends AbstractAtomicRule
             );
         }
 
+        $this->field   = $field;
         $this->minimum = $minimum;
     }
 
