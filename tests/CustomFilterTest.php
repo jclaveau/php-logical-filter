@@ -107,6 +107,47 @@ class CustomFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
+    public function test_addRule_with_different_operators()
+    {
+        $filter = new Filter();
+
+        // exception if different operators in the same operation
+        try {
+            $filter->addCompositeRule([
+                ['field', 'in', ['a', 'b', 'c']],
+                'or',
+                [
+                    ['field', 'in', ['d', 'e']],
+                    'and',
+                    [
+                        ['field_2', 'above', 3],
+                        'or',
+                        ['field_3', 'below', -2],
+                        'and',
+                        ['field_3', 'equal', 0],
+                    ],
+                ],
+            ]);
+
+            $this->assertTrue(
+                false,
+                'No exception thrown for different operators in one operation'
+            );
+        }
+        catch (\InvalidArgumentException $e) {
+
+            $this->assertTrue(
+                (bool) preg_match(
+                    "/^Mixing different operations in the same rule level not implemented:/",
+                    $e->getMessage()
+                )
+            );
+            return;
+        }
+    }
+
+    /**
+     */
     public function test_getRules()
     {
         $filter = new Filter();
