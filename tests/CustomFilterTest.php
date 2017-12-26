@@ -148,6 +148,37 @@ class CustomFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
+    public function test_addRule_without_operator()
+    {
+        $filter = new Filter();
+
+        // exception if no operator in an operation
+        try {
+            $filter->addCompositeRule([
+                ['field_2', 'above', 3],
+                ['field_3', 'below', -2],
+                ['field_3', 'equal', 0],
+            ]);
+
+            $this->assertTrue(
+                false,
+                'No exception thrown while operator is missing in an operation'
+            );
+        }
+        catch (\InvalidArgumentException $e) {
+
+            $this->assertTrue(
+                (bool) preg_match(
+                    "/^Please provide an operator for the operation: /",
+                    $e->getMessage()
+                )
+            );
+            return;
+        }
+    }
+
+    /**
+     */
     public function test_getRules()
     {
         $filter = new Filter();

@@ -18,6 +18,16 @@ class Filter
     /** @var  AndRule $rules */
     protected $rules;
 
+    /** @var  array $ruleAliases */
+    protected static $ruleAliases = [
+        '!=' => 'not equal',
+        '='  => 'equal',
+        '>'  => 'above',
+        '>=' => 'above or equal',
+        '<'  => 'below',
+        '<=' => 'below or equal',
+    ];
+
     /** @var  OrRule $optimizedRules */
     // protected $optimizedRules = [];
 
@@ -115,10 +125,21 @@ class Filter
         array $rules_composition,
         AbstractOperationRule $recursion_position
     ) {
-        if (    count($rules_composition) == 3
+        if (!array_filter($rules_composition, function ($rule_composition_part) {
+            return is_string($rule_composition_part);
+        })) {
+            // at least one operator is required for operation rules
+            throw new \InvalidArgumentException(
+                "Please provide an operator for the operation: \n"
+                .var_export($rules_composition, true)
+            );
+        }
+        elseif (    count($rules_composition) == 3
             &&  !in_array('and', $rules_composition)
             &&  !in_array('or',  $rules_composition)
+            &&  !in_array('not', $rules_composition)
         ) {
+            // atomic or composite rules
             $operand_left  = $rules_composition[0];
             $operation     = $rules_composition[1];
             $operand_right = $rules_composition[2];
@@ -129,6 +150,7 @@ class Filter
             $recursion_position->addOperand( $rule );
         }
         else {
+            // operations
             if (in_array('and', $rules_composition)) {
                 $rule = new AndRule();
                 $operator = 'and';
@@ -171,7 +193,6 @@ class Filter
                     $rule
                 );
             }
-
         }
 
         return $this;
