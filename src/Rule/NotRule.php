@@ -8,8 +8,11 @@ class NotRule extends AbstractOperationRule
 {
     /**
      */
-    public function __construct( $operand )
+    public function __construct( AbstractRule $operand=null )
     {
+        if (!$operand)
+            return;
+
         if (!$operand instanceof AbstractRule) {
             throw new \InvalidArgumentException(
                 "Operand of NOT must be an instance of AbstractRule"

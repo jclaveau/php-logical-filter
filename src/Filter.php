@@ -4,6 +4,7 @@ namespace JClaveau\CustomFilter;
 use JClaveau\CustomFilter\Rule\AbstractOperationRule;
 use JClaveau\CustomFilter\Rule\AndRule;
 use JClaveau\CustomFilter\Rule\OrRule;
+use JClaveau\CustomFilter\Rule\NotRule;
 
 /**
  * addRule
@@ -151,7 +152,11 @@ class Filter
         }
         else {
             // operations
-            if (in_array('and', $rules_composition)) {
+            if ($rules_composition[0] == 'not') {
+                $rule = new NotRule();
+                $operator = 'not';
+            }
+            elseif (in_array('and', $rules_composition)) {
                 $rule = new AndRule();
                 $operator = 'and';
             }
@@ -162,8 +167,6 @@ class Filter
             else {
                 throw new \Exception("Unhandled operation");
             }
-
-            $recursion_position->addOperand( $rule );
 
             $operands_descriptions = array_filter(
                 $rules_composition,
@@ -184,6 +187,15 @@ class Filter
                     "Mixing different operations in the same rule level not implemented: \n"
                     . implode(', ', $remaining_operations)."\n"
                     . 'in ' . var_export($rules_composition, true)
+                );
+            }
+
+            $recursion_position->addOperand( $rule );
+
+            if ($operator == 'not' && count($operands_descriptions) != 1) {
+                throw new \InvalidArgumentException(
+                    "Negations can have only one operand: \n"
+                    .var_export($rules_composition, true)
                 );
             }
 

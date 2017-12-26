@@ -5,6 +5,7 @@ use JClaveau\VisibilityViolator\VisibilityViolator;
 
 use JClaveau\CustomFilter\Rule\OrRule;
 use JClaveau\CustomFilter\Rule\AndRule;
+use JClaveau\CustomFilter\Rule\NotRule;
 use JClaveau\CustomFilter\Rule\InRule;
 use JClaveau\CustomFilter\Rule\EqualRule;
 use JClaveau\CustomFilter\Rule\AboveRule;
@@ -170,6 +171,51 @@ class CustomFilterTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(
                 (bool) preg_match(
                     "/^Please provide an operator for the operation: /",
+                    $e->getMessage()
+                )
+            );
+            return;
+        }
+    }
+
+    /**
+     */
+    public function test_addRule_with_negation()
+    {
+        $filter = new Filter();
+
+        $filter->addCompositeRule([
+            'not',
+            ['field_2', 'above', 3],
+        ]);
+
+        $this->assertEquals(
+            new AndRule([
+                new NotRule(
+                    new AboveRule('field_2', 3)
+                )
+            ]),
+            $filter->getRules()
+        );
+
+        // not with too much operands
+        try {
+            $filter->addCompositeRule([
+                'not',
+                ['field_2', 'above', 3],
+                ['field_2', 'equal', 5],
+            ]);
+
+            $this->assertTrue(
+                false,
+                'No exception thrown if two operands for a negation'
+            );
+        }
+        catch (\InvalidArgumentException $e) {
+
+            $this->assertTrue(
+                (bool) preg_match(
+                    "/^Negations can have only one operand: /",
                     $e->getMessage()
                 )
             );
