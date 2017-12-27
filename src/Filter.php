@@ -323,6 +323,19 @@ class Filter
 
     }
 
+    /**
+     * Replaces every negation operation rules by its opposit not negated
+     * one.
+     *
+     * This method scans the rule tree recursivelly.
+     *
+     */
+    public function removeNegations()
+    {
+        $this->rules->removeNegations();
+        return $this;
+    }
+
 
     /**
      * Generates a string id corresponding to the constraints caracterising

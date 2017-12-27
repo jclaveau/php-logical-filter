@@ -80,13 +80,18 @@ abstract class AbstractOperationRule extends AbstractRule
      *
      * @return $this
      */
-    public function removeNotRules()
+    public function removeNegations()
     {
         foreach ($this->operands as $i => $operand) {
-            if ($operand instanceof NotRule)
+            if ($operand instanceof NotRule) {
                 $this->operands[$i] = $operand->negateOperand();
-            elseif ($operand instanceof AbstractOperationRule)
-                $operand->removeNotRules();
+            }
+            elseif ($operand instanceof AbstractOperationRule) {
+                $operand->removeNegations();
+                // try to remove negations twice as removing one can
+                // produce some new ones
+                $operand->removeNegations();
+            }
         }
 
         return $this;

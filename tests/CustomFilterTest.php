@@ -48,6 +48,22 @@ class CustomFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
+    public function test_getRules()
+    {
+        $filter = new Filter();
+
+        $filter->addSimpleRule('field', 'in', ['a', 'b', 'c']);
+
+        $this->assertEquals(
+            new AndRule([
+                new InRule('field', ['a', 'b', 'c'])
+            ]),
+            $filter->getRules()
+        );
+    }
+
+    /**
+     */
     public function test_addOrRule()
     {
         $filter = new Filter();
@@ -224,26 +240,119 @@ class CustomFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     */
-    public function test_getRules()
-    {
-        $filter = new Filter();
-
-        $filter->addSimpleRule('field', 'in', ['a', 'b', 'c']);
-
-        $this->assertEquals(
-            new AndRule([
-                new InRule('field', ['a', 'b', 'c'])
-            ]),
-            $filter->getRules()
-        );
-    }
-
-    /**
-     * @todo
+     * @todo complexe with negations of Operations rules having more than
+     * 2 operands.
      */
     public function test_removeNegations()
     {
+        // simple
+        $filter = new Filter();
+
+        $filter->addCompositeRule([
+            'not',
+            ['field_2', 'above', 3],
+        ]);
+
+        $filter->removeNegations();
+
+        $this->assertEquals(
+            new AndRule([
+                new OrRule([
+                    new BelowRule('field_2', 3),
+                    new EqualRule('field_2', 3),
+                ])
+            ]),
+            $filter->getRules()
+        );
+
+        // complex
+        $filter = new Filter();
+
+        $filter->addCompositeRule([
+            'or',
+            ['field_1', 'below', 3],
+            ['not', ['field_2', 'above', 3]],
+            ['not', ['field_3', 'in', [7, 11, 13]]],
+            ['not',
+                [
+                    'or',
+                    ['field_4', 'below', 2],
+                    ['field_5', 'in', ['a', 'b', 'c']],
+                ],
+            ],
+        ]);
+
+        $filter->removeNegations();
+
+        $filter2 = new Filter;
+
+        $filter2->addCompositeRule([
+            'or',
+            ['field_1', 'below', 3],
+            // ['not', ['field_2', 'above', 3]],
+            [
+                'or',
+                ['field_2', 'below', 3],
+                ['field_2', 'equal', 3],
+            ],
+            // ['not', ['field_3', 'in', [7, 11, 13]]],
+            [
+                'and',
+                [
+                    'or',
+                    ['field_3', 'above', 7],
+                    ['field_3', 'below', 7],
+                ],
+                [
+                    'or',
+                    ['field_3', 'above', 11],
+                    ['field_3', 'below', 11],
+                ],
+                [
+                    'or',
+                    ['field_3', 'above', 13],
+                    ['field_3', 'below', 13],
+                ],
+            ],
+            // ['not',
+                // [
+                    // 'or',
+                    // ['field_4', 'below', 2],
+                    // ['field_5', 'in', ['a', 'b', 'c']],
+                // ],
+            // ],
+            [
+                'and',
+                [
+                    'or',
+                    ['field_4', 'above', 2],
+                    ['field_4', 'equal', 2],
+                ],
+                [
+                    'and',
+                    [
+                        'or',
+                        ['field_5', 'above', 'a'],
+                        ['field_5', 'below', 'a'],
+                    ],
+                    [
+                        'or',
+                        ['field_5', 'above', 'b'],
+                        ['field_5', 'below', 'b'],
+                    ],
+                    [
+                        'or',
+                        ['field_5', 'above', 'c'],
+                        ['field_5', 'below', 'c'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(
+            $filter2->getRules(),
+            $filter->getRules()
+        );
     }
 
     /**/
