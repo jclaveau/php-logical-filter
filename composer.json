@@ -1,8 +1,8 @@
 {
-    "name": "jclaveau/php-custom-filter",
+    "name": "jclaveau/php-logical-filter",
     "description": "A class to gather filter parameters into one object and handle them easily.",
     "license": "MIT",
-    "keywords": ["filter", "custom", "rules", "object parameter"],
+    "keywords": ["logical filter", "custom", "logical rules", "object parameter"],
     "authors": [
         {
             "name": "Jean Claveau",
