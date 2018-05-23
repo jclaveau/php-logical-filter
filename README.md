@@ -12,10 +12,17 @@ Basic rules that cannot be simplified
 
 + function (regex or custom function returning a bool)
 
-Composite rules
+Operation rules
 + ||
 + &&
 + !
+
+Composite rules
++ in
++ >=
++ <=
++ !=
++ between
 
 -----------------------------------
 Considering v a parameter, "a" and "b" two atomics rules, "A" and "B" two composite rules
