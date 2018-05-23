@@ -53,5 +53,16 @@ class AboveRule extends AbstractAtomicRule
         return !is_infinite( $this->minimum );
     }
 
+    /**
+     */
+    public function toArray()
+    {
+        return [
+            $this->field,
+            '>',
+            $this->minimum,
+        ];
+    }
+
     /**/
 }

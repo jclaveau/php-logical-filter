@@ -18,16 +18,14 @@ abstract class AbstractOperationRule extends AbstractRule
 
     /**
      */
-    public function __construct( array $operands=null )
+    public function __construct( array $operands=[] )
     {
-        if (!$operands)
-            return;
-
-        if (!array_filter($operands, function($operand) {
-            return $operand instanceof AbstractRule;
+        if ($nonRules = array_filter($operands, function($operand) {
+            return !$operand instanceof AbstractRule;
         })) {
             throw new \InvalidArgumentException(
-                "Operands must be instances of AbstractRule"
+                "Operands must be instances of AbstractRule: \n"
+                . var_export($nonRules, true)
             );
         }
 
@@ -64,9 +62,8 @@ abstract class AbstractOperationRule extends AbstractRule
     }
 
     /**
-     * Checks if the rule do not expect the value to be above infinity.
-     *
-     * @todo negative infinite?
+     * Atomic Rules or the opposit of OperationRules: they are the leaves of
+     * the RuleTree.
      *
      * @return bool
      */
@@ -95,6 +92,49 @@ abstract class AbstractOperationRule extends AbstractRule
         }
 
         return $this;
+    }
+
+    /**
+     * Simplify the current OperationRule.
+     * + If an OrRule or an AndRule contains only one operand, it's equivalent
+     *   to it.
+     *
+     * @todo Look for duplicates and remove them
+     * @todo Look for rules having the same Operator and the same field to
+     *       combine them.
+     *
+     * @return AbstractRule the simplified rule
+     */
+    public function simplify()
+    {
+        foreach ($this->operands as &$operand) {
+            if (method_exists($operand, 'simplify'))
+                $operand = $operand->simplify();
+        }
+
+        if (count($this->operands) == 1) {
+            return $this->operands[0];
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clones the rule and its operands.
+     *
+     * @return OperationRule A copy of the current instance with copied operands.
+     */
+    public function copy()
+    {
+        $copiedOperands = [];
+        foreach ($this->operands as $operand) {
+            $copiedOperands[] = $operand->copy();
+        }
+
+        $class = get_class($this);
+        $copiedRule = new $class( $copiedOperands );
+
+        return $copiedRule;
     }
 
     /**/

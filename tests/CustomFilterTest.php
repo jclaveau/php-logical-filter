@@ -15,7 +15,6 @@ class CustomFilterTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
-        //
         // ini_set('xdebug.max_nesting_level', 10000);
     }
 
@@ -352,6 +351,186 @@ class CustomFilterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             $filter2->getRules(),
             $filter->getRules()
+        );
+    }
+
+    /**
+     */
+    public function test_upLiftDisjunctions_minimal()
+    {
+        $filter = new Filter();
+
+        $filter->addCompositeRule([
+            'or',
+            ['field_5', 'above', 'a'],
+            ['field_5', 'below', 'a'],
+        ]);
+
+        $filter
+            ->upLiftDisjunctions()
+            // ->simplify()
+            ;
+
+        $filter2 = new Filter;
+
+        $filter2->addCompositeRule([
+            'or',
+            [
+                'and',
+                ['field_5', 'above', 'a'],
+            ],
+            [
+                'and',
+                ['field_5', 'below', 'a'],
+            ],
+        ]);
+
+        $this->assertEquals(
+            $filter2->getRules(),
+            $filter->getRules()
+        );
+    }
+
+    /**
+     */
+    public function test_upLiftDisjunctions_basic()
+    {
+        $filter = new Filter();
+
+        $filter->addCompositeRule([
+            'and',
+            [
+                'or',
+                ['field_5', 'above', 'a'],
+                ['field_5', 'below', 'a'],
+            ],
+            ['field_6', 'equal', 'b'],
+        ]);
+
+        $filter
+            ->upLiftDisjunctions()
+            ->simplify();
+        // var_export($filter->getRules()->toArray());
+        // echo "\n\n\n";
+
+        $filter2 = new Filter;
+        $filter2->addCompositeRule([
+            'or',
+            [
+                'and',
+                ['field_5', 'above', 'a'],
+                ['field_6', 'equal', 'b'],
+            ],
+            [
+                'and',
+                ['field_5', 'below', 'a'],
+                ['field_6', 'equal', 'b'],
+            ],
+        ]);
+
+        // var_export($filter2->getRules()->toArray());
+        // exit;
+
+        $this->assertEquals(
+            $filter2->getRules(),
+            $filter->getRules()
+        );
+    }
+
+    /**
+     */
+    public function test_upLiftDisjunctions_complex()
+    {
+        $filter = new Filter();
+
+        // (A' || A") && (B' || B") && (C' || C") <=>
+        //    (A' && B' && C') || (A' && B' && C") || (A' && B" && C') || (A' && B" && C")
+        // || (A" && B' && C') || (A" && B' && C") || (A" && B" && C') || (A" && B" && C");
+        $filter->addCompositeRule([
+            'and',
+            [
+                'or',
+                ['field_51', 'above', '5'],
+                ['field_52', 'below', '5'],
+            ],
+            [
+                'or',
+                ['field_61', 'above', '6'],
+                ['field_62', 'below', '6'],
+            ],
+            [
+                'or',
+                ['field_71', 'above', '7'],
+                ['field_72', 'below', '7'],
+            ],
+        ]);
+
+        $filter
+            ->upLiftDisjunctions()
+            ->simplify();
+
+        $filter2 = new Filter;
+        $filter2->addCompositeRule([
+            'or',
+            [
+                'and',
+                ['field_51', 'above', '5'],
+                ['field_61', 'above', '6'],
+                ['field_71', 'above', '7'],
+            ],
+            [
+                'and',
+                ['field_52', 'below', '5'],
+                ['field_61', 'above', '6'],
+                ['field_71', 'above', '7'],
+            ],
+
+            [
+                'and',
+                ['field_51', 'above', '5'],
+                ['field_62', 'below', '6'],
+                ['field_71', 'above', '7'],
+            ],
+            [
+                'and',
+                ['field_52', 'below', '5'],
+                ['field_62', 'below', '6'],
+                ['field_71', 'above', '7'],
+            ],
+            [
+                'and',
+                ['field_51', 'above', '5'],
+                ['field_61', 'above', '6'],
+                ['field_72', 'below', '7'],
+            ],
+            [
+                'and',
+                ['field_52', 'below', '5'],
+                ['field_61', 'above', '6'],
+                ['field_72', 'below', '7'],
+            ],
+
+            [
+                'and',
+                ['field_51', 'above', '5'],
+                ['field_62', 'below', '6'],
+                ['field_72', 'below', '7'],
+            ],
+
+
+            [
+                'and',
+                ['field_52', 'below', '5'],
+                ['field_62', 'below', '6'],
+                ['field_72', 'below', '7'],
+            ],
+
+
+        ]);
+
+        $this->assertEquals(
+            $filter->getRules()->toArray(),
+            $filter2->getRules()->toArray()
         );
     }
 

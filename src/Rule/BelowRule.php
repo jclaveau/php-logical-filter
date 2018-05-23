@@ -53,5 +53,16 @@ class BelowRule extends AbstractAtomicRule
         return $this->maximum;
     }
 
+    /**
+     */
+    public function toArray()
+    {
+        return [
+            $this->field,
+            '<',
+            $this->maximum,
+        ];
+    }
+
     /**/
 }

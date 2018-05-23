@@ -72,15 +72,92 @@ class AndRule extends AbstractOperationRule
         return $cases;
     }
 
+    /**
+     * Replace all the OrRules of the RuleTree by one OrRule at its root.
+     *
+     * @todo renjame as RootifyDisjunjctions?
+     * @return $this
+     */
+    public function upLiftDisjunctions()
+    {
+        $upLiftedOperands = [];
+        foreach ($this->getOperands() as $operand) {
+            $operand = $operand->copy();
+            if ($operand instanceof AbstractOperationRule)
+                $operand = $operand->upLiftDisjunctions();
+
+            $upLiftedOperands[] = $operand;
+        }
+
+        // If the AndRule doesn't contain any OrRule , there is nothing to uplift
+        if (!array_filter($upLiftedOperands, function($operand) {
+            return $operand instanceof OrRule;
+        })) {
+            return new AndRule($upLiftedOperands);
+        }
+
+        $firstAndOperand = new AndRule();
+
+        // This OrRule should contain only AndRules during its generation
+        $upLiftedOr = new OrRule([
+            $firstAndOperand
+        ]);
+
+
+        foreach ($upLiftedOperands as $i => $operand) {
+
+            if ($operand instanceof NotRule) {
+                throw new \LogicException(
+                    'UpLifting disjunctions MUST be done after negations removal'
+                );
+            }
+            elseif ($operand instanceof OrRule) {
+                // If an operand is an Or, me transform the current
+                // (A' || A") && (B')       <=> (A' && B') || (A" && B');
+                // (A' || A") && (B' || B") <=> (A' && B') || (A' && B") || (A" && B') || (A" && B");
+                // (A' || A") && (B' || B") && (C' || C") <=>
+                //    (A' && B' && C') || (A' && B' && C") || (A' && B" && C') || (A' && B" && C")
+                // || (A" && B' && C') || (A" && B' && C") || (A" && B" && C') || (A" && B" && C");
+                $newUpLiftedOr = new OrRule;
+                foreach ($operand->getOperands() as $subOperand) {
+                    foreach ($upLiftedOr->getOperands() as $upLiftedOrSubOperand) {
+                        $newUpLiftedOrSubOperand = $upLiftedOrSubOperand->copy();
+                        $newUpLiftedOrSubOperand->addOperand( $subOperand->copy() );
+                        $newUpLiftedOr->addOperand( $newUpLiftedOrSubOperand );
+                    }
+                }
+
+                $upLiftedOr = $newUpLiftedOr;
+            }
+            else {
+                // append the operand to all the operands of the $upLiftedOr
+                foreach ($upLiftedOr->getOperands() as $upLifdtedOperand) {
+                    if (!$upLifdtedOperand instanceof AndRule) {
+                        throw new \LogicException(
+                             "Operands of the uplifted OrRule MUST be AndRules during"
+                            ."the combination."
+                        );
+                    }
+
+                    $upLifdtedOperand->addOperand( $operand->copy() );
+                }
+            }
+        }
+
+        // TODO : move the simplification later in the process?
+        // return $upLiftedOr->simplify();
+        return $upLiftedOr;
+    }
 
     /**
-     * NotIn rule will always have a solution.
-     *
-     * @return bool
-     * /
-    public function hasSolution()
+     */
+    public function toArray()
     {
-        return true;
+        $operandsAsArray = ['and'];
+        foreach ($this->operands as $operand)
+            $operandsAsArray[] = $operand->toArray();
+
+        return $operandsAsArray;
     }
 
     /**/

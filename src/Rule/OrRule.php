@@ -32,5 +32,36 @@ class OrRule extends AbstractOperationRule
         return true;
     }
 
+    /**
+     * Replace all the OrRules of the RuleTree by one OrRule at its root.
+     *
+     * @todo renjame as RootifyDisjunjctions?
+     * @return $this
+     */
+    public function upLiftDisjunctions()
+    {
+        $upLiftedOperands = [];
+        foreach ($this->getOperands() as $operand) {
+            $operand = $operand->copy();
+            if ($operand instanceof AbstractOperationRule)
+                $operand = $operand->upLiftDisjunctions();
+
+            $upLiftedOperands[] = $operand;
+        }
+
+        return new OrRule($upLiftedOperands);
+    }
+
+    /**
+     */
+    public function toArray()
+    {
+        $operandsAsArray = ['or'];
+        foreach ($this->operands as $operand)
+            $operandsAsArray[] = $operand->toArray();
+
+        return $operandsAsArray;
+    }
+
     /**/
 }

@@ -140,7 +140,7 @@ class Filter
             &&  !in_array('or',  $rules_composition)
             &&  !in_array('not', $rules_composition)
         ) {
-            // atomic or composite rules
+            // atomic or composit rules
             $operand_left  = $rules_composition[0];
             $operation     = $rules_composition[1];
             $operand_right = $rules_composition[2];
@@ -312,10 +312,7 @@ class Filter
      */
     public function simplify()
     {
-        // remove negations
-        // $this->rules
-
-        // make combinations due to every OR constraint
+        $this->rules->simplify();
 
         // combine all combinable constraint
 
@@ -329,10 +326,26 @@ class Filter
      *
      * This method scans the rule tree recursivelly.
      *
+     * @return $this
      */
     public function removeNegations()
     {
         $this->rules->removeNegations();
+        return $this;
+    }
+
+    /**
+     * Remove all OR rules so only one remain at the top of rules tree.
+     *
+     * This method scans the rule tree recursivelly.
+     *
+     * @return $this
+     */
+    public function upLiftDisjunctions()
+    {
+        // We always keep an AndRule as root to be able to add new rules
+        // to the Filter afterwards
+        $this->rules = new AndRule([$this->rules->upLiftDisjunctions()]);
         return $this;
     }
 

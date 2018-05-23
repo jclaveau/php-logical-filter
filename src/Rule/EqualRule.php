@@ -53,5 +53,16 @@ class EqualRule extends AbstractAtomicRule
         return is_null( $this->value );
     }
 
+    /**
+     */
+    public function toArray()
+    {
+        return [
+            $this->field,
+            '=',
+            $this->value,
+        ];
+    }
+
     /**/
 }

@@ -50,7 +50,7 @@ class InRule extends OrRule
             if ($possibility instanceof AbstractRule) {
                 throw new \InvalidArgumentException(
                     "A possibility cannot be a rule: "
-                    . var_exprot($possibility, true)
+                    . var_export($possibility, true)
                 );
             }
 
@@ -69,6 +69,23 @@ class InRule extends OrRule
     public function hasSolution()
     {
         return !empty( $this->operands );
+    }
+
+    /**
+     * Clones the rule and its operands.
+     *
+     * @return InRule A copy of the current instance with copied operands.
+     */
+    public function copy()
+    {
+        $possibilities = [];
+        foreach ($this->operands as $operand) {
+            $possibilities[] = $operand->getValue();
+        }
+
+        $copiedRule = new InRule( $this->field, $possibilities );
+
+        return $copiedRule;
     }
 
     /**/

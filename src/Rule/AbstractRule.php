@@ -3,18 +3,6 @@ namespace JClaveau\CustomFilter\Rule;
 
 abstract class AbstractRule
 {
-    /** @var array $history */
-    protected $history;
-
-    /**
-     */
-    public function combineWith( Rule $other_constraint )
-    {
-        // + combine with rule of the same kind (a > 10 && a > 20 => a > 20)
-        // + combine with rules of other kinds
-        //
-    }
-
     /**
      */
     public function getPossibilities()
@@ -68,7 +56,7 @@ abstract class AbstractRule
      * @param  Rule $rule The rule that may have been combined.
      *
      * @return true
-     */
+     * /
     public function isCombinedWith( Rule $rule )
     {
         foreach ($this->history as $i => $combined_rule) {
