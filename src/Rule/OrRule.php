@@ -26,16 +26,6 @@ class OrRule extends AbstractOperationRule
     }
 
     /**
-     * NotIn rule will always have a solution.
-     *
-     * @return bool
-     */
-    public function hasSolution()
-    {
-        return true;
-    }
-
-    /**
      * Replace all the OrRules of the RuleTree by one OrRule at its root.
      *
      * @todo renjame as RootifyDisjunjctions?
@@ -96,6 +86,27 @@ class OrRule extends AbstractOperationRule
             return -1;
 
         return 1;
+    }
+
+    /**
+     * Checks if the tree below the current OperationRule can have solutions
+     * or if it contains contradictory rules.
+     *
+     * @return bool If the rule can have a solution or not
+     */
+    public function hasSolution()
+    {
+        $this->simplify();
+
+        foreach ($this->operands as $i => $operand) {
+            if (!$operand->hasSolution()) {
+                unset($this->operands[$i]);
+            }
+        }
+
+        // If there is no remaining operand in an OrRule, it means it has
+        // no solution.
+        return !empty($this->operands);
     }
 
     /**/

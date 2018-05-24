@@ -166,6 +166,49 @@ class AndRule extends AbstractOperationRule
     }
 
     /**
+     * Checks if a simplified AndRule has incompatible operands like:
+     * + a = 3 && a > 4
+     * + a = 3 && a < 2
+     * + a > 3 && a < 2
+     *
+     * @return bool If the AndRule can have a solution or not
+     */
+    public function hasSolution()
+    {
+        $this->simplify();
+
+        $operandsByFields = $this->groupOperandsByFieldAndOperator();
+        foreach ($operandsByFields as $field => $operandsByOperator) {
+
+            if (!empty($operandsByOperator[ EqualRule::operator ])) {
+                // There should never be multiple EqualRules after simplification
+                if (count($operandsByOperator[ EqualRule::operator ]) != 1)
+                    return false;
+
+                $equalRule = reset($operandsByOperator[ EqualRule::operator ]);
+
+                // There shouldn't be remaining AboveRules or BelowRules
+                // after simplification, if there is already an EqualRule
+                if (   !empty($operandsByOperator[ BelowRule::operator ])
+                    || !empty($operandsByOperator[ AboveRule::operator ])) {
+                    return false;
+                }
+            }
+            elseif (   !empty($operandsByOperator[ BelowRule::operator ])
+                    && !empty($operandsByOperator[ AboveRule::operator ])) {
+                $aboveRule = reset($operandsByOperator[ AboveRule::operator ]);
+                $belowRule = reset($operandsByOperator[ BelowRule::operator ]);
+
+                if ($belowRule->getMaximum() <= $aboveRule->getMinimum())
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    /**
      * + if A = 2 && A > 1 <=> A = 2
      * + if A = 2 && A < 4 <=> A = 2
      */

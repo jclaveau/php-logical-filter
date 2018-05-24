@@ -15,11 +15,43 @@ class AndRuleTest extends \PHPUnit_Framework_TestCase
         $equal = new EqualRule('field_name', 2);
         $above = new AboveRule('field_name', 1);
 
-        // AndRule
         $this->assertEquals(
             $equal,
             (new AndRule([$below, $equal, $above]))->simplify()
                 // ->dump(true)
+        );
+    }
+
+    /**
+     */
+    public function test_hasSolution()
+    {
+        $below = new BelowRule('field_name', 1);
+        $equal = new EqualRule('field_name', 2);
+        $above = new AboveRule('field_name', 3);
+
+        $this->assertFalse(
+            (new AndRule([$below, $equal]))->hasSolution()
+        );
+
+        $this->assertFalse(
+            (new AndRule([$equal, $above]))->hasSolution()
+        );
+
+        $this->assertFalse(
+            (new AndRule([$below, $above]))->hasSolution()
+        );
+
+        $this->assertTrue(
+            (new AndRule([$below]))->hasSolution()
+        );
+
+        $this->assertTrue(
+            (new AndRule([$equal]))->hasSolution()
+        );
+
+        $this->assertTrue(
+            (new AndRule([$above]))->hasSolution()
         );
     }
 

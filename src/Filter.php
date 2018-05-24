@@ -309,11 +309,23 @@ class Filter
     /**
      * Remove any constraint being a duplicate of another one.
      *
+     * @return $this
      */
     public function simplify()
     {
         $this->rules->simplify();
         return $this;
+    }
+
+    /**
+     * Checks if there is at least on set of conditions which is not
+     * contradictory.
+     *
+     * @return bool
+     */
+    public function hasSolution()
+    {
+        return $this->rules->hasSolution();
     }
 
     /**
