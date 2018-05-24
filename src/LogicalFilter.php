@@ -14,7 +14,7 @@ use JClaveau\LogicalFilter\Rule\NotRule;
  *
  * flatten for OR resolving
  */
-class Filter
+class LogicalFilter
 {
     /** @var  AndRule $rules */
     protected $rules;

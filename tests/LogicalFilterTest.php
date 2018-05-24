@@ -22,7 +22,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function test_addSimpleRule()
     {
-        $filter = new Filter();
+        $filter = new LogicalFilter();
 
         $filter->addSimpleRule('field', 'in', ['a', 'b', 'c']);
         // $filter->addRule('field', 'not_in', ['a', 'b', 'c']);
@@ -49,7 +49,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getRules()
     {
-        $filter = new Filter();
+        $filter = new LogicalFilter();
 
         $filter->addSimpleRule('field', 'in', ['a', 'b', 'c']);
 
@@ -65,7 +65,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function test_addOrRule()
     {
-        $filter = new Filter();
+        $filter = new LogicalFilter();
 
         $filter->addCompositeRule([
             ['field', 'in', ['a', 'b', 'c']],
@@ -88,7 +88,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function test_addRule_with_nested_operations()
     {
-        $filter = new Filter();
+        $filter = new LogicalFilter();
 
         $filter->addCompositeRule([
             ['field', 'in', ['a', 'b', 'c']],
@@ -125,7 +125,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function test_addRule_with_different_operators()
     {
-        $filter = new Filter();
+        $filter = new LogicalFilter();
 
         // exception if different operators in the same operation
         try {
@@ -166,7 +166,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function test_addRule_without_operator()
     {
-        $filter = new Filter();
+        $filter = new LogicalFilter();
 
         // exception if no operator in an operation
         try {
@@ -197,7 +197,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function test_addRule_with_negation()
     {
-        $filter = new Filter();
+        $filter = new LogicalFilter();
 
         $filter->addCompositeRule([
             'not',
@@ -245,7 +245,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
     public function test_removeNegations()
     {
         // simple
-        $filter = new Filter();
+        $filter = new LogicalFilter();
 
         $filter->addCompositeRule([
             'not',
@@ -265,7 +265,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         );
 
         // complex
-        $filter = new Filter();
+        $filter = new LogicalFilter();
 
         $filter->addCompositeRule([
             'or',
@@ -283,7 +283,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
         $filter->removeNegations();
 
-        $filter2 = new Filter;
+        $filter2 = new LogicalFilter;
 
         $filter2->addCompositeRule([
             'or',
@@ -358,7 +358,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function test_upLiftDisjunctions_minimal()
     {
-        $filter = new Filter();
+        $filter = new LogicalFilter();
 
         $filter->addCompositeRule([
             'or',
@@ -371,7 +371,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             // ->simplify()
             ;
 
-        $filter2 = new Filter;
+        $filter2 = new LogicalFilter;
 
         $filter2->addCompositeRule([
             'or',
@@ -395,7 +395,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function test_upLiftDisjunctions_basic()
     {
-        $filter = new Filter();
+        $filter = new LogicalFilter();
 
         $filter->addCompositeRule([
             'and',
@@ -413,7 +413,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         // var_export($filter->getRules()->toArray());
         // echo "\n\n\n";
 
-        $filter2 = new Filter;
+        $filter2 = new LogicalFilter;
         $filter2->addCompositeRule([
             'or',
             [
@@ -441,7 +441,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function test_upLiftDisjunctions_complex()
     {
-        $filter = new Filter();
+        $filter = new LogicalFilter();
 
         // (A' || A") && (B' || B") && (C' || C") <=>
         //    (A' && B' && C') || (A' && B' && C") || (A' && B" && C') || (A' && B" && C")
@@ -469,7 +469,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             ->upLiftDisjunctions()
             ->simplify();
 
-        $filter2 = new Filter;
+        $filter2 = new LogicalFilter;
         $filter2->addCompositeRule([
             'or',
             [
