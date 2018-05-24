@@ -81,18 +81,13 @@ abstract class AbstractRule
     }
 
     /**
-     * Generates an orRule containing trees of rules without any orRule
-     * inside.
+     * var_dump() the rule with a chained syntax.
      */
-    public function gatherOrRulesAtRoot()
+    public function dump($exit=false)
     {
-    }
-
-    /**
-     * Push or rules as far as possible in the rule branches
-     */
-    public function splitOrRulesToLeafs()
-    {
+        var_dump($this);
+        if ($exit)
+            exit;
     }
 
     /**/

@@ -10,7 +10,7 @@ namespace JClaveau\LogicalFilter\Rule;
 class OrRule extends AbstractOperationRule
 {
     /** @var string operator */
-    const operator = '||';
+    const operator = 'or';
 
     /**
      * @return $this

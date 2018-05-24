@@ -313,10 +313,7 @@ class Filter
     public function simplify()
     {
         $this->rules->simplify();
-
-        // combine all combinable constraint
-
-        // compare the result
+        return $this;
     }
 
     /**

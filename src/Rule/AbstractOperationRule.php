@@ -122,8 +122,7 @@ abstract class AbstractOperationRule extends AbstractRule
             }
         }
 
-        $this->unifySameOperands();
-        // TODO combine < and > and =
+        $this->unifyOperands();
 
         // base the keys on 0 for easier tests comparison
         $this->operands = array_values($this->operands);
@@ -146,6 +145,7 @@ abstract class AbstractOperationRule extends AbstractRule
         $operandsByFields = [];
         foreach ($this->operands as $operand) {
 
+            // Operation rules have no field but we need to keep them anyway
             $field = method_exists($operand, 'getField') ? $operand->getField() : '';
 
             if (!isset($operandsByFields[ $field ]))
@@ -165,27 +165,47 @@ abstract class AbstractOperationRule extends AbstractRule
      *
      * @return AbstractOperationRule the simplified rule
      */
-    public function unifySameOperands()
+    public function unifyOperands($unifyDifferentOperands = true)
     {
-        $unifiedOperands = [];
-
         $operandsByFields = $this->groupOperandsByFieldAndOperator();
-        foreach ($operandsByFields as $field => $operandsByOperator) {
 
+        // unifying same operands
+        foreach ($operandsByFields as $field => $operandsByOperator) {
             foreach ($operandsByOperator as $operator => $operands) {
                 if ($operator == AboveRule::operator) {
                     usort($operands, [$this, 'aboveRuleUnifySorter']);
-                    $unifiedOperands[] = reset($operands);
+                    $operands = [reset($operands)];
                 }
                 elseif ($operator == BelowRule::operator) {
                     usort($operands, [$this, 'belowRuleUnifySorter']);
-                    $unifiedOperands[] = reset($operands);
+                    $operands = [reset($operands)];
                 }
-                else {
-                    $unifiedOperands = array_merge(
-                        $unifiedOperands, $operands
-                    );
+                elseif ($operator == EqualRule::operator) {
+                    $operandsTmp = array_map(function($operand) {
+                        return serialize($operand);
+                    }, $operands);
+
+                    $operandsTmp = array_unique($operandsTmp);
+
+                    $operands = array_map(function($operand) {
+                        return unserialize($operand);
+                    }, $operandsTmp);
                 }
+
+                $operandsByFields[ $field ][ $operator ] = $operands;
+            }
+        }
+
+        if ($unifyDifferentOperands && $this instanceof AndRule) {
+            // unifiying operands of different types
+            $operandsByFields = $this->simplifyDifferentOperands($operandsByFields);
+        }
+
+        // Remove the index by fields and operators
+        $unifiedOperands = [];
+        foreach ($operandsByFields as $field => $operandsByOperator) {
+            foreach ($operandsByOperator as $operator => $operands) {
+                $unifiedOperands = array_merge($unifiedOperands, $operands);
             }
         }
 
@@ -193,8 +213,6 @@ abstract class AbstractOperationRule extends AbstractRule
 
         return $this;
     }
-
-
 
     /**
      * Clones the rule and its operands.

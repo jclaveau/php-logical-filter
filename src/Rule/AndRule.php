@@ -7,7 +7,7 @@ namespace JClaveau\LogicalFilter\Rule;
 class AndRule extends AbstractOperationRule
 {
     /** @var string operator */
-    const operator = '&&';
+    const operator = 'and';
 
     /**
      * Transforms all composite rules in the tree of operands into
@@ -163,6 +163,50 @@ class AndRule extends AbstractOperationRule
             $operandsAsArray[] = $operand->toArray();
 
         return $operandsAsArray;
+    }
+
+    /**
+     * + if A = 2 && A > 1 <=> A = 2
+     * + if A = 2 && A < 4 <=> A = 2
+     */
+    protected function simplifyDifferentOperands(array $operandsByFields)
+    {
+        foreach ($operandsByFields as $field => $operandsByOperator) {
+            if (!empty($operandsByOperator[ EqualRule::operator ])) {
+                if (count($operandsByOperator[ EqualRule::operator ]) != 1) {
+                    // Multiple Equal rules for one field with different values has no sense
+                    continue;
+                }
+
+                $equalRule = reset( $operandsByOperator[ EqualRule::operator ] );
+
+                if (!empty($operandsByOperator[ AboveRule::operator ])) {
+                    if (count($operandsByOperator[ AboveRule::operator ]) != 1) {
+                        throw new \LogicException(
+                            __METHOD__ . " MUST be called after unifyOperands()"
+                        );
+                    }
+
+                    $aboveRule = reset($operandsByOperator[ AboveRule::operator ]);
+                    if ($aboveRule->getMinimum() < $equalRule->getValue())
+                        unset($operandsByFields[ $field ][ AboveRule::operator ]);
+                }
+
+                if (!empty($operandsByOperator[ BelowRule::operator ])) {
+                    if (count($operandsByOperator[ BelowRule::operator ]) != 1) {
+                        throw new \LogicException(
+                            __METHOD__ . " MUST be called after unifyOperands()"
+                        );
+                    }
+
+                    $belowRule = reset($operandsByOperator[ BelowRule::operator ]);
+                    if ($belowRule->getMaximum() > $equalRule->getValue())
+                        unset($operandsByFields[ $field ][ BelowRule::operator ]);
+                }
+            }
+        }
+
+        return $operandsByFields;
     }
 
     /**
