@@ -1,5 +1,5 @@
 <?php
-namespace JClaveau\CustomFilter\Rule;
+namespace JClaveau\LogicalFilter\Rule;
 
 abstract class AbstractRule
 {

@@ -1,10 +1,10 @@
 <?php
-namespace JClaveau\CustomFilter;
+namespace JClaveau\LogicalFilter;
 
-use JClaveau\CustomFilter\Rule\AbstractOperationRule;
-use JClaveau\CustomFilter\Rule\AndRule;
-use JClaveau\CustomFilter\Rule\OrRule;
-use JClaveau\CustomFilter\Rule\NotRule;
+use JClaveau\LogicalFilter\Rule\AbstractOperationRule;
+use JClaveau\LogicalFilter\Rule\AndRule;
+use JClaveau\LogicalFilter\Rule\OrRule;
+use JClaveau\LogicalFilter\Rule\NotRule;
 
 /**
  * addRule

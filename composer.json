@@ -11,7 +11,7 @@
     ],
     "autoload": {
         "psr-4" : {
-            "JClaveau\\CustomFilter\\" : "src"
+            "JClaveau\\LogicalFilter\\" : "src"
         }
     },
     "repositories": [

@@ -1,5 +1,5 @@
 <?php
-namespace JClaveau\CustomFilter\Rule;
+namespace JClaveau\LogicalFilter\Rule;
 
 /**
  * Atomic rules are those who cannot be simplified :

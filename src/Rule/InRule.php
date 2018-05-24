@@ -1,5 +1,5 @@
 <?php
-namespace JClaveau\CustomFilter\Rule;
+namespace JClaveau\LogicalFilter\Rule;
 
 /**
  * This class represents a rule that expect a value to belong to a list of others.

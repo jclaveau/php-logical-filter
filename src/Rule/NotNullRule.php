@@ -1,5 +1,5 @@
 <?php
-namespace JClaveau\CustomFilter\Rule;
+namespace JClaveau\LogicalFilter\Rule;
 
 class NotNullRule extends AbstractAtomicRule
 {

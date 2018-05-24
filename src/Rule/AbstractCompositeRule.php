@@ -1,5 +1,5 @@
 <?php
-namespace JClaveau\CustomFilter\Rule;
+namespace JClaveau\LogicalFilter\Rule;
 
 /**
  * Composite rules are rules composed of others but are not operations.

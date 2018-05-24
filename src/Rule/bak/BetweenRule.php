@@ -1,5 +1,5 @@
 <?php
-namespace JClaveau\CustomFilter;
+namespace JClaveau\LogicalFilter;
 
 class BetweenRule extends Rule
 {

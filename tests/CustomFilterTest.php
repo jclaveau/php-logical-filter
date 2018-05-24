@@ -1,17 +1,17 @@
 <?php
-namespace JClaveau\CustomFilter;
+namespace JClaveau\LogicalFilter;
 
 use JClaveau\VisibilityViolator\VisibilityViolator;
 
-use JClaveau\CustomFilter\Rule\OrRule;
-use JClaveau\CustomFilter\Rule\AndRule;
-use JClaveau\CustomFilter\Rule\NotRule;
-use JClaveau\CustomFilter\Rule\InRule;
-use JClaveau\CustomFilter\Rule\EqualRule;
-use JClaveau\CustomFilter\Rule\AboveRule;
-use JClaveau\CustomFilter\Rule\BelowRule;
+use JClaveau\LogicalFilter\Rule\OrRule;
+use JClaveau\LogicalFilter\Rule\AndRule;
+use JClaveau\LogicalFilter\Rule\NotRule;
+use JClaveau\LogicalFilter\Rule\InRule;
+use JClaveau\LogicalFilter\Rule\EqualRule;
+use JClaveau\LogicalFilter\Rule\AboveRule;
+use JClaveau\LogicalFilter\Rule\BelowRule;
 
-class CustomFilterTest extends \PHPUnit_Framework_TestCase
+class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
