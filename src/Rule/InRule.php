@@ -20,19 +20,6 @@ class InRule extends OrRule
     }
 
     /**
-     * @return $this
-     */
-    public function combineWith( InRule $other_rule )
-    {
-        $this->operands = array_intersect(
-            $this->operands,
-            $other_rule->getOperands()
-        );
-
-        return $this;
-    }
-
-    /**
      * @return array
      */
     public function getPossibilities()
@@ -61,17 +48,6 @@ class InRule extends OrRule
         }
 
         return $this;
-    }
-
-    /**
-     * If the array of possibilities is empty, this rule has no solution and the
-     * filter neither so the filtering process can be stopped.
-     *
-     * @return bool
-     */
-    public function hasSolution()
-    {
-        return !empty( $this->operands );
     }
 
     /**

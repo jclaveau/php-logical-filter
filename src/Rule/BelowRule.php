@@ -29,24 +29,14 @@ class BelowRule extends AbstractAtomicRule
     }
 
     /**
-     * @return $this
-     */
-    public function combineWith( BelowRule $other_rule )
-    {
-        if ($other_rule->getMaximum() < $this->limit)
-            $this->maximum = $other_rule->getMaximum();
-
-        return $this;
-    }
-
-    /**
      * Checks if the rule do not expect the value to be above infinity.
      *
      * @return bool
      */
     public function hasSolution()
     {
-        return !is_infinite( $this->maximum );
+        return !(is_infinite( $this->maximum ) && $this->maximum < 0)
+            && (!is_numeric( $this->maximum ) || !is_nan( $this->maximum ));
     }
 
     /**
@@ -62,7 +52,7 @@ class BelowRule extends AbstractAtomicRule
     {
         return [
             $this->field,
-            '<',
+            self::operator,
             $this->maximum,
         ];
     }

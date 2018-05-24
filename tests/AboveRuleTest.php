@@ -7,17 +7,15 @@ class AboveRuleTest extends \PHPUnit_Framework_TestCase
 {
     /**
      */
-    public function test_combineWith()
+    public function test_hasSolution()
     {
-        $above2 = new AboveRule('field_name', 2);
-        $above3 = new AboveRule('field_name', 3);
-        $above5 = new AboveRule('field_name', 5);
+        $this->assertFalse( (new AboveRule('field_name', NAN))->hasSolution() );
 
-        $above3
-            ->combineWith($above5)
-            ->combineWith($above2);
+        $this->assertFalse( (new AboveRule('field_name', INF))->hasSolution() );
 
-        $this->assertEquals(5, $above3->getMinimum());
+        $this->assertTrue( (new AboveRule('field_name', -INF))->hasSolution() );
+
+        $this->assertTrue( (new AboveRule('field_name', 3))->hasSolution() );
     }
 
     /**/

@@ -29,17 +29,6 @@ class AboveRule extends AbstractAtomicRule
     }
 
     /**
-     * @return $this
-     */
-    public function combineWith( AboveRule $other_rule )
-    {
-        if ($other_rule->getMinimum() > $this->minimum)
-            $this->minimum = $other_rule->getMinimum();
-
-        return $this;
-    }
-
-    /**
      */
     public function getMinimum()
     {
@@ -53,7 +42,8 @@ class AboveRule extends AbstractAtomicRule
      */
     public function hasSolution()
     {
-        return !is_infinite( $this->minimum );
+        return !(is_infinite( $this->minimum ) && $this->minimum > 0)
+            && (!is_numeric( $this->minimum ) || !is_nan( $this->minimum ));
     }
 
     /**
@@ -62,7 +52,7 @@ class AboveRule extends AbstractAtomicRule
     {
         return [
             $this->field,
-            '>',
+            self::operator,
             $this->minimum,
         ];
     }
