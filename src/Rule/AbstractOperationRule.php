@@ -107,10 +107,21 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function simplify()
     {
-        foreach ($this->operands as &$operand) {
+        foreach ($this->operands as $i => &$operand) {
             if (method_exists($operand, 'simplify'))
                 $operand = $operand->simplify();
+
+            if (get_class($operand) == get_class($this)) {
+                // Id AND is an operand on AND they can be merge (and the same with OR)
+                foreach ($operand->getOperands() as $subOperand) {
+                    $this->addOperand($subOperand);
+                }
+                unset($this->operands[$i]);
+            }
         }
+
+        // base the keys on 0 for easier tests comparison
+        $this->operands = array_values($this->operands);
 
         if (count($this->operands) == 1) {
             return $this->operands[0];
