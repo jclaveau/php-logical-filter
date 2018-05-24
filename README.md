@@ -1,15 +1,12 @@
 # php-logical-filter
 This class provides a way to define complex filters freely and the tools to handle them easily
 
-Basic rules that cannot be simplified
+Basic rules that cannot be reduced in simpler rules
 + =
-
 + >
 + <
-
 + null
 + !null
-
 + function (regex or custom function returning a bool)
 
 Operation rules
@@ -39,8 +36,6 @@ Simplification
  - ! (B || A) : !B && !A
 
 + or to root
- - create a new trunk for every || rule by duplicating all its parents
- - combine rules
  - simplify the or root
 
 + combine same atomics rules to get one of each max

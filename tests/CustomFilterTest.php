@@ -484,7 +484,6 @@ class CustomFilterTest extends \PHPUnit_Framework_TestCase
                 ['field_61', 'above', '6'],
                 ['field_71', 'above', '7'],
             ],
-
             [
                 'and',
                 ['field_51', 'above', '5'],
@@ -509,28 +508,23 @@ class CustomFilterTest extends \PHPUnit_Framework_TestCase
                 ['field_61', 'above', '6'],
                 ['field_72', 'below', '7'],
             ],
-
             [
                 'and',
                 ['field_51', 'above', '5'],
                 ['field_62', 'below', '6'],
                 ['field_72', 'below', '7'],
             ],
-
-
             [
                 'and',
                 ['field_52', 'below', '5'],
                 ['field_62', 'below', '6'],
                 ['field_72', 'below', '7'],
             ],
-
-
         ]);
 
         $this->assertEquals(
-            $filter->getRules()->toArray(),
-            $filter2->getRules()->toArray()
+            $filter->toArray(),
+            $filter2->toArray()
         );
     }
 

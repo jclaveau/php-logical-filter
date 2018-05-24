@@ -317,7 +317,14 @@ class Filter
         // combine all combinable constraint
 
         // compare the result
+    }
 
+    /**
+     * Returns an array describing the rule tree of the Filter.
+     */
+    public function toArray()
+    {
+        return $this->rules->toArray();
     }
 
     /**
