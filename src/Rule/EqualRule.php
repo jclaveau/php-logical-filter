@@ -6,6 +6,9 @@ namespace JClaveau\LogicalFilter\Rule;
  */
 class EqualRule extends AbstractAtomicRule
 {
+    /** @var string operator */
+    const operator = '=';
+
     /** @var mixed $value */
     protected $value;
 

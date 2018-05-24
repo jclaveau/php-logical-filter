@@ -98,6 +98,8 @@ abstract class AbstractOperationRule extends AbstractRule
      * Simplify the current OperationRule.
      * + If an OrRule or an AndRule contains only one operand, it's equivalent
      *   to it.
+     * + If an OrRule has an other OrRule as operand, they can be merged
+     * + If an AndRule has an other AndRule as operand, they can be merged
      *
      * @todo Look for duplicates and remove them
      * @todo Look for rules having the same Operator and the same field to
@@ -120,6 +122,9 @@ abstract class AbstractOperationRule extends AbstractRule
             }
         }
 
+        $this->unifySameOperands();
+        // TODO combine < and > and =
+
         // base the keys on 0 for easier tests comparison
         $this->operands = array_values($this->operands);
 
@@ -129,6 +134,67 @@ abstract class AbstractOperationRule extends AbstractRule
 
         return $this;
     }
+
+    /**
+     * Indexes operands by their fields and operators. This sorting is
+     * used during the simplification step.
+     *
+     * @return array The 3 dimensions array of operands: field > operator > i
+     */
+    protected function groupOperandsByFieldAndOperator()
+    {
+        $operandsByFields = [];
+        foreach ($this->operands as $operand) {
+
+            $field = method_exists($operand, 'getField') ? $operand->getField() : '';
+
+            if (!isset($operandsByFields[ $field ]))
+                $operandsByFields[ $field ] = [];
+
+            if (!isset($operandsByFields[ $field ][ $operand::operator ]))
+                $operandsByFields[ $field ][ $operand::operator ] = [];
+
+            $operandsByFields[ $field ][ $operand::operator ][] = $operand;
+        }
+
+        return $operandsByFields;
+    }
+
+    /**
+     * Simplify the current AbstractOperationRule.
+     *
+     * @return AbstractOperationRule the simplified rule
+     */
+    public function unifySameOperands()
+    {
+        $unifiedOperands = [];
+
+        $operandsByFields = $this->groupOperandsByFieldAndOperator();
+        foreach ($operandsByFields as $field => $operandsByOperator) {
+
+            foreach ($operandsByOperator as $operator => $operands) {
+                if ($operator == AboveRule::operator) {
+                    usort($operands, [$this, 'aboveRuleUnifySorter']);
+                    $unifiedOperands[] = reset($operands);
+                }
+                elseif ($operator == BelowRule::operator) {
+                    usort($operands, [$this, 'belowRuleUnifySorter']);
+                    $unifiedOperands[] = reset($operands);
+                }
+                else {
+                    $unifiedOperands = array_merge(
+                        $unifiedOperands, $operands
+                    );
+                }
+            }
+        }
+
+        $this->operands = $unifiedOperands;
+
+        return $this;
+    }
+
+
 
     /**
      * Clones the rule and its operands.

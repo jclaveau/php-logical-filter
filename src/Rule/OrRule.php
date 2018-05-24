@@ -9,6 +9,9 @@ namespace JClaveau\LogicalFilter\Rule;
  */
 class OrRule extends AbstractOperationRule
 {
+    /** @var string operator */
+    const operator = '||';
+
     /**
      * @return $this
      */
@@ -56,11 +59,43 @@ class OrRule extends AbstractOperationRule
      */
     public function toArray()
     {
-        $operandsAsArray = ['or'];
+        $operandsAsArray = [self::operator];
         foreach ($this->operands as $operand)
             $operandsAsArray[] = $operand->toArray();
 
         return $operandsAsArray;
+    }
+
+    /**
+     * This is called by the unifyOperands() method to choose which AboveRule
+     * to keep for a given field.
+     *
+     * It's used as a usort() parameter.
+     *
+     * @return int -1|0|1
+     */
+    protected function aboveRuleUnifySorter( AboveRule $a, AboveRule $b)
+    {
+        if ($a->getMinimum() < $b->getMinimum())
+            return -1;
+
+        return 1;
+    }
+
+    /**
+     * This is called by the unifyOperands() method to choose which BelowRule
+     * to keep for a given field.
+     *
+     * It's used as a usort() parameter.
+     *
+     * @return int -1|0|1
+     */
+    protected function belowRuleUnifySorter( BelowRule $a, BelowRule $b)
+    {
+        if ($a->getMaximum() > $b->getMaximum())
+            return -1;
+
+        return 1;
     }
 
     /**/

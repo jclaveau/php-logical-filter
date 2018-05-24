@@ -6,6 +6,9 @@ namespace JClaveau\LogicalFilter\Rule;
  */
 class BelowRule extends AbstractAtomicRule
 {
+    /** @var string operator */
+    const operator = '<';
+
     /** @var scalar $minimum */
     protected $maximum;
 

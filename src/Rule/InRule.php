@@ -6,6 +6,9 @@ namespace JClaveau\LogicalFilter\Rule;
  */
 class InRule extends OrRule
 {
+    /** @var string operator */
+    const operator = 'in';
+
     /**
      * @param string $field         The field to apply the rule on.
      * @param array  $possibilities The values the field can belong to.
