@@ -1,5 +1,8 @@
-# php-logical-filter
-This class provides a way to define complex filters freely and the tools to handle them easily
+# WIP: php-logical-filter
+This class provides a way to define complex filters freely and the tools to handle them easily.
+
+This is still a prototype even if some core features are working (mainly rules contradiction checking).
+
 
 Basic rules that cannot be reduced in simpler rules
 + =
