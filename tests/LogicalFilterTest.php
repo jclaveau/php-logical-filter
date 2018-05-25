@@ -598,5 +598,29 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     */
+    public function test_copy()
+    {
+        $filter = (new LogicalFilter())->addCompositeRule([
+            'or',
+            [
+                'and',
+                ['field_5', 'above', 'a'],
+                ['field_5', 'below', 'a'],
+            ],
+            ['field_6', 'equal', 'b'],
+        ]);
+
+        $filter2 = $filter->copy();
+
+        $this->assertEquals($filter, $filter2);
+
+        $this->assertNotEquals(
+            spl_object_hash($filter->getRules(false)),
+            spl_object_hash($filter2->getRules(false))
+        );
+    }
+
     /**/
 }

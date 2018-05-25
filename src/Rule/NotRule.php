@@ -2,10 +2,14 @@
 namespace JClaveau\LogicalFilter\Rule;
 
 /**
- * Logical negation
+ * Logical negation:
+ * @see https://en.wikipedia.org/wiki/Negation
  */
 class NotRule extends AbstractOperationRule
 {
+    /** @var string operator */
+    const operator = 'not';
+
     /**
      */
     public function __construct( AbstractRule $operand=null )

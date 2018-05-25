@@ -1,6 +1,7 @@
 <?php
 namespace JClaveau\LogicalFilter;
 
+use JClaveau\LogicalFilter\Rule\AbstractRule;
 use JClaveau\LogicalFilter\Rule\AbstractOperationRule;
 use JClaveau\LogicalFilter\Rule\AndRule;
 use JClaveau\LogicalFilter\Rule\OrRule;
@@ -80,6 +81,12 @@ class LogicalFilter implements \JsonSerializable
      */
     public function addRule( AbstractRule $rule )
     {
+        if (    $rule instanceof AndRule
+            && count($rule->getOperands()) == 1) {
+            // TODO this could be factorized with simplification once its split in little steps
+            $rule = $rule->getOperands()[0];
+        }
+
         $this->rules->addOperand( $rule );
         return $this;
     }
@@ -139,9 +146,9 @@ class LogicalFilter implements \JsonSerializable
             );
         }
         elseif (    count($rules_composition) == 3
-            &&  !in_array('and', $rules_composition)
-            &&  !in_array('or',  $rules_composition)
-            &&  !in_array('not', $rules_composition)
+            &&  !in_array( AndRule::operator, $rules_composition )
+            &&  !in_array( OrRule::operator,  $rules_composition )
+            &&  !in_array( NotRule::operator, $rules_composition )
         ) {
             // atomic or composit rules
             $operand_left  = $rules_composition[0];
@@ -155,21 +162,20 @@ class LogicalFilter implements \JsonSerializable
         }
         else {
             // operations
-            if ($rules_composition[0] == 'not') {
+            if ($rules_composition[0] == NotRule::operator) {
                 $rule = new NotRule();
-                $operator = 'not';
             }
-            elseif (in_array('and', $rules_composition)) {
+            elseif (in_array( AndRule::operator, $rules_composition )) {
                 $rule = new AndRule();
-                $operator = 'and';
             }
-            elseif (in_array('or', $rules_composition)) {
+            elseif (in_array( OrRule::operator, $rules_composition)) {
                 $rule = new OrRule();
-                $operator = 'or';
             }
             else {
                 throw new \Exception("Unhandled operation");
             }
+
+            $operator = $rule::operator;
 
             $operands_descriptions = array_filter(
                 $rules_composition,
@@ -327,7 +333,7 @@ class LogicalFilter implements \JsonSerializable
      */
     public function flushRules()
     {
-        $this->rules = [];
+        $this->rules = new AndRule;
         return $this;
     }
 
@@ -373,9 +379,10 @@ class LogicalFilter implements \JsonSerializable
     public function copy()
     {
         $newFilter = clone $this;
+
         return $newFilter
             ->flushRules()
-            ->addRules( $this->rules->copy() );
+            ->addRule( $this->rules->copy() );
     }
 
     /**/

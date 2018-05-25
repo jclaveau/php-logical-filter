@@ -2,7 +2,8 @@
 namespace JClaveau\LogicalFilter\Rule;
 
 /**
- * Logical conjunction
+ * Logical conjunction:
+ * @see https://en.wikipedia.org/wiki/Logical_conjunction
  */
 class AndRule extends AbstractOperationRule
 {
