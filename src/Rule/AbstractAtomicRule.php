@@ -18,16 +18,6 @@ abstract class AbstractAtomicRule extends AbstractRule
     protected $field;
 
     /**
-     * @throws ErrorException If not overloaded
-     */
-    public function combineWith( AtomicRule $other_rule )
-    {
-        throw new \ErrorException(
-            'This method MUST be overloaded by the inheriting class'
-        );
-    }
-
-    /**
      * @return string $field
      */
     public final function getField()

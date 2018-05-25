@@ -13,19 +13,6 @@ class OrRule extends AbstractOperationRule
     const operator = 'or';
 
     /**
-     * @return $this
-     */
-    public function combineWith( OrRule $other_rule )
-    {
-        $this->operands = array_merge(
-            $this->operands,
-            $other_rule->getOperands()
-        );
-
-        return $this;
-    }
-
-    /**
      * Replace all the OrRules of the RuleTree by one OrRule at its root.
      *
      * @todo renjame as RootifyDisjunjctions?

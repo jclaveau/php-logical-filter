@@ -46,14 +46,6 @@ abstract class AbstractOperationRule extends AbstractRule
     }
 
     /**
-     * @return $this
-     */
-    public function combineWith( AbstractOperationRule $other_rule )
-    {
-        return $this;
-    }
-
-    /**
      * @return array
      */
     public function getOperands()

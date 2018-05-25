@@ -24,14 +24,6 @@ abstract class AbstractCompositeRule extends AbstractRule
     }
 
     /**
-     * @return $this
-     */
-    public function combineWith( AbstractCompositeRule $other_rule )
-    {
-        return $this;
-    }
-
-    /**
      * Checks if the rule do not expect the value to be above infinity.
      *
      * @todo negative infinite?
