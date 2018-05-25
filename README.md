@@ -3,6 +3,14 @@ This class provides a way to define complex filters freely and the tools to hand
 
 This is still a prototype even if some core features are working (mainly rules contradiction checking).
 
+Quality
+--------------
+[![Build Status](https://travis-ci.org/jclaveau/php-logical-filter.png?branch=master)](https://travis-ci.org/jclaveau/php-logical-filter)
+[![codecov](https://codecov.io/gh/jclaveau/php-logical-filter/branch/master/graph/badge.svg)](https://codecov.io/gh/jclaveau/php-logical-filter)
+[![Maintainability](https://api.codeclimate.com/v1/badges/eb85279bcfb224b7af1c/maintainability)](https://codeclimate.com/github/jclaveau/php-logical-filter/maintainability)
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/jclaveau/php-logical-filter/issues)
+[![Viewed](http://hits.dwyl.com/jclaveau/php-logical-filter.svg)](http://hits.dwyl.com/jclaveau/php-logical-filter)
+
 
 Basic rules that cannot be reduced in simpler rules
 + =
