@@ -528,5 +528,54 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     */
+    public function test_hasSolution()
+    {
+        $this->assertFalse(
+            (new LogicalFilter())
+                ->addCompositeRule([
+                    'and',
+                    ['field_5', 'above', 'a'],
+                    ['field_5', 'below', 'a'],
+                ])
+                ->hasSolution()
+        );
+
+        $this->assertFalse(
+            (new LogicalFilter())
+                ->addCompositeRule([
+                    'and',
+                    ['field_5', 'equal', 'a'],
+                    ['field_5', 'below', 'a'],
+                ])
+                ->hasSolution()
+        );
+
+        $this->assertFalse(
+            (new LogicalFilter())
+                ->addCompositeRule([
+                    'and',
+                    ['field_5', 'equal', 'a'],
+                    ['field_5', 'above', 'a'],
+                ])
+                ->hasSolution()
+        );
+
+        $this->assertTrue(
+            (new LogicalFilter())
+                ->addCompositeRule([
+                    'or',
+                    [
+                        'and',
+                        ['field_5', 'above', 'a'],
+                        ['field_5', 'below', 'a'],
+                    ],
+                    ['field_6', 'equal', 'b'],
+                ])
+                ->hasSolution()
+        );
+    }
+
     /**/
 }
