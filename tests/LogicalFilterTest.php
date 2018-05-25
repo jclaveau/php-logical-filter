@@ -210,7 +210,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                     new AboveRule('field_2', 3)
                 )
             ]),
-            $filter->getRules()
+            $filter->getRules(false)
         );
 
         // not with too much operands
@@ -574,6 +574,27 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                     ['field_6', 'equal', 'b'],
                 ])
                 ->hasSolution()
+        );
+    }
+
+    /**
+     * @see https://secure.php.net/manual/en/jsonserializable.jsonserialize.php
+     */
+    public function test_jsonSerialize()
+    {
+        $this->assertEquals(
+            '["and",["or",["and",["field_5",">","a"],["field_5","<","a"]],["field_6","=","b"]]]',
+            json_encode(
+                (new LogicalFilter())->addCompositeRule([
+                    'or',
+                    [
+                        'and',
+                        ['field_5', 'above', 'a'],
+                        ['field_5', 'below', 'a'],
+                    ],
+                    ['field_6', 'equal', 'b'],
+                ])
+            )
         );
     }
 

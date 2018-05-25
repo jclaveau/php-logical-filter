@@ -32,7 +32,6 @@ class NotRule extends AbstractOperationRule
      *
      * @return array
      */
-    // public function toAtomicRules()
     public function negateOperand()
     {
         $operand = $this->operands[0];
@@ -133,5 +132,14 @@ class NotRule extends AbstractOperationRule
         return $new_rule;
     }
 
+    /**
+     * Clones the rule and its operand.
+     *
+     * @return NotRule A copy of the current instance with its copied operand.
+     */
+    public function copy()
+    {
+        return new NotRule( $this->operands[0] );
+    }
     /**/
 }

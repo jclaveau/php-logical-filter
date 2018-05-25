@@ -1,7 +1,7 @@
 <?php
 namespace JClaveau\LogicalFilter\Rule;
 
-abstract class AbstractRule
+abstract class AbstractRule implements \JsonSerializable
 {
     /**
      */
@@ -88,6 +88,16 @@ abstract class AbstractRule
         var_dump($this);
         if ($exit)
             exit;
+    }
+
+    /**
+     * For implementing JsonSerializable interface.
+     *
+     * @see https://secure.php.net/manual/en/jsonserializable.jsonserialize.php
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 
     /**/

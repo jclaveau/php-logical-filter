@@ -7,14 +7,8 @@ use JClaveau\LogicalFilter\Rule\OrRule;
 use JClaveau\LogicalFilter\Rule\NotRule;
 
 /**
- * addRule
- * resolve
- * hasSolution
- * simplify
- *
- * flatten for OR resolving
  */
-class LogicalFilter
+class LogicalFilter implements \JsonSerializable
 {
     /** @var  AndRule $rules */
     protected $rules;
@@ -28,9 +22,6 @@ class LogicalFilter
         '<'  => 'below',
         '<=' => 'below or equal',
     ];
-
-    /** @var  OrRule $optimizedRules */
-    // protected $optimizedRules = [];
 
     /**
      */
@@ -78,6 +69,18 @@ class LogicalFilter
             $field, $type, $values
         ) );
 
+        return $this;
+    }
+
+    /**
+     * Add a rule to the filter at its root.
+     *
+     * @param  AbstractRule  $rule
+     * @return LogicalFilter $this
+     */
+    public function addRule( AbstractRule $rule )
+    {
+        $this->rules->addOperand( $rule );
         return $this;
     }
 
@@ -211,92 +214,21 @@ class LogicalFilter
     }
 
     /**
-     * Remove a constraint for the given field (a list a allowed values)
+     * Retrieve all the rules.
      *
-     * $todo absurd?
+     * @param  bool $copy By default copy the rule tree to avoid side effects.
      *
-     * @param string $field
-     * @param string $type
-     * @param mixed $value
-     *
-     * @return $this
-     * /
-    public function removeRule($field, $type, $values)
-    {
-        if (!isset($this->rules[$field]))
-            return $this;
-
-        $ruleClass = self::getRuleClass($type);
-
-        foreach ($this->rules[$field] as $i => $rule) {
-            if (!$rule instanceof $ruleClass) {
-                continue;
-            }
-
-            $rule->removeOperand($values);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Reset all the constraints applied to the given field
-     *
-     * @todo   check if the ability of removing the rules by "type" is
-     *         useful.
-     *
-     * @param  string $field
-     * @param  string $type
-     *
-     * @return Filter $this
+     * @return AbstractRule The tree of rules
      */
-    public function resetRule($field, $type=null)
+    public function getRules($copy = true)
     {
-        if (!isset($this->rules[$field]))
-            return $this;
-
-        $ruleClass = self::getRuleClass($type);
-
-        foreach ($this->rules[$field] as $i => $rule) {
-            if (!$rule instanceof $ruleClass) {
-                continue;
-            }
-
-            unset($this->rules[$field][$i]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Retrieve the rules for a given field
-     *
-     * @todo simplify / optimize / extract rules related to the given field
-     *
-     */
-    public function getFieldRules($field)
-    {
-
-
-        // if (!isset($this->rules[$field])) {
-            // return null;
-        // }
-
-        // return $this->rules[$field];
-    }
-
-    /**
-     * Retrieve all the rules
-     */
-    public function getRules()
-    {
-        return $this->rules;
+        return $copy ? $this->rules->copy() : $this->rules;
     }
 
     /**
      * Includes all the contraints of an other Filter into the current one.
-     */
-    public function combineWith( Filter $filterToMerge )
+     * /
+    public function combineWith( LogicalFilter $filterToMerge )
     {
         foreach ($filterToMerge->getRules() as $field => $rules) {
             foreach ($rules as $rule)
@@ -337,6 +269,16 @@ class LogicalFilter
     }
 
     /**
+     * For implementing JsonSerializable interface.
+     *
+     * @see https://secure.php.net/manual/en/jsonserializable.jsonserialize.php
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
      * Replaces every negation operation rules by its opposit not negated
      * one.
      *
@@ -371,7 +313,7 @@ class LogicalFilter
      * the filter. This is mainly proposed to simplify cache key generation.
      *
      * @return string The key.
-     */
+     * /
     public function getUid()
     {
         ksort($this->constraints);
@@ -390,30 +332,10 @@ class LogicalFilter
     }
 
     /**
-     * Makes a full copy of the rules property.
-     *
-     * @return array The copied rules
-     */
-    private function copyRules()
-    {
-        $copied_rules = [];
-
-        foreach ($this->rules as $field => $rules) {
-            $copied_rules[ $field ] = [];
-
-            foreach ($rules as $i => $rule) {
-                $copied_rules[ $field ][$i] = $rule->copy();
-            }
-        }
-
-        return $copied_rules;
-    }
-
-    /**
      * Extracts the keys from the filter and checks that none is unused.
      *
      * @return new Filter instance
-     */
+     * /
     public function useAllRules(array $rules_to_use)
     {
         $rules = $this->copyRules();
@@ -444,28 +366,16 @@ class LogicalFilter
     }
 
     /**
-     * Equivalent of var_dump() but will echo the json_encode value of
-     * the native array.
+     * Clone the current object and its rules.
      *
-     * This method is useful with the output buffer redirect to a json
-     * stream like on Vuble's ajax apis.
-     *
-     * @return Helper_Table $this
-     */
-    public function dumpJson($exit=false)
-    {
-        Debug::dumpJson($this->rules, $exit, 3);
-        return $this;
-    }
-
-    /**
-     * clone the current object.
-     *
-     * @return Helper_Table A copy of the current instance
+     * @return LogicalFilter A copy of the current instance with a copied ruletree
      */
     public function copy()
     {
-        return clone $this;
+        $newFilter = clone $this;
+        return $newFilter
+            ->flushRules()
+            ->addRules( $this->rules->copy() );
     }
 
     /**/
