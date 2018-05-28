@@ -55,5 +55,47 @@ class AndRuleTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     */
+    public function test_hasSolution_withNegations()
+    {
+        $below = new BelowRule('field_name', 1);
+        $equal = new EqualRule('field_name', 2);
+        $above = new AboveRule('field_name', 3);
+
+        // $result =(new AndRule([$above, new NotRule($above)]))
+            // ->removeNegations()
+            // ->upLiftDisjunctions()
+            // ->unifyOperands()
+            // ->simplify()
+            // ->dump(true)
+            // ;
+        // var_dump($result->hasSolution());
+
+        $this->assertFalse(
+            (new AndRule([$above, new NotRule($above)]))->hasSolution()
+        );
+
+        $this->assertTrue(
+            (new AndRule([new NotRule($above), new NotRule($above)]))->hasSolution()
+        );
+
+        $this->assertFalse(
+            (new AndRule([$below, new NotRule($below)]))->hasSolution()
+        );
+
+        $this->assertTrue(
+            (new AndRule([new NotRule($below), new NotRule($below)]))->hasSolution()
+        );
+
+        $this->assertFalse(
+            (new AndRule([$equal, new NotRule($equal)]))->hasSolution()
+        );
+
+        $this->assertTrue(
+            (new AndRule([new NotRule($equal), new NotRule($equal)]))->hasSolution()
+        );
+    }
+
     /**/
 }

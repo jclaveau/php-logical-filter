@@ -16,6 +16,8 @@ class OrRule extends AbstractOperationRule
      * Replace all the OrRules of the RuleTree by one OrRule at its root.
      *
      * @todo renjame as RootifyDisjunjctions?
+     * @todo return $this (implements a Rule monad?)
+     *
      * @return $this
      */
     public function upLiftDisjunctions()
@@ -34,11 +36,13 @@ class OrRule extends AbstractOperationRule
 
     /**
      */
-    public function toArray()
+    public function toArray($debug=false)
     {
-        $operandsAsArray = [self::operator];
+        $operandsAsArray = [
+            $debug ? get_class($this).':'.spl_object_id($this) : self::operator,
+        ];
         foreach ($this->operands as $operand)
-            $operandsAsArray[] = $operand->toArray();
+            $operandsAsArray[] = $operand->toArray($debug);
 
         return $operandsAsArray;
     }
@@ -83,17 +87,18 @@ class OrRule extends AbstractOperationRule
      */
     public function hasSolution()
     {
-        $this->simplify();
+        $instance = $this->simplify();
 
+        $valid_operands = [];
         foreach ($this->operands as $i => $operand) {
-            if (!$operand->hasSolution()) {
-                unset($this->operands[$i]);
+            if (method_exists($operand, 'hasSolution') && $operand->hasSolution()) {
+                $valid_operands[] = $operand;
             }
         }
 
         // If there is no remaining operand in an OrRule, it means it has
         // no solution.
-        return !empty($this->operands);
+        return !empty($valid_operands);
     }
 
     /**/

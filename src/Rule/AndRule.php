@@ -13,7 +13,8 @@ class AndRule extends AbstractOperationRule
     /**
      * Replace all the OrRules of the RuleTree by one OrRule at its root.
      *
-     * @todo   rename as RootifyDisjunjctions?
+     * @todo rename as RootifyDisjunjctions?
+     * @todo return $this (implements a Rule monad?)
      *
      * @return OrRule copied operands with one OR at its root
      */
@@ -88,11 +89,13 @@ class AndRule extends AbstractOperationRule
 
     /**
      */
-    public function toArray()
+    public function toArray($debug=false)
     {
-        $operandsAsArray = [self::operator];
+        $operandsAsArray = [
+            $debug ? get_class($this).':'.spl_object_id($this) : self::operator,
+        ];
         foreach ($this->operands as $operand)
-            $operandsAsArray[] = $operand->toArray();
+            $operandsAsArray[] = $operand->toArray($debug);
 
         return $operandsAsArray;
     }
@@ -104,36 +107,53 @@ class AndRule extends AbstractOperationRule
      * + a > 3 && a < 2
      *
      * @return bool If the AndRule can have a solution or not
+     *
+     * @todo remove this weird recursion once the issue with upliftDisjunctions is ok
      */
     public function hasSolution()
     {
-        $this->simplify();
+        $instance = $this->simplify()
+            // ->dump(true)
+            ;
 
-        $operandsByFields = $this->groupOperandsByFieldAndOperator();
-        foreach ($operandsByFields as $field => $operandsByOperator) {
+        if ($instance instanceof AndRule) {
+            $operandsByFields = $instance->groupOperandsByFieldAndOperator();
+            foreach ($operandsByFields as $field => $operandsByOperator) {
 
-            if (!empty($operandsByOperator[ EqualRule::operator ])) {
-                // There should never be multiple EqualRules after simplification
-                if (count($operandsByOperator[ EqualRule::operator ]) != 1)
-                    return false;
+                if (!empty($operandsByOperator[ EqualRule::operator ])) {
+                    // There should never be multiple EqualRules after simplification
+                    if (count($operandsByOperator[ EqualRule::operator ]) != 1)
+                        return false;
 
-                $equalRule = reset($operandsByOperator[ EqualRule::operator ]);
+                    $equalRule = reset($operandsByOperator[ EqualRule::operator ]);
 
-                // There shouldn't be remaining AboveRules or BelowRules
-                // after simplification, if there is already an EqualRule
-                if (   !empty($operandsByOperator[ BelowRule::operator ])
-                    || !empty($operandsByOperator[ AboveRule::operator ])) {
-                    return false;
+                    // There shouldn't be remaining AboveRules or BelowRules
+                    // after simplification, if there is already an EqualRule
+                    if (   !empty($operandsByOperator[ BelowRule::operator ])
+                        || !empty($operandsByOperator[ AboveRule::operator ])) {
+                        return false;
+                    }
+                }
+                elseif (   !empty($operandsByOperator[ BelowRule::operator ])
+                        && !empty($operandsByOperator[ AboveRule::operator ])) {
+                    $aboveRule = reset($operandsByOperator[ AboveRule::operator ]);
+                    $belowRule = reset($operandsByOperator[ BelowRule::operator ]);
+
+                    if ($belowRule->getMaximum() <= $aboveRule->getMinimum())
+                        return false;
                 }
             }
-            elseif (   !empty($operandsByOperator[ BelowRule::operator ])
-                    && !empty($operandsByOperator[ AboveRule::operator ])) {
-                $aboveRule = reset($operandsByOperator[ AboveRule::operator ]);
-                $belowRule = reset($operandsByOperator[ BelowRule::operator ]);
 
-                if ($belowRule->getMaximum() <= $aboveRule->getMinimum())
+            foreach ($instance->getOperands() as $operand) {
+                if (!$operand->hasSolution())
                     return false;
             }
+
+            return true;
+        }
+        else {
+            if (method_exists($instance, 'hasSolution'))
+                return $instance->hasSolution();
         }
 
         return true;

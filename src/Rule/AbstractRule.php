@@ -4,18 +4,6 @@ namespace JClaveau\LogicalFilter\Rule;
 abstract class AbstractRule implements \JsonSerializable
 {
     /**
-     * If a combination of rules have no possible solution (e.g. a > 10 && a < 5)
-     * the all filter won't have any solution in any case. This is useful to
-     * stop some process when the filter is not resolvable anymore.
-     *
-     * @return bool
-     */
-    public function hasSolution()
-    {
-        return true;
-    }
-
-    /**
      * Clones the rule with a chained syntax.
      *
      * @return Rule A copy of the current instance.
@@ -30,7 +18,13 @@ abstract class AbstractRule implements \JsonSerializable
      */
     public function dump($exit=false)
     {
-        var_dump($this);
+        $callstack_depth = 2;
+        $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $callstack_depth);
+        $caller = $bt[ $callstack_depth - 2 ];
+
+        echo "\n" . $caller['file'] . ':' . $caller['line'] . "\n";
+        var_export($this->toArray(true));
+        echo "\n\n";
         if ($exit)
             exit;
     }

@@ -15,7 +15,10 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
-        // ini_set('xdebug.max_nesting_level', 10000);
+        ini_set('xdebug.max_nesting_level', 10000);
+        ini_set('xdebug.var_display_max_depth', -1);
+        ini_set('xdebug.var_display_max_children', -1);
+        ini_set('xdebug.var_display_max_data', -1);
     }
 
     /**
@@ -401,24 +404,22 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             'and',
             [
                 'or',
-                ['field_5', 'above', 'a'],
+                ['field_4', 'above', 'a'],
                 ['field_5', 'below', 'a'],
             ],
             ['field_6', 'equal', 'b'],
         ]);
 
-        $filter
-            ->upLiftDisjunctions()
-            ->simplify();
-        // var_export($filter->getRules()->toArray());
-        // echo "\n\n\n";
+        $filter->simplify();
+
+        // $filter->getRules()->dump(!true);
 
         $filter2 = new LogicalFilter;
         $filter2->addRules([
             'or',
             [
                 'and',
-                ['field_5', 'above', 'a'],
+                ['field_4', 'above', 'a'],
                 ['field_6', 'equal', 'b'],
             ],
             [
@@ -428,8 +429,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             ],
         ]);
 
-        // var_export($filter2->getRules()->toArray());
-        // exit;
+        // $filter2->getRules()->dump(!true);
 
         $this->assertEquals(
             $filter2->getRules(),
@@ -465,9 +465,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             ],
         ]);
 
-        $filter
-            ->upLiftDisjunctions()
-            ->simplify();
+        $filter->simplify();
 
         $filter2 = new LogicalFilter;
         $filter2->addRules([

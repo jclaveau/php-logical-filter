@@ -265,8 +265,8 @@ class LogicalFilter implements \JsonSerializable
      */
     public function simplify()
     {
-        $this->rules->simplify();
-        return $this;
+        $simplified_rules = $this->rules->simplify();
+        return $this->flushRules()->addRules( $simplified_rules );
     }
 
     /**
@@ -283,9 +283,9 @@ class LogicalFilter implements \JsonSerializable
     /**
      * Returns an array describing the rule tree of the Filter.
      */
-    public function toArray()
+    public function toArray($debug=false)
     {
-        return $this->rules->toArray();
+        return $this->rules->toArray($debug);
     }
 
     /**

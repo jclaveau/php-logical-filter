@@ -48,11 +48,11 @@ class AboveRule extends AbstractAtomicRule
 
     /**
      */
-    public function toArray()
+    public function toArray($debug=false)
     {
         return [
             $this->field,
-            self::operator,
+            $debug ? get_class($this).':'.spl_object_id($this) : self::operator,
             $this->minimum,
         ];
     }

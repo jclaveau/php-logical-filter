@@ -16,6 +16,14 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     protected $operands = [];
 
+
+    /**
+     * Enabled when the tree has been simùplified and not altered afterwards.
+     *
+     * @var bool $simplified
+     */
+    protected $simplified = false;
+
     /**
      */
     public function __construct( array $operands=[] )
@@ -33,6 +41,14 @@ abstract class AbstractOperationRule extends AbstractRule
     }
 
     /**
+     * @return bool
+     */
+    public function isSimplified()
+    {
+        return $this->simplified;
+    }
+
+    /**
      * Adds an operand to the logical operation (&& or ||).
      *
      * @param  AbstractRule $new_operand
@@ -42,6 +58,7 @@ abstract class AbstractOperationRule extends AbstractRule
     public function addOperand( AbstractRule $new_operand )
     {
         $this->operands[] = $new_operand;
+        $this->simplified = false;
         return $this;
     }
 
@@ -51,6 +68,16 @@ abstract class AbstractOperationRule extends AbstractRule
     public function getOperands()
     {
         return $this->operands;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setOperands(array $operands)
+    {
+        // keep the index start at 0
+        $this->operands = array_values($operands);
+        return $this;
     }
 
     /**
@@ -87,6 +114,23 @@ abstract class AbstractOperationRule extends AbstractRule
     }
 
     /**
+     */
+    public function removeUselessOperations()
+    {
+        foreach ($this->operands as $i => $operand) {
+            if (get_class($operand) == get_class($this) && !$this instanceof NotRule) {
+                // Id AND is an operand on AND they can be merge (and the same with OR)
+                foreach ($operand->getOperands() as $subOperand) {
+                    $this->addOperand( $subOperand->copy() );
+                }
+                unset($this->operands[$i]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Simplify the current OperationRule.
      * + If an OrRule or an AndRule contains only one operand, it's equivalent
      *   to it.
@@ -101,29 +145,30 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function simplify()
     {
-        foreach ($this->operands as $i => &$operand) {
-            if (method_exists($operand, 'simplify'))
-                $operand = $operand->simplify();
+        if ($this->simplified)
+            return $this;
 
-            if (get_class($operand) == get_class($this)) {
-                // Id AND is an operand on AND they can be merge (and the same with OR)
-                foreach ($operand->getOperands() as $subOperand) {
-                    $this->addOperand($subOperand);
-                }
-                unset($this->operands[$i]);
-            }
+        $this->simplified = true;
+
+        $this->removeNegations();
+
+        $this->removeUselessOperations();
+
+        // FIXME return $this while RootifyingDisjunctions!
+        if (method_exists($this, 'upLiftDisjunctions')) {
+            $instance = $this->upLiftDisjunctions();
+        }
+        else {
+            $instance = $this;
         }
 
-        $this->unifyOperands();
+        $instance->unifyOperands();
 
-        // base the keys on 0 for easier tests comparison
-        $this->operands = array_values($this->operands);
-
-        if (count($this->operands) == 1) {
-            return $this->operands[0];
+        if (!$instance instanceof NotRule && count($instance->getOperands()) == 1) {
+            return $instance->getOperands()[0];
         }
 
-        return $this;
+        return $instance;
     }
 
     /**
