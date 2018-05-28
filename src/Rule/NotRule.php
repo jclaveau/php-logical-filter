@@ -137,13 +137,46 @@ class NotRule extends AbstractOperationRule
     }
 
     /**
+     * Not rules can only have one operand.
+     *
+     * @return $this
+     */
+    public function unifyOperands($unifyDifferentOperands = true)
+    {
+        return $this;
+    }
+
+    /**
+     * @todo Not implemented for NotRules. Its not required as it always
+     *       occures after removeNegations.
+     */
+    public function upLiftDisjunctions()
+    {
+        throw new \LogicException(
+            __METHOD__ . " MUST never be called before removing the negations"
+            . " from the rule tree"
+        );
+    }
+
+    /**
      * Clones the rule and its operand.
      *
      * @return NotRule A copy of the current instance with its copied operand.
      */
     public function copy()
     {
-        return new NotRule( $this->operands[0] );
+        return new NotRule( $this->operands[0]->copy() );
     }
+
+    /**
+     */
+    public function toArray()
+    {
+        return [
+            self::operator,
+            $this->operands[0]->toArray()
+        ];
+    }
+
     /**/
 }
