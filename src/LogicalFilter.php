@@ -248,16 +248,14 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
-     * Includes all the contraints of an other Filter into the current one.
-     * /
-    public function combineWith( LogicalFilter $filterToMerge )
+     * Includes all the rules of an other LogicalFilter into the current one.
+     *
+     * @param  LogicalFilter $filterToCombine
+     * @return LogicalFilter $this
+     */
+    public function combineWith( LogicalFilter $filterToCombine )
     {
-        foreach ($filterToMerge->getRules() as $field => $rules) {
-            foreach ($rules as $rule)
-                $this->rules[$field][] = $rule;
-        }
-
-        return $this;
+        return $this->addRules( $filterToCombine->getRules() );
     }
 
     /**
@@ -327,19 +325,6 @@ class LogicalFilter implements \JsonSerializable
         // to the Filter afterwards
         $this->rules = new AndRule([$this->rules->upLiftDisjunctions()]);
         return $this;
-    }
-
-
-    /**
-     * Generates a string id corresponding to the constraints caracterising
-     * the filter. This is mainly proposed to simplify cache key generation.
-     *
-     * @return string The key.
-     * /
-    public function getUid()
-    {
-        ksort($this->constraints);
-        return hash('crc32b', var_export($this->constraints, true));
     }
 
     /**
