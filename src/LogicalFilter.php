@@ -54,40 +54,56 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
-     * Add a constraint for the given field (a list a allowed values).
-     * We create an And rule that will gather all the possible combinations
-     * of rules that will be applied to the given field.
+     * This method gathers different ways to define the rules of a LogicalFilter.
+     * + You can add N already instanciated Rules.
+     * + You can provide 3 arguments: $field, $operator, $value
+     * + You can provide a tree of rules:
+     * [
+     *      'or',
+     *      [
+     *          'and',
+     *          ['field_5', 'above', 'a'],
+     *          ['field_5', 'below', 'a'],
+     *      ],
+     *      ['field_6', 'equal', 'b'],
+     *  ]
      *
-     * @param string $field
-     * @param string $type
-     * @param mixed  $value
-     *
-     * @return $this
-     */
-    public function addSimpleRule($field, $type, $values)
-    {
-        $this->rules->addOperand( self::generateSimpleRule(
-            $field, $type, $values
-        ) );
-
-        return $this;
-    }
-
-    /**
-     * Add a rule to the filter at its root.
-     *
-     * @param  AbstractRule  $rule
+     * @param  mixed         Rules definition
      * @return LogicalFilter $this
      */
-    public function addRule( AbstractRule $rule )
+    public function addRules()
     {
-        if (    $rule instanceof AndRule
-            && count($rule->getOperands()) == 1) {
-            // TODO this could be factorized with simplification once its split in little steps
-            $rule = $rule->getOperands()[0];
+        $args = func_get_args();
+
+        if (count($args) == 3 && is_string($args[0]) && is_string($args[1])) {
+            $newRule = self::generateSimpleRule(
+                $args[0], // field
+                $args[1], // operator
+                $args[2]  // value
+            );
+
+            $this->rules->addOperand($newRule);
+        }
+        elseif (count($args) == count(array_filter($args, function($arg) {
+            return $arg instanceof AbstractRule;
+        })) ) {
+            foreach ($args as $i => $newRule) {
+                $this->rules->addOperand($newRule);
+            }
+        }
+        elseif (count($args) == 1 && is_array($args[0])) {
+            $this->addCompositeRule_recursion(
+                $args[0],
+                $this->rules
+            );
+        }
+        else {
+            throw new \InvalidArgumentException(
+                "Bad set of arguments provided for rules addition: "
+                .var_export($args, true)
+            );
         }
 
-        $this->rules->addOperand( $rule );
         return $this;
     }
 
@@ -380,9 +396,17 @@ class LogicalFilter implements \JsonSerializable
     {
         $newFilter = clone $this;
 
+        $rules = $this->rules->copy();
+
+        if (    $rules instanceof AndRule
+            && count($rules->getOperands()) == 1) {
+            // TODO this could be factorized with simplification once its split in little steps
+            $rules = $rules->getOperands()[0];
+        }
+
         return $newFilter
             ->flushRules()
-            ->addRule( $this->rules->copy() );
+            ->addRules( $rules );
     }
 
     /**/

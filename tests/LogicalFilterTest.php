@@ -20,14 +20,14 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_addSimpleRule()
+    public function test_addRules_simple()
     {
         $filter = new LogicalFilter();
 
-        $filter->addSimpleRule('field', 'in', ['a', 'b', 'c']);
+        $filter->addRules('field', 'in', ['a', 'b', 'c']);
         // $filter->addRule('field', 'not_in', ['a', 'b', 'c']);
-        $filter->addSimpleRule('field', 'above', 3);
-        $filter->addSimpleRule('field', 'below', 5);
+        $filter->addRules('field', 'above', 3);
+        $filter->addRules('field', 'below', 5);
 
         $rules = VisibilityViolator::getHiddenProperty(
             $filter,
@@ -51,7 +51,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new LogicalFilter();
 
-        $filter->addSimpleRule('field', 'in', ['a', 'b', 'c']);
+        $filter->addRules('field', 'in', ['a', 'b', 'c']);
 
         $this->assertEquals(
             new AndRule([
@@ -67,7 +67,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new LogicalFilter();
 
-        $filter->addCompositeRule([
+        $filter->addRules([
             ['field', 'in', ['a', 'b', 'c']],
             'or',
             ['field', 'equal', 'e']
@@ -86,11 +86,11 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_addRule_with_nested_operations()
+    public function test_addRules_with_nested_operations()
     {
         $filter = new LogicalFilter();
 
-        $filter->addCompositeRule([
+        $filter->addRules([
             ['field', 'in', ['a', 'b', 'c']],
             'or',
             [
@@ -123,13 +123,13 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_addRule_with_different_operators()
+    public function test_addRules_with_different_operators()
     {
         $filter = new LogicalFilter();
 
         // exception if different operators in the same operation
         try {
-            $filter->addCompositeRule([
+            $filter->addRules([
                 ['field', 'in', ['a', 'b', 'c']],
                 'or',
                 [
@@ -164,13 +164,13 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_addRule_without_operator()
+    public function test_addRules_without_operator()
     {
         $filter = new LogicalFilter();
 
         // exception if no operator in an operation
         try {
-            $filter->addCompositeRule([
+            $filter->addRules([
                 ['field_2', 'above', 3],
                 ['field_3', 'below', -2],
                 ['field_3', 'equal', 0],
@@ -195,11 +195,11 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_addRule_with_negation()
+    public function test_addRules_with_negation()
     {
         $filter = new LogicalFilter();
 
-        $filter->addCompositeRule([
+        $filter->addRules([
             'not',
             ['field_2', 'above', 3],
         ]);
@@ -215,7 +215,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
         // not with too much operands
         try {
-            $filter->addCompositeRule([
+            $filter->addRules([
                 'not',
                 ['field_2', 'above', 3],
                 ['field_2', 'equal', 5],
@@ -247,7 +247,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         // simple
         $filter = new LogicalFilter();
 
-        $filter->addCompositeRule([
+        $filter->addRules([
             'not',
             ['field_2', 'above', 3],
         ]);
@@ -267,7 +267,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         // complex
         $filter = new LogicalFilter();
 
-        $filter->addCompositeRule([
+        $filter->addRules([
             'or',
             ['field_1', 'below', 3],
             ['not', ['field_2', 'above', 3]],
@@ -285,7 +285,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
         $filter2 = new LogicalFilter;
 
-        $filter2->addCompositeRule([
+        $filter2->addRules([
             'or',
             ['field_1', 'below', 3],
             // ['not', ['field_2', 'above', 3]],
@@ -360,7 +360,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new LogicalFilter();
 
-        $filter->addCompositeRule([
+        $filter->addRules([
             'or',
             ['field_5', 'above', 'a'],
             ['field_5', 'below', 'a'],
@@ -373,7 +373,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
         $filter2 = new LogicalFilter;
 
-        $filter2->addCompositeRule([
+        $filter2->addRules([
             'or',
             [
                 'and',
@@ -397,7 +397,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new LogicalFilter();
 
-        $filter->addCompositeRule([
+        $filter->addRules([
             'and',
             [
                 'or',
@@ -414,7 +414,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         // echo "\n\n\n";
 
         $filter2 = new LogicalFilter;
-        $filter2->addCompositeRule([
+        $filter2->addRules([
             'or',
             [
                 'and',
@@ -446,7 +446,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         // (A' || A") && (B' || B") && (C' || C") <=>
         //    (A' && B' && C') || (A' && B' && C") || (A' && B" && C') || (A' && B" && C")
         // || (A" && B' && C') || (A" && B' && C") || (A" && B" && C') || (A" && B" && C");
-        $filter->addCompositeRule([
+        $filter->addRules([
             'and',
             [
                 'or',
@@ -470,7 +470,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             ->simplify();
 
         $filter2 = new LogicalFilter;
-        $filter2->addCompositeRule([
+        $filter2->addRules([
             'or',
             [
                 'and',
@@ -534,7 +534,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse(
             (new LogicalFilter())
-                ->addCompositeRule([
+                ->addRules([
                     'and',
                     ['field_5', 'above', 'a'],
                     ['field_5', 'below', 'a'],
@@ -544,7 +544,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse(
             (new LogicalFilter())
-                ->addCompositeRule([
+                ->addRules([
                     'and',
                     ['field_5', 'equal', 'a'],
                     ['field_5', 'below', 'a'],
@@ -554,7 +554,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse(
             (new LogicalFilter())
-                ->addCompositeRule([
+                ->addRules([
                     'and',
                     ['field_5', 'equal', 'a'],
                     ['field_5', 'above', 'a'],
@@ -564,7 +564,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(
             (new LogicalFilter())
-                ->addCompositeRule([
+                ->addRules([
                     'or',
                     [
                         'and',
@@ -585,7 +585,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             '["and",["or",["and",["field_5",">","a"],["field_5","<","a"]],["field_6","=","b"]]]',
             json_encode(
-                (new LogicalFilter())->addCompositeRule([
+                (new LogicalFilter())->addRules([
                     'or',
                     [
                         'and',
@@ -602,7 +602,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function test_copy()
     {
-        $filter = (new LogicalFilter())->addCompositeRule([
+        $filter = (new LogicalFilter())->addRules([
             'or',
             [
                 'and',
