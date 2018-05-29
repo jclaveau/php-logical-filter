@@ -20,6 +20,8 @@ class AndRule extends AbstractOperationRule
      */
     public function upLiftDisjunctions()
     {
+        $this->moveSimplificationStepForward( self::disjunctions_rootified );
+
         $upLiftedOperands = [];
         foreach ($this->getOperands() as $operand) {
             $operand = $operand->copy();
@@ -98,6 +100,58 @@ class AndRule extends AbstractOperationRule
             $operandsAsArray[] = $operand->toArray($debug);
 
         return $operandsAsArray;
+    }
+
+    /**
+     * Removes rule branches that cannot produce result like:
+     * A = 1 || (B < 2 && B > 3) <=> A = 1
+     *
+     * @return null|AndRule The rule with removed invalid subrules or null
+     *                      if it's invalid itself.
+     */
+    public function removeInvalidBranches()
+    {
+        $this->moveSimplificationStepForward(self::invalid_branches_removed);
+
+        foreach ($this->operands as $i => $operand) {
+            if ($operand instanceof AbstractOperationRule) {
+                if (!$this->operands[$i] = $operand->removeInvalidBranches())
+                    return null;
+            }
+        }
+
+        $operandsByFields = $this->groupOperandsByFieldAndOperator();
+
+        foreach ($operandsByFields as $field => $operandsByOperator) {
+
+            if (!empty($operandsByOperator[ EqualRule::operator ])) {
+                // There should never be multiple EqualRules after simplification
+                if (count($operandsByOperator[ EqualRule::operator ]) != 1)
+                    return null;
+
+                $equalRule = reset($operandsByOperator[ EqualRule::operator ]);
+
+                // There shouldn't be remaining AboveRules or BelowRules
+                // after simplification, if there is already an EqualRule
+                if (   !empty($operandsByOperator[ BelowRule::operator ])
+                    || !empty($operandsByOperator[ AboveRule::operator ])) {
+                    return null;
+                }
+            }
+            elseif (   !empty($operandsByOperator[ BelowRule::operator ])
+                    && !empty($operandsByOperator[ AboveRule::operator ])) {
+                $aboveRule = reset($operandsByOperator[ AboveRule::operator ]);
+                $belowRule = reset($operandsByOperator[ BelowRule::operator ]);
+
+                if ($belowRule->getMaximum() <= $aboveRule->getMinimum())
+                    return null;
+            }
+        }
+
+        if (empty($this->operands))
+            return null;
+
+        return $this;
     }
 
     /**

@@ -16,13 +16,33 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     protected $operands = [];
 
+    const negations_removed              = 'negations_removed';
+    const operation_duplicates_removed   = 'operation_duplicates_removed';
+    const disjunctions_rootified         = 'disjunctions_rootified';
+    const atomic_operands_unified        = 'atomic_operands_unified';
+    const monooperand_operations_removed = 'monooperand_operations_removed';
+    const invalid_branches_removed       = 'invalid_branches_removed';
+    const simplified                     = 'simplified';
 
     /**
-     * Enabled when the tree has been simùplified and not altered afterwards.
+     * The order is important!
      *
-     * @var bool $simplified
+     * @var array $simplification_steps
      */
-    protected $simplified = false;
+    const simplification_steps = [
+        self::negations_removed,
+        self::operation_duplicates_removed,
+        self::disjunctions_rootified,
+        self::atomic_operands_unified,
+        self::monooperand_operations_removed,
+        self::invalid_branches_removed,
+        self::simplified,
+    ];
+
+    /**
+     * @var null|string $simplified
+     */
+    protected $current_simplification_step = null;
 
     /**
      */
@@ -45,7 +65,7 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function isSimplified()
     {
-        return $this->simplified;
+        return $this->current_simplification_step == self::simplified;
     }
 
     /**
@@ -58,7 +78,7 @@ abstract class AbstractOperationRule extends AbstractRule
     public function addOperand( AbstractRule $new_operand )
     {
         $this->operands[] = $new_operand;
-        $this->simplified = false;
+        $this->current_simplification_step = null;
         return $this;
     }
 
@@ -77,18 +97,64 @@ abstract class AbstractOperationRule extends AbstractRule
     {
         // keep the index start at 0
         $this->operands = array_values($operands);
+        $this->current_simplification_step = null;
         return $this;
     }
 
     /**
-     * Atomic Rules or the opposit of OperationRules: they are the leaves of
-     * the RuleTree.
+     * @param string $step_to_go_to
+     */
+    public function moveSimplificationStepForward($step_to_go_to)
+    {
+        if (!in_array($step_to_go_to, self::simplification_steps)) {
+            throw new \InvalidArgumentException(
+                "Invalid simplification step to go to: ".$step_to_go_to
+            );
+        }
+
+        $steps_indices = array_flip(self::simplification_steps);
+
+        if ($this->current_simplification_step != null) {
+            $current_index = $steps_indices[ $this->current_simplification_step ];
+            $target_index  = $steps_indices[ $step_to_go_to ];
+
+            if ( $current_index < $target_index - 1 ) {
+                throw new \LogicException(
+                    "$step_to_go_to MUST be fullfilled after " . self::simplification_steps[$target_index - 1]
+                    . " instead of the current step: " . $this->current_simplification_step
+                    ."\nfor: " . $this
+                );
+            }
+
+        }
+
+        $this->current_simplification_step = $step_to_go_to;
+    }
+
+    /**
+     * Checks if a simplification step is reached.
+     *
+     * @param  string step
      *
      * @return bool
      */
-    public function isAtomic()
+    public function simplicationStepReached($step)
     {
-        return false;
+        if (!in_array($step, self::simplification_steps)) {
+            throw new \InvalidArgumentException(
+                "Invalid simplification step: ".$step
+            );
+        }
+
+        if ($this->current_simplification_step == null)
+            return false;
+
+        $steps_indices = array_flip(self::simplification_steps);
+
+        $current_index = $steps_indices[ $this->current_simplification_step ];
+        $step_index    = $steps_indices[ $step ];
+
+        return $current_index >= $step_index;
     }
 
     /**
@@ -98,6 +164,8 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function removeNegations()
     {
+        $this->moveSimplificationStepForward(self::negations_removed);
+
         foreach ($this->operands as $i => $operand) {
             if ($operand instanceof NotRule) {
                 $this->operands[$i] = $operand->negateOperand();
@@ -117,6 +185,8 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function removeUselessOperations()
     {
+        $this->moveSimplificationStepForward( self::operation_duplicates_removed );
+
         foreach ($this->operands as $i => $operand) {
             if (get_class($operand) == get_class($this) && !$this instanceof NotRule) {
                 // Id AND is an operand on AND they can be merge (and the same with OR)
@@ -131,79 +201,14 @@ abstract class AbstractOperationRule extends AbstractRule
     }
 
     /**
-     * Simplify the current OperationRule.
-     * + If an OrRule or an AndRule contains only one operand, it's equivalent
-     *   to it.
-     * + If an OrRule has an other OrRule as operand, they can be merged
-     * + If an AndRule has an other AndRule as operand, they can be merged
-     *
-     * @todo Look for duplicates and remove them
-     * @todo Look for rules having the same Operator and the same field to
-     *       combine them.
-     *
-     * @return AbstractRule the simplified rule
-     */
-    public function simplify()
-    {
-        if ($this->simplified)
-            return $this;
-
-        $this->simplified = true;
-
-        $this->removeNegations();
-
-        $this->removeUselessOperations();
-
-        // FIXME return $this while RootifyingDisjunctions!
-        if (method_exists($this, 'upLiftDisjunctions')) {
-            $instance = $this->upLiftDisjunctions();
-        }
-        else {
-            $instance = $this;
-        }
-
-        $instance->unifyOperands();
-
-        if (!$instance instanceof NotRule && count($instance->getOperands()) == 1) {
-            return $instance->getOperands()[0];
-        }
-
-        return $instance;
-    }
-
-    /**
-     * Indexes operands by their fields and operators. This sorting is
-     * used during the simplification step.
-     *
-     * @return array The 3 dimensions array of operands: field > operator > i
-     */
-    protected function groupOperandsByFieldAndOperator()
-    {
-        $operandsByFields = [];
-        foreach ($this->operands as $operand) {
-
-            // Operation rules have no field but we need to keep them anyway
-            $field = method_exists($operand, 'getField') ? $operand->getField() : '';
-
-            if (!isset($operandsByFields[ $field ]))
-                $operandsByFields[ $field ] = [];
-
-            if (!isset($operandsByFields[ $field ][ $operand::operator ]))
-                $operandsByFields[ $field ][ $operand::operator ] = [];
-
-            $operandsByFields[ $field ][ $operand::operator ][] = $operand;
-        }
-
-        return $operandsByFields;
-    }
-
-    /**
      * Simplify the current AbstractOperationRule.
      *
      * @return AbstractOperationRule the simplified rule
      */
     public function unifyOperands($unifyDifferentOperands = true)
     {
+        $this->moveSimplificationStepForward( self::atomic_operands_unified );
+
         $operandsByFields = $this->groupOperandsByFieldAndOperator();
 
         // unifying same operands
@@ -249,6 +254,94 @@ abstract class AbstractOperationRule extends AbstractRule
         $this->operands = $unifiedOperands;
 
         return $this;
+    }
+
+    /**
+     * Simplify the current OperationRule.
+     * + If an OrRule or an AndRule contains only one operand, it's equivalent
+     *   to it.
+     * + If an OrRule has an other OrRule as operand, they can be merged
+     * + If an AndRule has an other AndRule as operand, they can be merged
+     *
+     * @return AbstractRule the simplified rule
+     */
+    public final function simplify($step_to_stop_after=null)
+    {
+        if ($step_to_stop_after && !in_array($step_to_stop_after, self::$simplification_steps)) {
+            throw new \InvalidArgumentException(
+                "Invalid simplification step to stop at: ".$step_to_stop_after
+            );
+        }
+
+        if ($step_to_stop_after == self::simplified)
+            return $this;
+
+        $this->removeNegations();
+
+        if ($step_to_stop_after == self::negations_removed)
+            return $this;
+
+        $this->removeUselessOperations();
+
+        if ($step_to_stop_after == self::operation_duplicates_removed)
+            return $this;
+
+        // FIXME return $this while RootifyingDisjunctions!
+        if (method_exists($this, 'upLiftDisjunctions')) {
+            $instance = $this->upLiftDisjunctions();
+        }
+        else {
+            $instance = $this;
+        }
+
+        if ($step_to_stop_after == self::disjunctions_rootified)
+            return $instance;
+
+        $instance->unifyOperands();
+
+        if ($step_to_stop_after == self::atomic_operands_unified)
+            return $instance;
+
+        if (!$instance instanceof NotRule && count($instance->getOperands()) == 1) {
+            return $instance->getOperands()[0];
+        }
+
+        $instance->moveSimplificationStepForward( self::monooperand_operations_removed );
+
+        if ($step_to_stop_after == self::monooperand_operations_removed)
+            return $instance;
+
+        $instance->removeInvalidBranches();
+
+        $instance->moveSimplificationStepForward( self::simplified );
+
+        return $instance;
+    }
+
+    /**
+     * Indexes operands by their fields and operators. This sorting is
+     * used during the simplification step.
+     *
+     * @return array The 3 dimensions array of operands: field > operator > i
+     */
+    protected function groupOperandsByFieldAndOperator()
+    {
+        $operandsByFields = [];
+        foreach ($this->operands as $operand) {
+
+            // Operation rules have no field but we need to keep them anyway
+            $field = method_exists($operand, 'getField') ? $operand->getField() : '';
+
+            if (!isset($operandsByFields[ $field ]))
+                $operandsByFields[ $field ] = [];
+
+            if (!isset($operandsByFields[ $field ][ $operand::operator ]))
+                $operandsByFields[ $field ][ $operand::operator ] = [];
+
+            $operandsByFields[ $field ][ $operand::operator ][] = $operand;
+        }
+
+        return $operandsByFields;
     }
 
     /**

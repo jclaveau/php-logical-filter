@@ -22,6 +22,7 @@ class OrRule extends AbstractOperationRule
      */
     public function upLiftDisjunctions()
     {
+        $this->moveSimplificationStepForward( self::disjunctions_rootified );
         $upLiftedOperands = [];
         foreach ($this->getOperands() as $operand) {
             $operand = $operand->copy();
@@ -80,6 +81,37 @@ class OrRule extends AbstractOperationRule
     }
 
     /**
+     * Removes rule branches that cannot produce result like:
+     * A = 1 && ( (B < 2 && B > 3) || (C = 8 && C = 10) ) <=> A = 1
+     *
+     * @return null|OrRule The rule with removed invalid subrules or null
+     *                     if it's invalid itself.
+     */
+    public function removeInvalidBranches()
+    {
+        $this->moveSimplificationStepForward(self::invalid_branches_removed);
+
+        foreach ($this->operands as $i => $operand) {
+
+            if ($operand instanceof AbstractOperationRule) {
+                if (!$this->operands[$i] = $operand->removeInvalidBranches()) {
+                    unset($this->operands[$i]);
+                    continue;
+                }
+            }
+            else {
+                if (!$this->operands[$i]->hasSolution())
+                    unset($this->operands[$i]);
+            }
+        }
+
+        if (empty($this->operands))
+            return null;
+
+        return $this;
+    }
+
+    /**
      * Checks if the tree below the current OperationRule can have solutions
      * or if it contains contradictory rules.
      *
@@ -87,7 +119,11 @@ class OrRule extends AbstractOperationRule
      */
     public function hasSolution()
     {
-        $instance = $this->simplify();
+        if (!$this->simplicationStepReached(self::simplified)) {
+            throw new \LogicException(
+                "hasSolution has no sens if the rule is not simplified"
+            );
+        }
 
         $valid_operands = [];
         foreach ($this->operands as $i => $operand) {

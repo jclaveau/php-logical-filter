@@ -143,6 +143,7 @@ class NotRule extends AbstractOperationRule
      */
     public function unifyOperands($unifyDifferentOperands = true)
     {
+        $this->moveSimplificationStepForward( self::atomic_operands_unified );
         return $this;
     }
 
@@ -152,6 +153,7 @@ class NotRule extends AbstractOperationRule
      */
     public function upLiftDisjunctions()
     {
+        $this->moveSimplificationStepForward( self::disjunctions_rootified );
         throw new \LogicException(
             __METHOD__ . " MUST never be called before removing the negations"
             . " from the rule tree"
@@ -176,6 +178,30 @@ class NotRule extends AbstractOperationRule
             $debug ? get_class($this).':'.spl_object_id($this) : self::operator,
             $this->operands[0]->toArray($debug)
         ];
+    }
+
+    /**
+     * Removes rule branches that cannot produce result like:
+     * A = 1 && ( (B < 2 && B > 3) || (C = 8 && C = 10) ) <=> A = 1
+     *
+     * @return null|OrRule The rule with removed invalid subrules or null
+     *                     if it's invalid itself.
+     * /
+    public function removeInvalidBranches()
+    {
+        $operand = $this->operands[0];
+
+        if ($operand instanceof AbstractOperationRule) {
+            if (!$operand->removeInvalidBranches())
+                unset($this->operands[0]);
+        }
+        else
+
+
+        if (empty($this->operands))
+            return null;
+
+        return $this;
     }
 
     /**/

@@ -55,8 +55,8 @@ class AbstractOperationRuleTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->assertEquals(
-            $expectedOrRule,
-            $orRule->simplify()
+            $expectedOrRule->toArray(),
+            $orRule->simplify()->toArray()
         );
 
         // AndRule
@@ -72,8 +72,8 @@ class AbstractOperationRuleTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->assertEquals(
-            $expectedAndRule,
-            $andRule->simplify(false)
+            $expectedAndRule->toArray(),
+            $andRule->simplify()->toArray()
         );
     }
 
@@ -135,6 +135,68 @@ class AbstractOperationRuleTest extends \PHPUnit_Framework_TestCase
             $equal1,
             (new OrRule([$equal1, $equal2, $equal3]))->simplify()
         );
+    }
+
+    /**
+     */
+    public function test_removeInvalidBranches_withNegations()
+    {
+        $above = new AboveRule('field_name', 3);
+        $below = new BelowRule('field_name', 1);
+        $equal = new EqualRule('field_name', 2);
+
+        // $result =(new AndRule([$above, new NotRule($above)]))
+            // ->removeNegations()
+            // ->upLiftDisjunctions()
+            // ->unifyOperands()
+            // ->simplify()
+            // ->dump(true)
+            // ;
+        // var_dump($result->hasSolution());
+
+        $this->assertNull(
+            (new AndRule([$above, new NotRule($above)]))
+                ->simplify()
+                ->removeInvalidBranches()
+        );
+
+        $this->assertEquals(
+            (new OrRule([$below]))
+                ->toArray(),
+            (new OrRule([
+                    (new AndRule([$above, new NotRule($above)])),
+                    $below,
+                ]))
+                ->simplify()
+                ->removeInvalidBranches()
+                ->toArray()
+        );
+
+        // OR with no possibility working
+        // $this->assertNull(
+            // (new OrRule([
+                    // (new AndRule([$above, new NotRule($above)])),
+                    // (new AndRule([$above, $equal])),
+                // ]))
+                // ->simplify()
+                // ->removeInvalidBranches()
+        // );
+
+        // $this->assertEquals(
+            // (new OrRule([$below]))
+                // ->toArray(),
+            // (new OrRule([
+                    // (new AndRule([
+                        // (new OrRule([$above, new NotRule($above)])),
+
+                    // ])),
+                    // $below,
+                // ]))
+                // ->simplify()
+                // ->removeInvalidBranches()
+                // ->toArray()
+        // );
+
     }
 
     /**/

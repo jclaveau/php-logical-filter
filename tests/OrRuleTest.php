@@ -18,7 +18,9 @@ class OrRuleTest extends \PHPUnit_Framework_TestCase
                 new AndRule([$below, $equal]),
                 new AndRule([$above, $equal]),
                 new AndRule([$above, $below]),
-            ]))->hasSolution()
+            ]))
+            ->simplify()
+            ->hasSolution()
         );
 
         $this->assertTrue(
@@ -26,17 +28,23 @@ class OrRuleTest extends \PHPUnit_Framework_TestCase
                 new AndRule([$below, $equal]),
                 new AndRule([$above, $equal]),
                 new AndRule([$above]),
-            ]))->hasSolution()
+            ]))
+            ->simplify()
+            ->hasSolution()
         );
 
         $this->assertTrue(
             (new OrRule([
                 $above,
-            ]))->hasSolution()
+            ]))
+            ->simplify()
+            ->hasSolution()
         );
 
         $this->assertFalse(
-            (new OrRule([]))->hasSolution()
+            (new OrRule([]))
+            ->simplify()
+            ->hasSolution()
         );
     }
 
