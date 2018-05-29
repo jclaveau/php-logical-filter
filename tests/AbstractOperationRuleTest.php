@@ -173,30 +173,14 @@ class AbstractOperationRuleTest extends \PHPUnit_Framework_TestCase
         );
 
         // OR with no possibility working
-        // $this->assertNull(
-            // (new OrRule([
-                    // (new AndRule([$above, new NotRule($above)])),
-                    // (new AndRule([$above, $equal])),
-                // ]))
-                // ->simplify()
-                // ->removeInvalidBranches()
-        // );
-
-        // $this->assertEquals(
-            // (new OrRule([$below]))
-                // ->toArray(),
-            // (new OrRule([
-                    // (new AndRule([
-                        // (new OrRule([$above, new NotRule($above)])),
-
-                    // ])),
-                    // $below,
-                // ]))
-                // ->simplify()
-                // ->removeInvalidBranches()
-                // ->toArray()
-        // );
-
+        $this->assertNull(
+            (new OrRule([
+                    (new AndRule([$above, new NotRule($above)])),
+                    (new AndRule([$above, $equal])),
+                ]))
+                ->simplify()
+                ->removeInvalidBranches()
+        );
     }
 
     /**/
