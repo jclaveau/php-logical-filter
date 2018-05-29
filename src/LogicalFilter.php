@@ -49,7 +49,7 @@ class LogicalFilter implements \JsonSerializable
     {
         $this->rules = new AndRule;
         if ($rules)
-            $this->addRules();
+            $this->addRules( $rules );
     }
 
     /**
@@ -281,40 +281,6 @@ class LogicalFilter implements \JsonSerializable
     {
         $this->rules = new AndRule;
         return $this;
-    }
-
-    /**
-     * Extracts the keys from the filter and checks that none is unused.
-     *
-     * @return new Filter instance
-     * /
-    public function useAllRules(array $rules_to_use)
-    {
-        $rules = $this->copyRules();
-
-        $parameters = [];
-
-        foreach ($rules_to_use as $parameter_name => $rule_to_use) {
-
-            // TODO simplify $rule_to_use to have only one set of parameters
-            //
-
-
-            if (isset( $rules[ $rule_to_use[0] ][ $rule_to_use[1] ] )) {
-
-                $parameters[ $parameter_name ]
-                    = $rules[ $rule_to_use[0] ][ $rule_to_use[1] ]->getParameters();
-
-                unset($rules[ $rule_to_use[0] ][ $rule_to_use[1] ]);
-            }
-        }
-
-        if (array_filter($rules)) {
-            throw new \ErrorException("Unused rules in the filter: "
-                .print_r($rules, true));
-        }
-
-        return $parameters;
     }
 
     /**
