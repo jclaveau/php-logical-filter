@@ -2,4 +2,4 @@
 vendor/bin/phpdoc  -d src -t docs/phpdoc --template="xml"
 
 # Next, run phpdocmd:
-vendor/bin/phpdocmd docs/phpdoc/structure.xml docs
+vendor/bin/phpdocmd docs/phpdoc/structure.xml --index README.md docs
