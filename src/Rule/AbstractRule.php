@@ -26,7 +26,7 @@ abstract class AbstractRule implements \JsonSerializable
     public static function getRuleClass($rule_type)
     {
         $rule_class = __NAMESPACE__
-            . '\\Rule\\'
+            . '\\'
             . str_replace('_', '', ucwords($rule_type, '_'))
             . 'Rule';
 
@@ -74,6 +74,14 @@ abstract class AbstractRule implements \JsonSerializable
     public function jsonSerialize()
     {
         return $this->toArray();
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return var_export($this->toArray(), true);
     }
 
     /**/
