@@ -8,6 +8,12 @@ use JClaveau\LogicalFilter\Rule\OrRule;
 use JClaveau\LogicalFilter\Rule\NotRule;
 
 /**
+ * LogicalFilter describes a set of logical rules structured by
+ * conjunctions and disjunctions (AND and OR).
+ *
+ * It's able to simplify them in order to find contractories branches
+ * of the tree rule and check if there is at least one set rules having
+ * possibilities.
  */
 class LogicalFilter implements \JsonSerializable
 {
