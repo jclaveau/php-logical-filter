@@ -20,6 +20,42 @@ Methods
 -------
 
 
+### generateSimpleRule
+
+    \JClaveau\LogicalFilter\Rule\AbstractRule JClaveau\LogicalFilter\Rule\AbstractRule::generateSimpleRule(string $field, string $type, $values)
+
+
+
+
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $field **string**
+* $type **string**
+* $values **mixed**
+
+
+
+### getRuleClass
+
+    string JClaveau\LogicalFilter\Rule\AbstractRule::getRuleClass($rule_type)
+
+
+
+
+
+* Visibility: **public**
+* This method is **static**.
+
+
+#### Arguments
+* $rule_type **mixed**
+
+
+
 ### copy
 
     \JClaveau\LogicalFilter\Rule\Rule JClaveau\LogicalFilter\Rule\AbstractRule::copy()

@@ -49,42 +49,27 @@ Methods
 
 ### __construct
 
-    mixed JClaveau\LogicalFilter\LogicalFilter::__construct()
+    mixed JClaveau\LogicalFilter\LogicalFilter::__construct(array $rules)
 
-
-
-
-
-* Visibility: **public**
-
-
-
-
-### getRuleClass
-
-    string JClaveau\LogicalFilter\LogicalFilter::getRuleClass($rule_type)
-
-
+Creates a filter. You can provide a description of rules as in
+addRules() as paramater.
 
 
 
 * Visibility: **public**
-* This method is **static**.
 
 
 #### Arguments
-* $rule_type **mixed**
+* $rules **array**
 
 
 
 ### addRules
 
-    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::addRules()
+    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::addRules(array $rules)
 
 This method gathers different ways to define the rules of a LogicalFilter.
 
-+ You can add N already instanciated Rules.
-+ You can provide 3 arguments: $field, $operator, $value
 + You can provide a tree of rules:
 [
      'or',
@@ -99,42 +84,8 @@ This method gathers different ways to define the rules of a LogicalFilter.
 * Visibility: **public**
 
 
-
-
-### generateSimpleRule
-
-    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::generateSimpleRule(string $field, string $type, $values)
-
-
-
-
-
-* Visibility: **public**
-* This method is **static**.
-
-
 #### Arguments
-* $field **string**
-* $type **string**
-* $values **mixed**
-
-
-
-### addCompositeRule
-
-    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::addCompositeRule(array $rules_composition)
-
-Transforms an array gathering different rules representing
-atomic and operation rules into a tree of Rules added to the
-current Filter.
-
-
-
-* Visibility: **public**
-
-
-#### Arguments
-* $rules_composition **array**
+* $rules **array** - &lt;p&gt;Rules description&lt;/p&gt;
 
 
 
@@ -146,12 +97,15 @@ Recursion auxiliary of addCompositeRule.
 
 
 
-* Visibility: **private**
+* Visibility: **protected**
 
 
 #### Arguments
-* $rules_composition **array**
-* $recursion_position **[JClaveau\LogicalFilter\Rule\AbstractOperationRule](JClaveau-LogicalFilter-Rule-AbstractOperationRule.md)**
+* $rules_composition **array** - &lt;p&gt;The description of the
+                                                 rules to add.&lt;/p&gt;
+* $recursion_position **[JClaveau\LogicalFilter\Rule\AbstractOperationRule](JClaveau-LogicalFilter-Rule-AbstractOperationRule.md)** - &lt;p&gt;The position in the
+                                                 tree where rules must
+                                                 be added.&lt;/p&gt;
 
 
 
@@ -216,7 +170,7 @@ contradictory.
 
 ### toArray
 
-    mixed JClaveau\LogicalFilter\LogicalFilter::toArray($debug)
+    array JClaveau\LogicalFilter\LogicalFilter::toArray($debug)
 
 Returns an array describing the rule tree of the Filter.
 
@@ -226,7 +180,7 @@ Returns an array describing the rule tree of the Filter.
 
 
 #### Arguments
-* $debug **mixed**
+* $debug **mixed** - &lt;p&gt;Provides a source oriented dump.&lt;/p&gt;
 
 
 

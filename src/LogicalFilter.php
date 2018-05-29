@@ -1,4 +1,11 @@
 <?php
+/**
+ * LogicalFilter
+ *
+ * @package php-logical-filter
+ * @author  Jean Claveau
+ * @version 0.1.0 (29/05/2018)
+ */
 namespace JClaveau\LogicalFilter;
 
 use JClaveau\LogicalFilter\Rule\AbstractRule;
@@ -31,38 +38,22 @@ class LogicalFilter implements \JsonSerializable
     ];
 
     /**
+     * Creates a filter. You can provide a description of rules as in
+     * addRules() as paramater.
+     *
+     * @param  array $rules
+     *
+     * @see self::addRules
      */
-    public function __construct()
+    public function __construct(array $rules=[])
     {
         $this->rules = new AndRule;
-    }
-
-    /**
-     * @param  string rule name
-     *
-     * @return string corresponding rule class name
-     */
-    public static function getRuleClass($rule_type)
-    {
-        $rule_class = __NAMESPACE__
-            . '\\Rule\\'
-            . str_replace('_', '', ucwords($rule_type, '_'))
-            . 'Rule';
-
-        if (!class_exists( $rule_class)) {
-            throw new \InvalidArgumentException(
-                "No rule class corresponding to the expected type: '$rule_type'. "
-                ."Looking for '$rule_class'"
-            );
-        }
-
-        return $rule_class;
+        if ($rules)
+            $this->addRules();
     }
 
     /**
      * This method gathers different ways to define the rules of a LogicalFilter.
-     * + You can add N already instanciated Rules.
-     * + You can provide 3 arguments: $field, $operator, $value
      * + You can provide a tree of rules:
      * [
      *      'or',
@@ -74,73 +65,13 @@ class LogicalFilter implements \JsonSerializable
      *      ['field_6', 'equal', 'b'],
      *  ]
      *
-     * @param  mixed         Rules definition
+     * @param  array         $rules Rules description
      * @return LogicalFilter $this
      */
-    public function addRules()
-    {
-        $args = func_get_args();
-
-        if (count($args) == 3 && is_string($args[0]) && is_string($args[1])) {
-            $newRule = self::generateSimpleRule(
-                $args[0], // field
-                $args[1], // operator
-                $args[2]  // value
-            );
-
-            $this->rules->addOperand($newRule);
-        }
-        elseif (count($args) == count(array_filter($args, function($arg) {
-            return $arg instanceof AbstractRule;
-        })) ) {
-            foreach ($args as $i => $newRule) {
-                $this->rules->addOperand($newRule);
-            }
-        }
-        elseif (count($args) == 1 && is_array($args[0])) {
-            $this->addCompositeRule_recursion(
-                $args[0],
-                $this->rules
-            );
-        }
-        else {
-            throw new \InvalidArgumentException(
-                "Bad set of arguments provided for rules addition: "
-                .var_export($args, true)
-            );
-        }
-
-        return $this;
-    }
-
-    /**
-     *
-     * @param string $field
-     * @param string $type
-     * @param mixed  $value
-     *
-     * @return $this
-     */
-    public static function generateSimpleRule($field, $type, $values)
-    {
-        $ruleClass = self::getRuleClass($type);
-
-        return new $ruleClass( $field, $values );
-    }
-
-    /**
-     * Transforms an array gathering different rules representing
-     * atomic and operation rules into a tree of Rules added to the
-     * current Filter.
-     *
-     * @param array $rules_composition
-     *
-     * @return $this
-     */
-    public function addCompositeRule(array $rules_composition)
+    public function addRules(array $rules)
     {
         $this->addCompositeRule_recursion(
-            $rules_composition,
+            $rules,
             $this->rules
         );
 
@@ -150,11 +81,15 @@ class LogicalFilter implements \JsonSerializable
     /**
      * Recursion auxiliary of addCompositeRule.
      *
-     * @param array $rules_composition
+     * @param array                 $rules_composition  The description of the
+     *                                                  rules to add.
+     * @param AbstractOperationRule $recursion_position The position in the
+     *                                                  tree where rules must
+     *                                                  be added.
      *
      * @return $this
      */
-    private function addCompositeRule_recursion(
+    protected function addCompositeRule_recursion(
         array $rules_composition,
         AbstractOperationRule $recursion_position
     ) {
@@ -177,7 +112,7 @@ class LogicalFilter implements \JsonSerializable
             $operation     = $rules_composition[1];
             $operand_right = $rules_composition[2];
 
-            $rule = self::generateSimpleRule(
+            $rule = AbstractRule::generateSimpleRule(
                 $operand_left, $operation, $operand_right
             );
             $recursion_position->addOperand( $rule );
@@ -288,6 +223,10 @@ class LogicalFilter implements \JsonSerializable
 
     /**
      * Returns an array describing the rule tree of the Filter.
+     *
+     * @param $debug Provides a source oriented dump.
+     *
+     * @return array A description of the rules.
      */
     public function toArray($debug=false)
     {

@@ -1,14 +1,15 @@
 JClaveau\LogicalFilter\Rule\AbstractAtomicRule
 ===============
 
-Atomic rules are those who cannot be simplified :
+Atomic rules are those who cannot be simplified:
 + null
 + not null
 + equal
 + above
 + below
+Atomic rules are namable.
 
-Atomic rules are namable
+
 
 
 * Class name: AbstractAtomicRule
@@ -62,6 +63,44 @@ Methods
 
 * Visibility: **public**
 
+
+
+
+### generateSimpleRule
+
+    \JClaveau\LogicalFilter\Rule\AbstractRule JClaveau\LogicalFilter\Rule\AbstractRule::generateSimpleRule(string $field, string $type, $values)
+
+
+
+
+
+* Visibility: **public**
+* This method is **static**.
+* This method is defined by [JClaveau\LogicalFilter\Rule\AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)
+
+
+#### Arguments
+* $field **string**
+* $type **string**
+* $values **mixed**
+
+
+
+### getRuleClass
+
+    string JClaveau\LogicalFilter\Rule\AbstractRule::getRuleClass($rule_type)
+
+
+
+
+
+* Visibility: **public**
+* This method is **static**.
+* This method is defined by [JClaveau\LogicalFilter\Rule\AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)
+
+
+#### Arguments
+* $rule_type **mixed**
 
 
 

@@ -3,7 +3,7 @@ JClaveau\LogicalFilter\Rule\AboveRule
 
 a &gt; x
 
-Atomic rules are namable
+
 
 
 * Class name: AboveRule
@@ -138,6 +138,44 @@ Checks if the rule do not expect the value to be above infinity.
 * Visibility: **public**
 * This method is defined by [JClaveau\LogicalFilter\Rule\AbstractAtomicRule](JClaveau-LogicalFilter-Rule-AbstractAtomicRule.md)
 
+
+
+
+### generateSimpleRule
+
+    \JClaveau\LogicalFilter\Rule\AbstractRule JClaveau\LogicalFilter\Rule\AbstractRule::generateSimpleRule(string $field, string $type, $values)
+
+
+
+
+
+* Visibility: **public**
+* This method is **static**.
+* This method is defined by [JClaveau\LogicalFilter\Rule\AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)
+
+
+#### Arguments
+* $field **string**
+* $type **string**
+* $values **mixed**
+
+
+
+### getRuleClass
+
+    string JClaveau\LogicalFilter\Rule\AbstractRule::getRuleClass($rule_type)
+
+
+
+
+
+* Visibility: **public**
+* This method is **static**.
+* This method is defined by [JClaveau\LogicalFilter\Rule\AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)
+
+
+#### Arguments
+* $rule_type **mixed**
 
 
 
