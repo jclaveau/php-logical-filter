@@ -73,6 +73,7 @@ class LogicalFilter implements \JsonSerializable
     public function addRules()
     {
         if ($this->rules instanceof AndRule && empty($this->rules->getOperands())) {
+            // An empty AndRule is a rule having no solution
             throw new \LogicException(
                  "You are trying to add rules to a LogicalFilter which had "
                 ."only contradictory rules that have been simplified."
