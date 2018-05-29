@@ -66,10 +66,12 @@ addRules() as paramater.
 
 ### addRules
 
-    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::addRules(array $rules)
+    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::addRules()
 
 This method gathers different ways to define the rules of a LogicalFilter.
 
++ You can add N already instanciated Rules.
++ You can provide 3 arguments: $field, $operator, $value
 + You can provide a tree of rules:
 [
      'or',
@@ -83,9 +85,6 @@ This method gathers different ways to define the rules of a LogicalFilter.
 
 * Visibility: **public**
 
-
-#### Arguments
-* $rules **array** - &lt;p&gt;Rules description&lt;/p&gt;
 
 
 
@@ -239,9 +238,9 @@ Removes all the defined constraints.
 
 ### copy
 
-    \JClaveau\LogicalFilter\new JClaveau\LogicalFilter\LogicalFilter::copy()
+    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::copy()
 
-Extracts the keys from the filter and checks that none is unused.
+Clone the current object and its rules.
 
 
 

@@ -290,3 +290,17 @@ For implementing JsonSerializable interface.
 
 
 
+
+### __toString
+
+    string JClaveau\LogicalFilter\Rule\AbstractRule::__toString()
+
+
+
+
+
+* Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)
+
+
+

@@ -19,7 +19,4 @@ API Index
             * [BelowRule](JClaveau-LogicalFilter-Rule-BelowRule.md)
         * [LogicalFilter](JClaveau-LogicalFilter-LogicalFilter.md)
         * [BetweenRule](JClaveau-LogicalFilter-BetweenRule.md)
-        * [NotInRule](JClaveau-LogicalFilter-NotInRule.md)
-    * JClaveau\SocialVideo
-        * [NotImplementedException](JClaveau-SocialVideo-NotImplementedException.md)
 
