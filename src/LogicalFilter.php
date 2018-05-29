@@ -187,7 +187,7 @@ class LogicalFilter implements \JsonSerializable
 
             $recursion_position->addOperand( $rule );
 
-            if ($operator == 'not' && count($operands_descriptions) != 1) {
+            if ($operator == NotRule::operator && count($operands_descriptions) != 1) {
                 throw new \InvalidArgumentException(
                     "Negations can have only one operand: \n"
                     .var_export($rules_composition, true)

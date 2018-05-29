@@ -23,6 +23,20 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
+    public function test_construct()
+    {
+        $filter = new LogicalFilter(['field', 'above', 3]);
+
+        $this->assertEquals(
+            new AndRule([
+                new AboveRule('field', 3),
+            ]),
+            $filter->getRules()
+        );
+    }
+
+    /**
+     */
     public function test_addRules_simple()
     {
         $filter = new LogicalFilter();
