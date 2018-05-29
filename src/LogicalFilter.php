@@ -28,14 +28,14 @@ class LogicalFilter implements \JsonSerializable
     protected $rules;
 
     /** @var  array $ruleAliases */
-    protected static $ruleAliases = [
-        '!=' => 'not equal',
-        '='  => 'equal',
-        '>'  => 'above',
-        '>=' => 'above or equal',
-        '<'  => 'below',
-        '<=' => 'below or equal',
-    ];
+    // protected static $ruleAliases = [
+        // '!=' => 'not equal',
+        // '='  => 'equal',
+        // '>'  => 'above',
+        // '>=' => 'above or equal',
+        // '<'  => 'below',
+        // '<=' => 'below or equal',
+    // ];
 
     /**
      * Creates a filter. You can provide a description of rules as in
@@ -47,7 +47,6 @@ class LogicalFilter implements \JsonSerializable
      */
     public function __construct(array $rules=[])
     {
-        $this->rules = new AndRule;
         if ($rules)
             $this->addRules( $rules );
     }
@@ -73,6 +72,15 @@ class LogicalFilter implements \JsonSerializable
      */
     public function addRules()
     {
+        if ($this->rules instanceof AndRule && !$this->rules->hasSolution()) {
+            throw new \LogicException(
+                 "You are trying to add rules to a LogicalFilter which had "
+                ."only contradictory rules that have been simplified."
+            );
+        }
+        if ($this->rules === null)
+            $this->rules = new AndRule;
+
         $args = func_get_args();
 
         if (count($args) == 3 && is_string($args[0]) && is_string($args[1])) {
@@ -302,13 +310,13 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
-     * Removes all the defined constraints.
+     * Removes all the defined rules.
      *
      * @return $this
      */
     public function flushRules()
     {
-        $this->rules = new AndRule;
+        $this->rules = null;
         return $this;
     }
 

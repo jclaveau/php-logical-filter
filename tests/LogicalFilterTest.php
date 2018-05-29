@@ -634,5 +634,32 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     */
+    public function test_addRules_on_noSolution_filter()
+    {
+        $filter = (new LogicalFilter())->addRules([
+            'and',
+            [
+                'or',
+                ['field_5', 'above', 'a'],
+                ['field_5', 'below', 'a'],
+            ],
+            ['field_5', 'equal', 'b'],
+        ]);
+
+        $filter->simplify();
+        $this->assertNull( $filter->getRules()->removeInvalidBranches() );
+
+        try {
+            $filter->addRules('a', '<', 'b');
+            $this->assertFalse(false, "Adding rule to an invalid filter not forbidden");
+        }
+        catch (\Exception $e) {
+            $e->getMessage() ==  "You are trying to add rules to a LogicalFilter which had "
+                ."only contradictory rules that have been simplified.";
+        }
+    }
+
     /**/
 }
