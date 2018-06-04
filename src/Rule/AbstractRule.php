@@ -3,6 +3,40 @@ namespace JClaveau\LogicalFilter\Rule;
 
 abstract class AbstractRule implements \JsonSerializable
 {
+    /** @var  array $ruleAliases */
+    protected static $ruleAliases = [
+        '!'  => 'not',
+        '='  => 'equal',
+        '>'  => 'above',
+        '<'  => 'below',
+
+        // '<=' => 'below or equal',
+        // '!=' => 'not equal',
+        // '>=' => 'above or equal',
+    ];
+
+    /**
+     */
+    public static function findSymbolicOperator($english_operator)
+    {
+        $association = array_flip( self::$ruleAliases );
+        if (isset($association[ $english_operator ]))
+            return $association[ $english_operator ];
+
+        return $english_operator;
+    }
+
+    /**
+     */
+    public static function findEnglishOperator($symbolic_operator)
+    {
+        $association = self::$ruleAliases;
+        if (isset($association[ $symbolic_operator ]))
+            return $association[ $symbolic_operator ];
+
+        return $symbolic_operator;
+    }
+
     /**
      *
      * @param  string $field
@@ -19,12 +53,14 @@ abstract class AbstractRule implements \JsonSerializable
     }
 
     /**
-     * @param  string rule name
+     * @param  string rule type
      *
-     * @return string corresponding rule class name
+     * @return string corresponding rule class type
      */
     public static function getRuleClass($rule_type)
     {
+        $rule_type = self::findEnglishOperator($rule_type);
+
         $rule_class = __NAMESPACE__
             . '\\'
             . str_replace('_', '', ucwords($rule_type, '_'))

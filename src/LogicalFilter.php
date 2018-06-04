@@ -27,16 +27,6 @@ class LogicalFilter implements \JsonSerializable
     /** @var  AndRule $rules */
     protected $rules;
 
-    /** @var  array $ruleAliases */
-    // protected static $ruleAliases = [
-        // '!=' => 'not equal',
-        // '='  => 'equal',
-        // '>'  => 'above',
-        // '>=' => 'above or equal',
-        // '<'  => 'below',
-        // '<=' => 'below or equal',
-    // ];
-
     /**
      * Creates a filter. You can provide a description of rules as in
      * addRules() as paramater.
@@ -144,7 +134,11 @@ class LogicalFilter implements \JsonSerializable
             &&  !in_array( AndRule::operator, $rules_composition )
             &&  !in_array( OrRule::operator,  $rules_composition )
             &&  !in_array( NotRule::operator, $rules_composition )
+            &&  !in_array( AbstractRule::findSymbolicOperator( AndRule::operator ), $rules_composition )
+            &&  !in_array( AbstractRule::findSymbolicOperator( OrRule::operator ),  $rules_composition )
+            &&  !in_array( AbstractRule::findSymbolicOperator( NotRule::operator ), $rules_composition )
         ) {
+
             // atomic or composit rules
             $operand_left  = $rules_composition[0];
             $operation     = $rules_composition[1];
@@ -157,13 +151,16 @@ class LogicalFilter implements \JsonSerializable
         }
         else {
             // operations
-            if ($rules_composition[0] == NotRule::operator) {
+            if (    $rules_composition[0] == NotRule::operator
+                ||  $rules_composition[0] == AbstractRule::findSymbolicOperator( NotRule::operator ) ) {
                 $rule = new NotRule();
             }
-            elseif (in_array( AndRule::operator, $rules_composition )) {
+            elseif (in_array( AndRule::operator, $rules_composition )
+                ||  in_array( AbstractRule::findSymbolicOperator( AndRule::operator ), $rules_composition ) ) {
                 $rule = new AndRule();
             }
-            elseif (in_array( OrRule::operator, $rules_composition)) {
+            elseif (in_array( OrRule::operator, $rules_composition )
+                ||  in_array( AbstractRule::findSymbolicOperator( OrRule::operator ), $rules_composition ) ) {
                 $rule = new OrRule();
             }
             else {
@@ -175,7 +172,7 @@ class LogicalFilter implements \JsonSerializable
             $operands_descriptions = array_filter(
                 $rules_composition,
                 function ($operand) use ($operator) {
-                    return $operand !== $operator;
+                    return !in_array($operand, [$operator, AbstractRule::findSymbolicOperator( $operator )]);
                 }
             );
 
@@ -268,7 +265,11 @@ class LogicalFilter implements \JsonSerializable
      */
     public function toArray($debug=false)
     {
-        return $this->rules->toArray($debug);
+        $rules = $this->rules;
+        if ($rules instanceof AndRule && count($rules->getOperands()) == 1)
+            $rules = $rules->getOperands()[0];
+
+        return $rules->toArray($debug);
     }
 
     /**

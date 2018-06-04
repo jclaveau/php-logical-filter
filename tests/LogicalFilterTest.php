@@ -596,7 +596,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
     public function test_jsonSerialize()
     {
         $this->assertEquals(
-            '["and",["or",["and",["field_5",">","a"],["field_5","<","a"]],["field_6","=","b"]]]',
+            '["or",["and",["field_5",">","a"],["field_5","<","a"]],["field_6","=","b"]]',
             json_encode(
                 (new LogicalFilter())->addRules([
                     'or',
@@ -660,6 +660,56 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             $e->getMessage() ==  "You are trying to add rules to a LogicalFilter which had "
                 ."only contradictory rules that have been simplified.";
         }
+    }
+
+    /**
+     */
+    public function test_addRules_with_symbolic_operators()
+    {
+        $filter = (new LogicalFilter())->addRules([
+            'and',
+            ['field_5', '>', 'a'],
+            ['field_5', '<', 'a'],
+            [
+                '!',
+                ['field_5', '=', 'a'],
+            ],
+        ]);
+
+        $this->assertEquals(
+            [
+                'and',
+                ['field_5', '>', 'a'],
+                ['field_5', '<', 'a'],
+                [
+                    'not',
+                    ['field_5', '=', 'a'],
+                ],
+            ],
+            $filter->toArray()
+        );
+
+    }
+
+    /**
+     */
+    public function test_addRules_from_toArray()
+    {
+        $filter = (new LogicalFilter())->addRules([
+            'and',
+            ['field_5', '>', 'a'],
+            ['field_5', '<', 'a'],
+            [
+                '!',
+                ['field_5', '=', 'a'],
+            ],
+        ]);
+
+        $this->assertEquals(
+            $filter->toArray(),
+            (new LogicalFilter($filter->toArray()))->toArray()
+        );
+
     }
 
     /**/
