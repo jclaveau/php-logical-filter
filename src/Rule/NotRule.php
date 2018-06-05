@@ -36,7 +36,7 @@ class NotRule extends AbstractOperationRule
      *
      * @return array
      */
-    public function negateOperand()
+    public function negateOperand($remove_generated_negations=false)
     {
         $operand = $this->operands[0];
 
@@ -145,29 +145,6 @@ class NotRule extends AbstractOperationRule
     {
         $this->moveSimplificationStepForward( self::atomic_operands_unified );
         return $this;
-    }
-
-    /**
-     * @todo Not implemented for NotRules. Its not required as it always
-     *       occures after removeNegations.
-     */
-    public function upLiftDisjunctions()
-    {
-        $this->moveSimplificationStepForward( self::disjunctions_rootified );
-        throw new \LogicException(
-            __METHOD__ . " MUST never be called before removing the negations"
-            . " from the rule tree"
-        );
-    }
-
-    /**
-     * Clones the rule and its operand.
-     *
-     * @return NotRule A copy of the current instance with its copied operand.
-     */
-    public function copy()
-    {
-        return new NotRule( $this->operands[0]->copy() );
     }
 
     /**

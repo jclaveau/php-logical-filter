@@ -24,6 +24,37 @@ class AndRuleTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
+    public function test_removeInvalidBranches()
+    {
+        $below = new BelowRule('field_name', 1);
+        $equal = new EqualRule('field_name', 2);
+        $above = new AboveRule('field_name', 3);
+
+        $this->assertEmpty(
+            (new AndRule([$below, $equal]))
+                ->simplify( AbstractOperationRule::remove_invalid_branches )
+                ->removeInvalidBranches()
+                ->getOperands()
+        );
+
+        $this->assertEmpty(
+            (new AndRule([$equal, $above]))
+                ->simplify( AbstractOperationRule::remove_invalid_branches )
+                ->removeInvalidBranches()
+                ->getOperands()
+        );
+
+        $this->assertEmpty(
+            (new AndRule([$below, $above]))
+                ->simplify( AbstractOperationRule::remove_invalid_branches )
+                ->removeInvalidBranches()
+                ->getOperands()
+        );
+
+    }
+
+    /**
+     */
     public function test_hasSolution()
     {
         $below = new BelowRule('field_name', 1);
@@ -31,27 +62,27 @@ class AndRuleTest extends \PHPUnit_Framework_TestCase
         $above = new AboveRule('field_name', 3);
 
         $this->assertFalse(
-            (new AndRule([$below, $equal]))->hasSolution()
+            (new AndRule([$below, $equal]))->simplify()->hasSolution()
         );
 
         $this->assertFalse(
-            (new AndRule([$equal, $above]))->hasSolution()
+            (new AndRule([$equal, $above]))->simplify()->hasSolution()
         );
 
         $this->assertFalse(
-            (new AndRule([$below, $above]))->hasSolution()
+            (new AndRule([$below, $above]))->simplify()->hasSolution()
         );
 
         $this->assertTrue(
-            (new AndRule([$below]))->hasSolution()
+            (new AndRule([$below]))->simplify()->hasSolution()
         );
 
         $this->assertTrue(
-            (new AndRule([$equal]))->hasSolution()
+            (new AndRule([$equal]))->simplify()->hasSolution()
         );
 
         $this->assertTrue(
-            (new AndRule([$above]))->hasSolution()
+            (new AndRule([$above]))->simplify()->hasSolution()
         );
     }
 
@@ -70,30 +101,30 @@ class AndRuleTest extends \PHPUnit_Framework_TestCase
             // ->simplify()
             // ->dump(true)
             // ;
-        // var_dump($result->hasSolution());
+        // var_dump($result->simplify()->hasSolution());
 
         $this->assertFalse(
-            (new AndRule([$above, new NotRule($above)]))->hasSolution()
+            (new AndRule([$above, new NotRule($above)]))->simplify()->hasSolution()
         );
 
         $this->assertTrue(
-            (new AndRule([new NotRule($above), new NotRule($above)]))->hasSolution()
+            (new AndRule([new NotRule($above), new NotRule($above)]))->simplify()->hasSolution()
         );
 
         $this->assertFalse(
-            (new AndRule([$below, new NotRule($below)]))->hasSolution()
+            (new AndRule([$below, new NotRule($below)]))->simplify()->hasSolution()
         );
 
         $this->assertTrue(
-            (new AndRule([new NotRule($below), new NotRule($below)]))->hasSolution()
+            (new AndRule([new NotRule($below), new NotRule($below)]))->simplify()->hasSolution()
         );
 
         $this->assertFalse(
-            (new AndRule([$equal, new NotRule($equal)]))->hasSolution()
+            (new AndRule([$equal, new NotRule($equal)]))->simplify()->hasSolution()
         );
 
         $this->assertTrue(
-            (new AndRule([new NotRule($equal), new NotRule($equal)]))->hasSolution()
+            (new AndRule([new NotRule($equal), new NotRule($equal)]))->simplify()->hasSolution()
         );
     }
 

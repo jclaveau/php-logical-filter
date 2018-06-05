@@ -2,7 +2,7 @@
 namespace JClaveau\LogicalFilter\Rule;
 
 /**
- * a > x
+ * a = x
  */
 class EqualRule extends AbstractAtomicRule
 {
@@ -44,6 +44,16 @@ class EqualRule extends AbstractAtomicRule
             $debug ? $this->getInstanceId() : self::operator,
             $this->value,
         ];
+    }
+
+    /**
+     * By default, every atomic rule can have a solution by itself
+     *
+     * @return bool
+     */
+    public function hasSolution()
+    {
+        return true;
     }
 
     /**/

@@ -20,16 +20,23 @@ class OrRule extends AbstractOperationRule
      *
      * @return $this
      */
-    public function upLiftDisjunctions()
+    public function rootifyDisjunctions()
     {
-        $this->moveSimplificationStepForward( self::disjunctions_rootified );
+        $this->moveSimplificationStepForward( self::rootify_disjunctions );
+
         $upLiftedOperands = [];
         foreach ($this->getOperands() as $operand) {
             $operand = $operand->copy();
             if ($operand instanceof AbstractOperationRule)
-                $operand = $operand->upLiftDisjunctions();
+                $operand = $operand->rootifyDisjunctions();
 
-            $upLiftedOperands[] = $operand;
+            if ($operand instanceof OrRule) {
+                foreach ($operand->getOperands() as $subOperand)
+                    $upLiftedOperands[] = $subOperand;
+            }
+            else {
+                $upLiftedOperands[] = $operand;
+            }
         }
 
         return new OrRule($upLiftedOperands);
@@ -84,17 +91,17 @@ class OrRule extends AbstractOperationRule
      * Removes rule branches that cannot produce result like:
      * A = 1 && ( (B < 2 && B > 3) || (C = 8 && C = 10) ) <=> A = 1
      *
-     * @return null|OrRule The rule with removed invalid subrules or null
-     *                     if it's invalid itself.
+     * @return OrRule
      */
     public function removeInvalidBranches()
     {
-        $this->moveSimplificationStepForward(self::invalid_branches_removed);
+        $this->moveSimplificationStepForward(self::remove_invalid_branches);
 
         foreach ($this->operands as $i => $operand) {
 
             if ($operand instanceof AbstractOperationRule) {
-                if (!$this->operands[$i] = $operand->removeInvalidBranches()) {
+                $this->operands[$i] = $operand->removeInvalidBranches();
+                if (!$this->operands[$i]->getOperands()) {
                     unset($this->operands[$i]);
                     continue;
                 }
@@ -104,9 +111,6 @@ class OrRule extends AbstractOperationRule
                     unset($this->operands[$i]);
             }
         }
-
-        if (empty($this->operands))
-            return null;
 
         return $this;
     }
@@ -126,16 +130,9 @@ class OrRule extends AbstractOperationRule
             );
         }
 
-        $valid_operands = [];
-        foreach ($this->operands as $i => $operand) {
-            if (method_exists($operand, 'hasSolution') && $operand->hasSolution()) {
-                $valid_operands[] = $operand;
-            }
-        }
-
         // If there is no remaining operand in an OrRule, it means it has
         // no solution.
-        return !empty($valid_operands);
+        return !empty($this->getOperands());
     }
 
     /**/

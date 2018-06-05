@@ -18,15 +18,15 @@ class AndRule extends AbstractOperationRule
      *
      * @return OrRule copied operands with one OR at its root
      */
-    public function upLiftDisjunctions()
+    public function rootifyDisjunctions()
     {
-        $this->moveSimplificationStepForward( self::disjunctions_rootified );
+        $this->moveSimplificationStepForward( self::rootify_disjunctions );
 
         $upLiftedOperands = [];
         foreach ($this->getOperands() as $operand) {
             $operand = $operand->copy();
             if ($operand instanceof AbstractOperationRule)
-                $operand = $operand->upLiftDisjunctions();
+                $operand = $operand->rootifyDisjunctions();
 
             $upLiftedOperands[] = $operand;
         }
@@ -106,17 +106,19 @@ class AndRule extends AbstractOperationRule
      * Removes rule branches that cannot produce result like:
      * A = 1 || (B < 2 && B > 3) <=> A = 1
      *
-     * @return null|AndRule The rule with removed invalid subrules or null
-     *                      if it's invalid itself.
+     * @return AndRule $this
      */
     public function removeInvalidBranches()
     {
-        $this->moveSimplificationStepForward(self::invalid_branches_removed);
+        $this->moveSimplificationStepForward(self::remove_invalid_branches);
 
         foreach ($this->operands as $i => $operand) {
             if ($operand instanceof AbstractOperationRule) {
-                if (!$this->operands[$i] = $operand->removeInvalidBranches())
-                    return null;
+                $this->operands[$i] = $operand->removeInvalidBranches();
+                if (!$this->operands[$i]->hasSolution()) {
+                    $this->operands = [];
+                    return $this;
+                }
             }
         }
 
@@ -125,17 +127,30 @@ class AndRule extends AbstractOperationRule
         foreach ($operandsByFields as $field => $operandsByOperator) {
 
             if (!empty($operandsByOperator[ EqualRule::operator ])) {
-                // There should never be multiple EqualRules after simplification
-                if (count($operandsByOperator[ EqualRule::operator ]) != 1)
-                    return null;
+
+                foreach ($operandsByOperator[ EqualRule::operator ] as $equalRule) {
+                    // Multiple equal rules with same value is invalid
+                    if (isset($previousEqualRule) && $previousEqualRule->getValue() != $equalRule->getValue()) {
+                        $this->operands = [];
+                        return $this;
+                    }
+                    $previousEqualRule = $equalRule;
+                }
 
                 $equalRule = reset($operandsByOperator[ EqualRule::operator ]);
 
-                // There shouldn't be remaining AboveRules or BelowRules
-                // after simplification, if there is already an EqualRule
                 if (   !empty($operandsByOperator[ BelowRule::operator ])
-                    || !empty($operandsByOperator[ AboveRule::operator ])) {
-                    return null;
+                    && $equalRule->getValue() >= reset($operandsByOperator[ BelowRule::operator ])->getMaximum()
+                ) {
+                    $this->operands = [];
+                    return $this;
+                }
+
+                if (   !empty($operandsByOperator[ AboveRule::operator ])
+                    && $equalRule->getValue() <= reset($operandsByOperator[ AboveRule::operator ])->getMinimum()
+                ) {
+                    $this->operands = [];
+                    return $this;
                 }
             }
             elseif (   !empty($operandsByOperator[ BelowRule::operator ])
@@ -143,13 +158,12 @@ class AndRule extends AbstractOperationRule
                 $aboveRule = reset($operandsByOperator[ AboveRule::operator ]);
                 $belowRule = reset($operandsByOperator[ BelowRule::operator ]);
 
-                if ($belowRule->getMaximum() <= $aboveRule->getMinimum())
-                    return null;
+                if ($belowRule->getMaximum() <= $aboveRule->getMinimum()) {
+                    $this->operands = [];
+                    return $this;
+                }
             }
         }
-
-        if (empty($this->operands))
-            return null;
 
         return $this;
     }
@@ -161,56 +175,23 @@ class AndRule extends AbstractOperationRule
      * + a > 3 && a < 2
      *
      * @return bool If the AndRule can have a solution or not
-     *
-     * @todo remove this weird recursion once the issue with upliftDisjunctions is ok
      */
     public function hasSolution()
     {
-        $instance = $this->simplify()
-            // ->dump(true)
-            ;
-
-        if ($instance instanceof AndRule) {
-            $operandsByFields = $instance->groupOperandsByFieldAndOperator();
-            foreach ($operandsByFields as $field => $operandsByOperator) {
-
-                if (!empty($operandsByOperator[ EqualRule::operator ])) {
-                    // There should never be multiple EqualRules after simplification
-                    if (count($operandsByOperator[ EqualRule::operator ]) != 1)
-                        return false;
-
-                    $equalRule = reset($operandsByOperator[ EqualRule::operator ]);
-
-                    // There shouldn't be remaining AboveRules or BelowRules
-                    // after simplification, if there is already an EqualRule
-                    if (   !empty($operandsByOperator[ BelowRule::operator ])
-                        || !empty($operandsByOperator[ AboveRule::operator ])) {
-                        return false;
-                    }
-                }
-                elseif (   !empty($operandsByOperator[ BelowRule::operator ])
-                        && !empty($operandsByOperator[ AboveRule::operator ])) {
-                    $aboveRule = reset($operandsByOperator[ AboveRule::operator ]);
-                    $belowRule = reset($operandsByOperator[ BelowRule::operator ]);
-
-                    if ($belowRule->getMaximum() <= $aboveRule->getMinimum())
-                        return false;
-                }
-            }
-
-            foreach ($instance->getOperands() as $operand) {
-                if (!$operand->hasSolution())
-                    return false;
-            }
-
-            return true;
-        }
-        else {
-            if (method_exists($instance, 'hasSolution'))
-                return $instance->hasSolution();
+        if (!$this->simplicationStepReached(self::simplified)) {
+            throw new \LogicException(
+                "hasSolution has no sens if the rule is not simplified instead of being at: "
+                .var_export($this->current_simplification_step, true)
+            );
         }
 
-        return true;
+        // atomic rules
+        foreach ($this->getOperands() as $operand) {
+            if (method_exists($operand, 'hasSolution') && !$operand->hasSolution())
+                return false;
+        }
+
+        return !empty($this->getOperands());
     }
 
 

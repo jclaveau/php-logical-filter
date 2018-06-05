@@ -50,22 +50,5 @@ class InRule extends OrRule
         return $this;
     }
 
-    /**
-     * Clones the rule and its operands.
-     *
-     * @return InRule A copy of the current instance with copied operands.
-     */
-    public function copy()
-    {
-        $possibilities = [];
-        foreach ($this->operands as $operand) {
-            $possibilities[] = $operand->getValue();
-        }
-
-        $copiedRule = new InRule( $this->field, $possibilities );
-
-        return $copiedRule;
-    }
-
     /**/
 }

@@ -2,13 +2,13 @@
 namespace JClaveau\LogicalFilter\Rule;
 
 /**
- * Atomic rules are those who cannot be simplified:
+ * Atomic rules are those who cannot be simplified (so already are):
  * + null
  * + not null
  * + equal
  * + above
  * + below
- * Atomic rules are namable.
+ * Atomic rules are related to a field.
  */
 abstract class AbstractAtomicRule extends AbstractRule
 {
@@ -24,9 +24,11 @@ abstract class AbstractAtomicRule extends AbstractRule
     }
 
     /**
-     * @return bool true
+     * Atomic rules are always simplified
+     *
+     * @return bool
      */
-    public final function isAtomic()
+    public function isSimplified()
     {
         return true;
     }

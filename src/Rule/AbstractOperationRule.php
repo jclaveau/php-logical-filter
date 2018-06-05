@@ -1,5 +1,6 @@
 <?php
 namespace JClaveau\LogicalFilter\Rule;
+use       JClaveau\VisibilityViolator\VisibilityViolator;
 
 /**
  * Operation rules:
@@ -16,13 +17,14 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     protected $operands = [];
 
-    const negations_removed              = 'negations_removed';
-    const operation_duplicates_removed   = 'operation_duplicates_removed';
-    const disjunctions_rootified         = 'disjunctions_rootified';
-    const atomic_operands_unified        = 'atomic_operands_unified';
-    const monooperand_operations_removed = 'monooperand_operations_removed';
-    const invalid_branches_removed       = 'invalid_branches_removed';
-    const simplified                     = 'simplified';
+    const remove_negations              = 'remove_negations';
+    const remove_operation_duplicates   = 'remove_operation_duplicates';
+    const rootify_disjunctions          = 'rootify_disjunctions';
+    const unify_atomic_operands         = 'unify_atomic_operands';
+    const remove_monooperand_operations = 'remove_monooperand_operations';
+    const remove_invalid_branches       = 'remove_invalid_branches';
+    // const simplified                     = 'simplified';
+    const simplified                     = self::remove_invalid_branches;
 
     /**
      * The order is important!
@@ -30,13 +32,13 @@ abstract class AbstractOperationRule extends AbstractRule
      * @var array $simplification_steps
      */
     const simplification_steps = [
-        self::negations_removed,
-        self::operation_duplicates_removed,
-        self::disjunctions_rootified,
-        self::atomic_operands_unified,
-        self::monooperand_operations_removed,
-        self::invalid_branches_removed,
-        self::simplified,
+        self::remove_negations,
+        self::remove_operation_duplicates,
+        self::rootify_disjunctions,
+        self::unify_atomic_operands,
+        self::remove_monooperand_operations,
+        self::remove_invalid_branches,
+        // self::simplified,
     ];
 
     /**
@@ -161,12 +163,15 @@ abstract class AbstractOperationRule extends AbstractRule
      * Replace NotRule objects by the negation of their operands.
      *
      * @return $this
+     *
+     * @todo Clean it
      */
     public function removeNegations()
     {
-        $this->moveSimplificationStepForward(self::negations_removed);
+        $this->moveSimplificationStepForward(self::remove_negations);
 
         foreach ($this->operands as $i => $operand) {
+
             if ($operand instanceof NotRule) {
                 $this->operands[$i] = $operand->negateOperand();
             }
@@ -183,18 +188,27 @@ abstract class AbstractOperationRule extends AbstractRule
 
     /**
      */
-    public function removeUselessOperations()
+    public function removeOperationDuplicates()
     {
-        $this->moveSimplificationStepForward( self::operation_duplicates_removed );
+        $this->moveSimplificationStepForward( self::remove_operation_duplicates );
 
         foreach ($this->operands as $i => $operand) {
-            if (get_class($operand) == get_class($this) && !$this instanceof NotRule) {
+            if ($operand instanceof AbstractOperationRule)
+                $operand->removeOperationDuplicates();
+        }
+
+        if ($this instanceof NotRule)
+            return $this;
+
+        foreach ($this->operands as $i => $operand) {
+            if (get_class($operand) == get_class($this)) {
                 // Id AND is an operand on AND they can be merge (and the same with OR)
-                foreach ($operand->getOperands() as $subOperand) {
-                    $this->addOperand( $subOperand->copy() );
+                foreach ($operand->getOperands() as $sub_operand) {
+                    $this->addOperand( $sub_operand->copy() );
                 }
                 unset($this->operands[$i]);
             }
+
         }
 
         return $this;
@@ -207,7 +221,7 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function unifyOperands($unifyDifferentOperands = true)
     {
-        $this->moveSimplificationStepForward( self::atomic_operands_unified );
+        $this->moveSimplificationStepForward( self::unify_atomic_operands );
 
         $operandsByFields = $this->groupOperandsByFieldAndOperator();
 
@@ -263,57 +277,68 @@ abstract class AbstractOperationRule extends AbstractRule
      * + If an OrRule has an other OrRule as operand, they can be merged
      * + If an AndRule has an other AndRule as operand, they can be merged
      *
+     * @param  string $step_to_stop_before Mainly used for unit testing
+     *
      * @return AbstractRule the simplified rule
      */
-    public final function simplify($step_to_stop_after=null)
+    public final function simplify($step_to_stop_before=null)
     {
-        if ($step_to_stop_after && !in_array($step_to_stop_after, self::$simplification_steps)) {
+        if ($step_to_stop_before && !in_array($step_to_stop_before, self::simplification_steps)) {
             throw new \InvalidArgumentException(
-                "Invalid simplification step to stop at: ".$step_to_stop_after
+                "Invalid simplification step to stop at: ".$step_to_stop_before
             );
         }
 
-        if ($step_to_stop_after == self::simplified)
+        if ($step_to_stop_before == self::remove_negations)
             return $this;
 
         $this->removeNegations();
 
-        if ($step_to_stop_after == self::negations_removed)
+        if ($step_to_stop_before == self::remove_operation_duplicates)
             return $this;
 
-        $this->removeUselessOperations();
+        // $this->dump(true);
 
-        if ($step_to_stop_after == self::operation_duplicates_removed)
+        $this->removeOperationDuplicates();
+
+        if ($step_to_stop_before == self::rootify_disjunctions)
             return $this;
+        // $this->dump(!true);
+
+        // $this->dump(true);
 
         // FIXME return $this while RootifyingDisjunctions!
-        if (method_exists($this, 'upLiftDisjunctions')) {
-            $instance = $this->upLiftDisjunctions();
+        if (method_exists($this, 'rootifyDisjunctions')) {
+            $instance = $this->rootifyDisjunctions();
         }
         else {
             $instance = $this;
         }
 
-        if ($step_to_stop_after == self::disjunctions_rootified)
+        // $instance->dump(true);
+
+        if ($step_to_stop_before == self::unify_atomic_operands)
             return $instance;
 
         $instance->unifyOperands();
 
-        if ($step_to_stop_after == self::atomic_operands_unified)
+        if ($step_to_stop_before == self::remove_monooperand_operations)
             return $instance;
 
         if (!$instance instanceof NotRule && count($instance->getOperands()) == 1) {
             return $instance->getOperands()[0];
         }
 
-        $instance->moveSimplificationStepForward( self::monooperand_operations_removed );
+        $instance->moveSimplificationStepForward( self::remove_monooperand_operations );
 
-        if ($step_to_stop_after == self::monooperand_operations_removed)
+        if ($step_to_stop_before == self::remove_invalid_branches)
             return $instance;
 
         $instance->removeInvalidBranches();
 
-        $instance->moveSimplificationStepForward( self::simplified );
+        // $instance->dump(true);
+
+        // $instance->moveSimplificationStepForward( self::simplified );
 
         return $instance;
     }
@@ -324,7 +349,7 @@ abstract class AbstractOperationRule extends AbstractRule
      *
      * @return array The 3 dimensions array of operands: field > operator > i
      */
-    protected function groupOperandsByFieldAndOperator()
+    public function groupOperandsByFieldAndOperator()
     {
         $operandsByFields = [];
         foreach ($this->operands as $operand) {
@@ -351,15 +376,19 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function copy()
     {
-        $copiedOperands = [];
+        $copied_rule = clone $this;
+        $copied_operands = [];
         foreach ($this->operands as $operand) {
-            $copiedOperands[] = $operand->copy();
+            $copied_operands[] = $operand->copy();
         }
 
-        $class = get_class($this);
-        $copiedRule = new $class( $copiedOperands );
+        VisibilityViolator::setHiddenProperty(
+            $copied_rule,
+            'operands',
+            $copied_operands
+        );
 
-        return $copiedRule;
+        return $copied_rule;
     }
 
     /**/

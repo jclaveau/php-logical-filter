@@ -89,17 +89,19 @@ abstract class AbstractRule implements \JsonSerializable
     /**
      * var_dump() the rule with a chained syntax.
      */
-    public function dump($exit=false)
+    public function dump($exit=false, $debug=true)
     {
         $callstack_depth = 2;
         $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $callstack_depth);
         $caller = $bt[ $callstack_depth - 2 ];
 
         echo "\n" . $caller['file'] . ':' . $caller['line'] . "\n";
-        var_export($this->toArray(true));
+        var_export($this->toArray($debug));
         echo "\n\n";
         if ($exit)
             exit;
+
+        return $this;
     }
 
     /**

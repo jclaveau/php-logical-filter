@@ -62,16 +62,6 @@ class LogicalFilter implements \JsonSerializable
      */
     public function addRules()
     {
-        if ($this->rules instanceof AndRule && empty($this->rules->getOperands())) {
-            // An empty AndRule is a rule having no solution
-            throw new \LogicException(
-                 "You are trying to add rules to a LogicalFilter which had "
-                ."only contradictory rules that have been simplified."
-            );
-        }
-        if ($this->rules === null)
-            $this->rules = new AndRule;
-
         $args = func_get_args();
 
         if (count($args) == 3 && is_string($args[0]) && is_string($args[1])) {
@@ -81,16 +71,24 @@ class LogicalFilter implements \JsonSerializable
                 $args[2]  // value
             );
 
-            $this->rules->addOperand($newRule);
+            $this->addRule($newRule);
         }
         elseif (count($args) == count(array_filter($args, function($arg) {
             return $arg instanceof AbstractRule;
         })) ) {
             foreach ($args as $i => $newRule) {
-                $this->rules->addOperand($newRule);
+                $this->addRule($newRule);
             }
         }
         elseif (count($args) == 1 && is_array($args[0])) {
+
+            if ($this->rules === null) {
+                $this->rules = new AndRule;
+            }
+            elseif (!$this->rules instanceof AndRule) {
+                $this->rules = new AndRule([$this->rules]);
+            }
+
             $this->addCompositeRule_recursion(
                 $args[0],
                 $this->rules
@@ -101,6 +99,36 @@ class LogicalFilter implements \JsonSerializable
                 "Bad set of arguments provided for rules addition: "
                 .var_export($args, true)
             );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add one rule object
+     *
+     * @param AbstractRule $rule
+     *
+     * @return $this
+     */
+    public function addRule( AbstractRule $rule )
+    {
+        if ($this->rules instanceof AndRule && empty($this->rules->getOperands())) {
+            // An empty AndRule is a rule having no solution
+            throw new \LogicException(
+                 "You are trying to add rules to a LogicalFilter which had "
+                ."only contradictory rules that have been simplified."
+            );
+        }
+
+        if ($this->rules === null) {
+            $this->rules = $rule;
+        }
+        elseif (!$this->rules instanceof AndRule) {
+            $this->rules = new AndRule([$this->rules, $rule]);
+        }
+        else {
+            $this->rules->addOperand($rule);
         }
 
         return $this;
@@ -220,6 +248,9 @@ class LogicalFilter implements \JsonSerializable
      */
     public function getRules($copy = true)
     {
+        if (!$this->rules)
+            $this->rules = new AndRule;
+
         return $copy ? $this->rules->copy() : $this->rules;
     }
 
@@ -237,12 +268,13 @@ class LogicalFilter implements \JsonSerializable
     /**
      * Remove any constraint being a duplicate of another one.
      *
+     * @param  string $step_to_stop_before Mainly used for unit testing
      * @return $this
      */
-    public function simplify()
+    public function simplify($step_to_stop_before=null)
     {
-        $simplified_rules = $this->rules->simplify();
-        return $this->flushRules()->addRules( $simplified_rules );
+        $this->rules = $this->rules->simplify($step_to_stop_before);
+        return $this;
     }
 
     /**
@@ -292,7 +324,13 @@ class LogicalFilter implements \JsonSerializable
      */
     public function removeNegations()
     {
-        $this->rules->removeNegations();
+        if ($this->rules) {
+            $this->rules = (new AndRule([$this->rules]))
+                ->removeNegations()
+                // ->dump(true, false)
+                ->getOperands()[0];
+        }
+
         return $this;
     }
 
@@ -303,11 +341,11 @@ class LogicalFilter implements \JsonSerializable
      *
      * @return $this
      */
-    public function upLiftDisjunctions()
+    public function rootifyDisjunctions()
     {
-        // We always keep an AndRule as root to be able to add new rules
-        // to the Filter afterwards
-        $this->rules = new AndRule([$this->rules->upLiftDisjunctions()]);
+        if ($this->rules)
+            $this->rules = $this->rules->rootifyDisjunctions();
+
         return $this;
     }
 
@@ -331,17 +369,9 @@ class LogicalFilter implements \JsonSerializable
     {
         $newFilter = clone $this;
 
-        $rules = $this->rules->copy();
-
-        if (    $rules instanceof AndRule
-            && count($rules->getOperands()) == 1) {
-            // TODO this could be factorized with simplification once its split in little steps
-            $rules = $rules->getOperands()[0];
-        }
-
         return $newFilter
             ->flushRules()
-            ->addRules( $rules );
+            ->addRules( $this->rules->copy() );
     }
 
     /**/
