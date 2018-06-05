@@ -120,5 +120,17 @@ abstract class AbstractRule implements \JsonSerializable
         return var_export($this->toArray(), true);
     }
 
+    /**
+     * Returns an id describing the instance internally for debug purpose.
+     *
+     * @see https://secure.php.net/manual/en/function.spl-object-id.php
+     *
+     * @return string
+     */
+    public function getInstanceId()
+    {
+        return get_class($this).':'.spl_object_id($this);
+    }
+
     /**/
 }

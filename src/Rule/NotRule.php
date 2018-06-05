@@ -175,7 +175,7 @@ class NotRule extends AbstractOperationRule
     public function toArray($debug=false)
     {
         return [
-            $debug ? get_class($this).':'.spl_object_id($this) : self::operator,
+            $debug ? $this->getInstanceId() : self::operator,
             $this->operands[0]->toArray($debug)
         ];
     }

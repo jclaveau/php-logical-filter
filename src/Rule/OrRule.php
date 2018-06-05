@@ -40,7 +40,7 @@ class OrRule extends AbstractOperationRule
     public function toArray($debug=false)
     {
         $operandsAsArray = [
-            $debug ? get_class($this).':'.spl_object_id($this) : self::operator,
+            $debug ? $this->getInstanceId() : self::operator,
         ];
         foreach ($this->operands as $operand)
             $operandsAsArray[] = $operand->toArray($debug);
@@ -121,7 +121,8 @@ class OrRule extends AbstractOperationRule
     {
         if (!$this->simplicationStepReached(self::simplified)) {
             throw new \LogicException(
-                "hasSolution has no sens if the rule is not simplified"
+                "hasSolution has no sens if the rule is not simplified instead of being at: "
+                .var_export($this->current_simplification_step, true)
             );
         }
 

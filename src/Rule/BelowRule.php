@@ -52,7 +52,7 @@ class BelowRule extends AbstractAtomicRule
     {
         return [
             $this->field,
-            $debug ? get_class($this).':'.spl_object_id($this) : self::operator,
+            $debug ? $this->getInstanceId() : self::operator,
             $this->maximum,
         ];
     }

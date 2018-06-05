@@ -94,7 +94,7 @@ class AndRule extends AbstractOperationRule
     public function toArray($debug=false)
     {
         $operandsAsArray = [
-            $debug ? get_class($this).':'.spl_object_id($this) : self::operator,
+            $debug ? $this->getInstanceId() : self::operator,
         ];
         foreach ($this->operands as $operand)
             $operandsAsArray[] = $operand->toArray($debug);
