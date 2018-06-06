@@ -24,7 +24,7 @@ class CustomConverterTest extends \PHPUnit_Framework_TestCase
 
         $root_or_mysql = [];
 
-        $converter = new CustomConverter(
+        $converter = new CustomMinimalConverter(
             function () use (&$root_or_mysql) {
                 $root_or_mysql[] = [];
             },

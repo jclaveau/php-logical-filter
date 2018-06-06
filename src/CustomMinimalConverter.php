@@ -1,6 +1,6 @@
 <?php
 /**
- * CustomConverter
+ * CustomMinimalConverter
  *
  * @package php-logical-filter
  * @author  Jean Claveau
@@ -13,29 +13,33 @@ use       JClaveau\LogicalFilter\Converter\ConverterInterface;
  * This class implements a converter using callbacks for every pseudo-event
  * related to the rules parsing.
  */
-class CustomConverter implements ConverterInterface
+class CustomMinimalConverter implements ConverterInterface
 {
     /** @var protected array $callbacks */
     protected $callbacks = [];
 
     /**
      */
-    public function __construct(callable $onOpenOr, callable $onAndPossibility, callable $onCloseOr)
-    {
-        $this->callbacks = [
-            'onOpenOr'         => $onOpenOr,
-            'onAndPossibility' => $onAndPossibility,
-            'onCloseOr'        => $onCloseOr,
-        ];
+    public function __construct(
+        callable $onOpenOr,
+        callable $onAndPossibility,
+        callable $onCloseOr
+    ) {
+        $this->callbacks = get_defined_vars();
     }
 
     /**
-     * Pseudo-event called while opening a case of the root Or of the
-     * filter.
      */
     public function onOpenOr()
     {
-        call_user_func( $this->callbacks['onOpenOr'] );
+        call_user_func( $this->callbacks[ __FUNCTION__ ] );
+    }
+
+    /**
+     */
+    public function onCloseOr()
+    {
+        call_user_func( $this->callbacks[ __FUNCTION__ ] );
     }
 
     /**
@@ -45,7 +49,7 @@ class CustomConverter implements ConverterInterface
     public function onAndPossibility($field, $operator, $operand, array $allOperandsByField)
     {
         call_user_func(
-            $this->callbacks['onAndPossibility'],
+            $this->callbacks[__FUNCTION__ ],
             $field,
             $operator,
             $operand,
@@ -54,20 +58,11 @@ class CustomConverter implements ConverterInterface
     }
 
     /**
-     * Pseudo-event called while closing a case of the root Or of the
-     * filter.
-     */
-    public function onCloseOr()
-    {
-        call_user_func( $this->callbacks['onCloseOr'] );
-    }
-
-    /**
      * @param LogicalFilter $filter
      */
     public function convert( LogicalFilter $filter )
     {
-        $rootOr = $filter->simplify()->getRules();
+        $rootOr = $filter->simplify(['force_logical_core' => true])->getRules();
 
         if (!$rootOr->hasSolution())
             return $this;

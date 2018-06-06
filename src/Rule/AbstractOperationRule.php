@@ -22,9 +22,9 @@ abstract class AbstractOperationRule extends AbstractRule
     const rootify_disjunctions          = 'rootify_disjunctions';
     const unify_atomic_operands         = 'unify_atomic_operands';
     const remove_monooperand_operations = 'remove_monooperand_operations';
-    const remove_invalid_branches       = 'remove_invalid_branches';
-    // const simplified                     = 'simplified';
-    const simplified                     = self::remove_invalid_branches;
+    const remove_invalid_branches       = 'remove_invalid_branches';    // simplified after this step
+
+    const simplified                    = self::remove_invalid_branches;
 
     /**
      * The order is important!
@@ -38,7 +38,6 @@ abstract class AbstractOperationRule extends AbstractRule
         self::unify_atomic_operands,
         self::remove_monooperand_operations,
         self::remove_invalid_branches,
-        // self::simplified,
     ];
 
     /**
@@ -120,14 +119,17 @@ abstract class AbstractOperationRule extends AbstractRule
             $current_index = $steps_indices[ $this->current_simplification_step ];
             $target_index  = $steps_indices[ $step_to_go_to ];
 
-            if ( $current_index < $target_index - 1 ) {
+            if ( $current_index >= $target_index ) {
+                // allow recall of previous step without going back
+                return;
+            }
+            elseif ( $current_index < $target_index - 1 ) {
                 throw new \LogicException(
                     "$step_to_go_to MUST be fullfilled after " . self::simplification_steps[$target_index - 1]
                     . " instead of the current step: " . $this->current_simplification_step
                     ."\nfor: " . $this
                 );
             }
-
         }
 
         $this->current_simplification_step = $step_to_go_to;
@@ -223,6 +225,12 @@ abstract class AbstractOperationRule extends AbstractRule
     {
         $this->moveSimplificationStepForward( self::unify_atomic_operands );
 
+        foreach ($this->operands as $operand) {
+            if ($operand instanceof AbstractOperationRule) {
+                $operand->unifyOperands();
+            }
+        }
+
         $operandsByFields = $this->groupOperandsByFieldAndOperator();
 
         // unifying same operands
@@ -271,18 +279,46 @@ abstract class AbstractOperationRule extends AbstractRule
     }
 
     /**
+     */
+    public function removeMonooperandOperations()
+    {
+        $this->moveSimplificationStepForward( self::remove_monooperand_operations );
+
+        if ($this instanceof NotRule) {
+            throw new LogicException(
+                "NotRule MUST have been already removed here"
+            );
+        }
+
+        foreach ($this->operands as $i => $operand) {
+            if ($operand instanceof AbstractOperationRule) {
+                $this->operands[$i] = $operand->removeMonooperandOperations();
+            }
+        }
+
+        if (count($this->operands) == 1)
+            return reset($this->operands);
+
+        return $this;
+    }
+
+    /**
      * Simplify the current OperationRule.
      * + If an OrRule or an AndRule contains only one operand, it's equivalent
      *   to it.
      * + If an OrRule has an other OrRule as operand, they can be merged
      * + If an AndRule has an other AndRule as operand, they can be merged
      *
-     * @param  string $step_to_stop_before Mainly used for unit testing
+     * @param  array $options stop_after | stop_before | force_logical_core
      *
      * @return AbstractRule the simplified rule
      */
-    public final function simplify($step_to_stop_before=null)
+    public final function simplify($options=[])
     {
+        $step_to_stop_before = !empty($options['stop_before'])        ? $options['stop_before'] : null;
+        $step_to_stop_after  = !empty($options['stop_after'])         ? $options['stop_after']  : null;
+        $force_logical_core  = !empty($options['force_logical_core']) ? $options['force_logical_core'] : false;
+
         if ($step_to_stop_before && !in_array($step_to_stop_before, self::simplification_steps)) {
             throw new \InvalidArgumentException(
                 "Invalid simplification step to stop at: ".$step_to_stop_before
@@ -294,18 +330,17 @@ abstract class AbstractOperationRule extends AbstractRule
 
         $this->removeNegations();
 
-        if ($step_to_stop_before == self::remove_operation_duplicates)
+        if ($step_to_stop_after  == self::remove_negations ||
+            $step_to_stop_before == self::remove_operation_duplicates )
             return $this;
 
         // $this->dump(true);
 
         $this->removeOperationDuplicates();
 
-        if ($step_to_stop_before == self::rootify_disjunctions)
+        if ($step_to_stop_after  == self::remove_operation_duplicates ||
+            $step_to_stop_before == self::rootify_disjunctions )
             return $this;
-        // $this->dump(!true);
-
-        // $this->dump(true);
 
         // FIXME return $this while RootifyingDisjunctions!
         if (method_exists($this, 'rootifyDisjunctions')) {
@@ -315,26 +350,36 @@ abstract class AbstractOperationRule extends AbstractRule
             $instance = $this;
         }
 
-        // $instance->dump(true);
+        // $instance->dump(!true, false);
 
-        if ($step_to_stop_before == self::unify_atomic_operands)
+        if ($step_to_stop_after  == self::rootify_disjunctions ||
+            $step_to_stop_before == self::unify_atomic_operands )
             return $instance;
 
         $instance->unifyOperands();
 
-        if ($step_to_stop_before == self::remove_monooperand_operations)
+        if ($step_to_stop_after  == self::unify_atomic_operands ||
+            $step_to_stop_before == self::remove_monooperand_operations )
             return $instance;
 
-        if (!$instance instanceof NotRule && count($instance->getOperands()) == 1) {
-            return $instance->getOperands()[0];
+        // $instance->dump(!true, false);
+
+        $instance = $instance->removeMonooperandOperations();
+
+        // $instance->dump(true, false);
+
+        if ($step_to_stop_after  == self::remove_monooperand_operations ||
+            $step_to_stop_before == self::remove_invalid_branches )
+            return $instance;
+
+        if (method_exists($instance, 'removeInvalidBranches')) {
+            $instance->removeInvalidBranches();
+            // Monooperands can be recreated by removeInvalidBranches
+            $instance = $instance->removeMonooperandOperations();
         }
 
-        $instance->moveSimplificationStepForward( self::remove_monooperand_operations );
-
-        if ($step_to_stop_before == self::remove_invalid_branches)
-            return $instance;
-
-        $instance->removeInvalidBranches();
+        if ($force_logical_core)
+            $instance = $instance->forceLogicalCore();
 
         // $instance->dump(true);
 

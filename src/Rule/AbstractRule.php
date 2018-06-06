@@ -87,11 +87,10 @@ abstract class AbstractRule implements \JsonSerializable
     }
 
     /**
-     * var_dump() the rule with a chained syntax.
+     * var_export() the rule with a chained syntax.
      */
-    public function dump($exit=false, $debug=true)
+    public function dump($exit=false, $debug=false, $callstack_depth = 2)
     {
-        $callstack_depth = 2;
         $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $callstack_depth);
         $caller = $bt[ $callstack_depth - 2 ];
 
@@ -132,6 +131,49 @@ abstract class AbstractRule implements \JsonSerializable
     public function getInstanceId()
     {
         return get_class($this).':'.spl_object_id($this);
+    }
+
+    /**
+     * Forces the two firsts levels of the tree to be an OrRule having
+     * only AndRules as operands:
+     * ['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+     * As a simplified ruleTree will alwways be reduced to this structure
+     * with no suboperands others than atomic ones or a simpler one like:
+     * ['or', ['field', '=', '1'], ['field2', '>', '3']]
+     *
+     * This helpes to ease the result of simplify()
+     *
+     * @return OrRule
+     */
+    protected function forceLogicalCore()
+    {
+        if ($this instanceof AbstractAtomicRule) {
+            $ruleTree = new OrRule([
+                new AndRule([
+                    $this
+                ])
+            ]);
+        }
+        elseif ($this instanceof AndRule) {
+            $ruleTree = new OrRule([
+                $this
+            ]);
+        }
+        elseif ($this instanceof OrRule) {
+            foreach ($this->operands as $i => $operand) {
+                if (!$operand instanceof AndRule)
+                    $this->operands[$i] = new AndRule([$operand]);
+            }
+            $ruleTree = $this;
+        }
+        else {
+            throw new \LogicException(
+                "Unhandled type of simplified rules provided for conversion: "
+                .$this->toArray()
+            );
+        }
+
+        return $ruleTree;
     }
 
     /**/

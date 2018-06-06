@@ -33,21 +33,21 @@ class AndRuleTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEmpty(
             (new AndRule([$below, $equal]))
-                ->simplify( AbstractOperationRule::remove_invalid_branches )
+                ->simplify( ['stop_before' => AbstractOperationRule::remove_invalid_branches] )
                 ->removeInvalidBranches()
                 ->getOperands()
         );
 
         $this->assertEmpty(
             (new AndRule([$equal, $above]))
-                ->simplify( AbstractOperationRule::remove_invalid_branches )
+                ->simplify( ['stop_before' => AbstractOperationRule::remove_invalid_branches] )
                 ->removeInvalidBranches()
                 ->getOperands()
         );
 
         $this->assertEmpty(
             (new AndRule([$below, $above]))
-                ->simplify( AbstractOperationRule::remove_invalid_branches )
+                ->simplify( ['stop_before' => AbstractOperationRule::remove_invalid_branches] )
                 ->removeInvalidBranches()
                 ->getOperands()
         );

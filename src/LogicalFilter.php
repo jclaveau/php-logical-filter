@@ -65,6 +65,7 @@ class LogicalFilter implements \JsonSerializable
         $args = func_get_args();
 
         if (count($args) == 3 && is_string($args[0]) && is_string($args[1])) {
+            // Atomic rules
             $newRule = AbstractRule::generateSimpleRule(
                 $args[0], // field
                 $args[1], // operator
@@ -76,23 +77,20 @@ class LogicalFilter implements \JsonSerializable
         elseif (count($args) == count(array_filter($args, function($arg) {
             return $arg instanceof AbstractRule;
         })) ) {
+            // Already instanciated rules
             foreach ($args as $i => $newRule) {
                 $this->addRule($newRule);
             }
         }
         elseif (count($args) == 1 && is_array($args[0])) {
-
-            if ($this->rules === null) {
-                $this->rules = new AndRule;
-            }
-            elseif (!$this->rules instanceof AndRule) {
-                $this->rules = new AndRule([$this->rules]);
-            }
+            $wrapper = new AndRule;
 
             $this->addCompositeRule_recursion(
                 $args[0],
-                $this->rules
+                $wrapper
             );
+
+            $this->rules = $wrapper->getOperands()[0];
         }
         else {
             throw new \InvalidArgumentException(
@@ -248,10 +246,7 @@ class LogicalFilter implements \JsonSerializable
      */
     public function getRules($copy = true)
     {
-        if (!$this->rules)
-            $this->rules = new AndRule;
-
-        return $copy ? $this->rules->copy() : $this->rules;
+        return $copy && $this->rules ? $this->rules->copy() : $this->rules;
     }
 
     /**
@@ -268,12 +263,19 @@ class LogicalFilter implements \JsonSerializable
     /**
      * Remove any constraint being a duplicate of another one.
      *
-     * @param  string $step_to_stop_before Mainly used for unit testing
+     * @param  array $options stop_after | stop_before |
      * @return $this
      */
-    public function simplify($step_to_stop_before=null)
+    public function simplify($options=[])
     {
-        $this->rules = $this->rules->simplify($step_to_stop_before);
+        if ($this->rules) {
+            // AndRule added to make all Operation methods available
+            $this->rules = (new AndRule([$this->rules]))
+                ->simplify( $options )
+                // ->dump(true, false)
+                ;
+        }
+
         return $this;
     }
 
@@ -297,11 +299,7 @@ class LogicalFilter implements \JsonSerializable
      */
     public function toArray($debug=false)
     {
-        $rules = $this->rules;
-        if ($rules instanceof AndRule && count($rules->getOperands()) == 1)
-            $rules = $rules->getOperands()[0];
-
-        return $rules->toArray($debug);
+        return $this->rules ? $this->rules->toArray($debug) : $this->rules;
     }
 
     /**
@@ -372,6 +370,14 @@ class LogicalFilter implements \JsonSerializable
         return $newFilter
             ->flushRules()
             ->addRules( $this->rules->copy() );
+    }
+
+    /**
+     */
+    public function dump($exit=false, $debug=false)
+    {
+        $this->getRules()->dump($exit, $debug, 3);
+        return $this;
     }
 
     /**/

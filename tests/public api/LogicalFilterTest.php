@@ -26,9 +26,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         $filter = new LogicalFilter(['field', 'above', 3]);
 
         $this->assertEquals(
-            new AndRule([
-                new AboveRule('field', 3),
-            ]),
+            new AboveRule('field', 3),
             $filter->getRules()
         );
     }
@@ -87,13 +85,11 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->assertEquals(
-            new AndRule([
-                new OrRule([
-                    new InRule('field', ['a', 'b', 'c']),
-                    new EqualRule('field', 'e')
-                ]),
-            ]),
-            $filter->getRules()
+            (new OrRule([
+                new InRule('field', ['a', 'b', 'c']),
+                new EqualRule('field', 'e')
+            ]))->toArray(),
+            $filter->getRules()->toArray()
         );
     }
 
@@ -118,19 +114,17 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->assertEquals(
-            new AndRule([
-                new OrRule([
-                    new InRule('field', ['a', 'b', 'c']),
-                    new AndRule([
-                        new InRule('field', ['d', 'e']),
-                        new OrRule([
-                            new AboveRule('field_2', 3),
-                            new BelowRule('field_3', -2),
-                        ]),
+            (new OrRule([
+                new InRule('field', ['a', 'b', 'c']),
+                new AndRule([
+                    new InRule('field', ['d', 'e']),
+                    new OrRule([
+                        new AboveRule('field_2', 3),
+                        new BelowRule('field_3', -2),
                     ]),
                 ]),
-            ]),
-            $filter->getRules()
+            ]))->toArray(),
+            $filter->toArray()
         );
     }
 
@@ -218,12 +212,10 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->assertEquals(
-            new AndRule([
-                new NotRule(
-                    new AboveRule('field_2', 3)
-                )
-            ]),
-            $filter->getRules(false)
+            (new NotRule(
+                new AboveRule('field_2', 3)
+            ))->toArray(),
+            $filter->getRules()->toArray()
         );
 
         // not with too much operands
@@ -253,7 +245,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_removeNegations_basic()
+    public function test_simplify_removeNegations_basic()
     {
         $filter = new LogicalFilter();
 
@@ -262,7 +254,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             ['field_2', 'above', 3],
         ]);
 
-        $filter->removeNegations();
+        $filter->simplify();
 
         $this->assertEquals(
             (new OrRule([
@@ -367,22 +359,18 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function test_rootifyDisjunctions_minimal()
     {
-        $filter = new LogicalFilter();
-
-        $filter->addRules([
+        $filter = (new LogicalFilter([
             'or',
             ['field_5', 'above', 'a'],
             ['field_5', 'below', 'a'],
-        ]);
+        ]))
+        ->simplify([
+            'force_logical_core' => true
+        ])
+        // ->dump()
+        ;
 
-        $filter
-            ->rootifyDisjunctions()
-            // ->simplify()
-            ;
-
-        $filter2 = new LogicalFilter;
-
-        $filter2->addRules([
+        $filter2 = (new LogicalFilter([
             'or',
             [
                 'and',
@@ -392,7 +380,12 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                 'and',
                 ['field_5', 'below', 'a'],
             ],
-        ]);
+        ]))
+        ->simplify([
+            'force_logical_core' => true
+        ])
+        // ->dump()
+        ;
 
         $this->assertEquals(
             $filter2->toArray(),
@@ -404,9 +397,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function test_rootifyDisjunctions_basic()
     {
-        $filter = new LogicalFilter();
-
-        $filter->addRules([
+        $filter = (new LogicalFilter([
             'and',
             [
                 'or',
@@ -414,14 +405,12 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                 ['field_5', 'below', 'a'],
             ],
             ['field_6', 'equal', 'b'],
-        ]);
+        ]))
+        ->simplify()
+        // ->dump()
+        ;
 
-        $filter->simplify();
-
-        // $filter->getRules()->dump(!true);
-
-        $filter2 = new LogicalFilter;
-        $filter2->addRules([
+        $filter2 = (new LogicalFilter([
             'or',
             [
                 'and',
@@ -433,9 +422,9 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                 ['field_5', 'below', 'a'],
                 ['field_6', 'equal', 'b'],
             ],
-        ]);
-
-        // $filter2->getRules()->dump(!true);
+        ]))
+        // ->dump(true)
+        ;
 
         $this->assertEquals(
             $filter2->toArray(),
@@ -647,7 +636,10 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         $filter->simplify();
 
         $this->assertEmpty(
-            $filter->getRules()->dump()->getOperands()
+            $filter
+                ->getRules()
+                // ->dump()
+                ->getOperands()
         );
 
         try {
@@ -751,7 +743,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $filter
-            ->simplify( AbstractOperationRule::rootify_disjunctions )
+            ->simplify( ['stop_before' => AbstractOperationRule::rootify_disjunctions] )
             ;
 
         // $this->assertTrue( $filter->getRules()->isSimplified() );
@@ -782,7 +774,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $filter
-            ->simplify( AbstractOperationRule::rootify_disjunctions )
+            ->simplify( ['stop_before' => AbstractOperationRule::rootify_disjunctions] )
             ;
 
         // $this->assertTrue( $filter->getRules()->isSimplified() );
@@ -813,9 +805,8 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             ],
         ]);
 
-        $filter
-            ->simplify( AbstractOperationRule::rootify_disjunctions )
-            // ->getRules()->dump(!true)
+        $filter->simplify()
+            // ->dump(!true, false)
             ;
 
         $this->assertEquals( [
@@ -843,8 +834,8 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             ],
         ]);
 
-        $filter
-            ->simplify( AbstractOperationRule::rootify_disjunctions )
+        $filter->simplify()
+            // ->dump(!true, false)
             ;
 
         $this->assertEquals( [
@@ -857,7 +848,6 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             ],
             $filter->toArray()
         );
-
     }
 
     /**
@@ -938,29 +928,24 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         ]);
 
 
-        $filter->simplify(
-                AbstractOperationRule::remove_monooperand_operations
-            )
-            // ->getRules()->dump(false, false)
+        $filter->simplify([
+                'force_logical_core' => true
+            ])
+            // ->dump(false, false)
             ;
 
         $this->assertEquals( [
             'or',
             [
                 'and',
-                ['field_5', '>', 5],
-            ],
-            [
-                'and',
-                ['field_5', '>', 5],
-                ['field_5', '<', 5],
+                ['field_5', '>', 'a'],
             ],
         ], $filter->toArray() );
     }
 
     /**
      */
-    public function test_simplify_with_negation()
+    public function test_simplify_with_negation_without_logicalCore()
     {
         $filter = (new LogicalFilter())->addRules([
             'and',
@@ -972,13 +957,11 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         ]);
 
 
-        $filter->simplify(
-                // AbstractOperationRule::remove_monooperand_operations
-            )
-            // ->getRules()->dump(false, false)
+        $filter->simplify()
+            // ->dump(false, false)
             ;
 
-        $this->assertEquals( ['field_5', '>', 5], $filter->toArray() );
+        $this->assertEquals( ['field_5', '>', 'a'], $filter->toArray() );
     }
 
     /**
@@ -1023,12 +1006,11 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
 
         $filter->simplify(
-                // AbstractOperationRule::remove_invalid_branches
             )
             // ->getRules()->dump(false, false)
             ;
 
-        $this->assertEquals( ['or', ['field_5', '=', 'a']], $filter->toArray() );
+        $this->assertEquals( ['field_5', '=', 'a'], $filter->toArray() );
     }
 
 

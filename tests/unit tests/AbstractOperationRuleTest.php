@@ -147,13 +147,14 @@ class AbstractOperationRuleTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEmpty(
             (new AndRule([$above, new NotRule($above)]))
-                ->simplify( AbstractOperationRule::remove_invalid_branches )
+                ->simplify( ['stop_before' => AbstractOperationRule::remove_invalid_branches] )
                 ->removeInvalidBranches()
                 ->getOperands()
         );
 
         $this->assertEquals(
-            (new OrRule([$below]))
+            $below
+                // ->dump(false, false)
                 ->toArray(),
 
             (new OrRule([
