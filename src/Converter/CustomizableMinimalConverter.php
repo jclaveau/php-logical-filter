@@ -1,10 +1,9 @@
 <?php
 /**
- * CustomMinimalConverter
+ * CustomizableMinimalConverter
  *
  * @package php-logical-filter
  * @author  Jean Claveau
- * @version 0.1.0 (29/05/2018)
  */
 namespace JClaveau\LogicalFilter;
 use       JClaveau\LogicalFilter\Converter\ConverterInterface;
@@ -13,7 +12,7 @@ use       JClaveau\LogicalFilter\Converter\ConverterInterface;
  * This class implements a converter using callbacks for every pseudo-event
  * related to the rules parsing.
  */
-class CustomMinimalConverter implements ConverterInterface
+class CustomizableMinimalConverter implements ConverterInterface
 {
     /** @var protected array $callbacks */
     protected $callbacks = [];

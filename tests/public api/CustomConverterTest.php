@@ -8,7 +8,7 @@ class CustomConverterTest extends \PHPUnit_Framework_TestCase
 {
     /**
      */
-    public function test_convert_to_mysql_simple()
+    public function test_convert_to_mysql_with_customizable_converter()
     {
         $filter = new LogicalFilter([
             'and',
@@ -24,7 +24,7 @@ class CustomConverterTest extends \PHPUnit_Framework_TestCase
 
         $root_or_mysql = [];
 
-        $converter = new CustomMinimalConverter(
+        $converter = new CustomizableMinimalConverter(
             function () use (&$root_or_mysql) {
                 $root_or_mysql[] = [];
             },
