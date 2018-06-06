@@ -84,5 +84,69 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     */
+    public function test_convert_with_elasticsearch_converter()
+    {
+        $filter = new LogicalFilter([
+            'and',
+            ['field_1', '=', 2],
+            [
+                'or',
+                ['field_2', '>', 4],
+                ['field_2', '<', -4],
+            ]
+        ]);
+
+        $es_filter = (new ElasticSearchMinimalConverter())->convert( $filter );
+
+        $this->assertEquals(
+            [
+                'bool' => [
+                    'minimum_should_match' => 1,
+                    'should' => [
+                        [
+                            'bool' => [
+                                'must' => [
+                                    [
+                                        "term" => [
+                                            "field_1" => 2
+                                        ]
+                                    ],
+                                    [
+                                        "range" => [
+                                            "field_2" => [
+                                                "gt" => 4
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ],
+                        [
+                            'bool' => [
+                                'must' => [
+                                    [
+                                        "term" => [
+                                            "field_1" => 2
+                                        ]
+                                    ],
+                                    [
+                                        "range" => [
+                                            "field_2" => [
+                                                "lt" => -4
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $es_filter
+        );
+    }
+
     /**/
 }

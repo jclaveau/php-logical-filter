@@ -1,6 +1,6 @@
 <?php
 /**
- * InlineSqlMinimalConverter
+ * ElasticSearchMinimalConverter
  *
  * @package php-logical-filter
  * @author  Jean Claveau
@@ -10,9 +10,9 @@ use       JClaveau\LogicalFilter\Converter\ConverterInterface;
 use       JClaveau\LogicalFilter\LogicalFilter;
 
 /**
- * This class implements a converter for MySQL.
+ * This class implements a converter for ElasticSearch.
  */
-class InlineSqlMinimalConverter extends MinimalConverter implements ConverterInterface
+class ElasticSearchMinimalConverter extends MinimalConverter implements ConverterInterface
 {
     /** @var array $output */
     protected $output = [];
@@ -22,24 +22,36 @@ class InlineSqlMinimalConverter extends MinimalConverter implements ConverterInt
      */
     public function convert( LogicalFilter $filter )
     {
-        $this->output = [];
+        $this->output = [
+        ];
+
         parent::convert($filter);
-        return '('.implode(') OR (', $this->output).')';
+
+        return [
+            'bool' => [
+                'minimum_should_match' => 1, // default
+                'should' => $this->output,
+            ]
+        ];
     }
 
     /**
      */
     public function onOpenOr()
     {
-        $this->output[] = [];
+        $this->output[] = [
+            'bool' => [
+                "must" => [
+
+                ]
+            ]
+        ];
     }
 
     /**
      */
     public function onCloseOr()
     {
-        $last_key = $this->getLastOrOperandKey();
-        $this->output[ $last_key ] = implode(' AND ', $this->output[ $last_key ]);
     }
 
     /**
@@ -49,13 +61,29 @@ class InlineSqlMinimalConverter extends MinimalConverter implements ConverterInt
     public function onAndPossibility($field, $operator, $operand, array $allOperandsByField)
     {
         if ($operator == '=') {
-            $new_rule = " $field = {$operand->getValue()} ";
+            $new_rule = [
+                'term' => [
+                    $field => $operand->getValue()
+                ]
+            ];
         }
         elseif ($operator == '<') {
-            $new_rule = " $field < {$operand->getMaximum()} ";
+            $new_rule = [
+                'range' => [
+                    $field => [
+                        'lt' => $operand->getMaximum()
+                    ],
+                ]
+            ];
         }
         elseif ($operator == '>') {
-            $new_rule = " $field > {$operand->getMinimum()} ";
+            $new_rule = [
+                'range' => [
+                    $field => [
+                        'gt' => $operand->getMinimum()
+                    ],
+                ]
+            ];
         }
 
         $this->appendToLastOrOperandKey($new_rule);
@@ -75,7 +103,7 @@ class InlineSqlMinimalConverter extends MinimalConverter implements ConverterInt
     protected function appendToLastOrOperandKey($rule)
     {
         $last_key = $this->getLastOrOperandKey();
-        $this->output[ $last_key ][] = $rule;
+        $this->output[ $last_key ]['bool']['must'][] = $rule;
     }
 
     /**/
