@@ -880,5 +880,157 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     */
+    public function test_simplify_multiple_aboves()
+    {
+        $filter = (new LogicalFilter())->addRules([
+            'and',
+            ['field_5', '>', 3],
+            ['field_5', '>', 5],
+            ['field_5', '>', 5],
+        ]);
+
+        $filter
+            ->simplify()
+            // ->getRules()->dump(!true)
+            ;
+
+        $this->assertEquals(
+            ['field_5', '>', 5],
+            $filter->getRules()->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify_multiple_below()
+    {
+        $filter = (new LogicalFilter())->addRules([
+            'and',
+            ['field_5', '<', 3],
+            ['field_5', '<', 5],
+            ['field_5', '<', 5],
+        ]);
+
+        $filter
+            ->simplify()
+            // ->getRules()->dump(!true)
+            ;
+
+        $this->assertEquals(
+            ['field_5', '<', 3],
+            $filter->getRules()->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify_unifyOperands_inRecursion()
+    {
+        $filter = (new LogicalFilter())->addRules([
+            'and',
+            ['field_5', '>', 'a'],
+            [
+                '!',
+                ['field_5', '=', 'a'],
+            ],
+        ]);
+
+
+        $filter->simplify(
+                AbstractOperationRule::remove_monooperand_operations
+            )
+            // ->getRules()->dump(false, false)
+            ;
+
+        $this->assertEquals( [
+            'or',
+            [
+                'and',
+                ['field_5', '>', 5],
+            ],
+            [
+                'and',
+                ['field_5', '>', 5],
+                ['field_5', '<', 5],
+            ],
+        ], $filter->toArray() );
+    }
+
+    /**
+     */
+    public function test_simplify_with_negation()
+    {
+        $filter = (new LogicalFilter())->addRules([
+            'and',
+            ['field_5', '>', 'a'],
+            [
+                '!',
+                ['field_5', '=', 'a'],
+            ],
+        ]);
+
+
+        $filter->simplify(
+                // AbstractOperationRule::remove_monooperand_operations
+            )
+            // ->getRules()->dump(false, false)
+            ;
+
+        $this->assertEquals( ['field_5', '>', 5], $filter->toArray() );
+    }
+
+    /**
+     */
+    public function test_simplify_remove_monooperands_and()
+    {
+        $filter = (new LogicalFilter())->addRules([
+            'and',
+            [
+                'and',
+                [
+                    'and',
+                    ['field_5', '=', 'a'],
+                ],
+            ],
+        ]);
+
+
+        $filter->simplify(
+                // AbstractOperationRule::remove_invalid_branches
+            )
+            // ->getRules()->dump(false, false)
+            ;
+
+        $this->assertEquals( ['field_5', '=', 'a'], $filter->toArray() );
+    }
+
+    /**
+     */
+    public function test_simplify_remove_monooperands_or()
+    {
+        $filter = (new LogicalFilter())->addRules([
+            'or',
+            [
+                'or',
+                [
+                    'or',
+                    ['field_5', '=', 'a'],
+                ],
+            ],
+        ]);
+
+
+        $filter->simplify(
+                // AbstractOperationRule::remove_invalid_branches
+            )
+            // ->getRules()->dump(false, false)
+            ;
+
+        $this->assertEquals( ['or', ['field_5', '=', 'a']], $filter->toArray() );
+    }
+
+
     /**/
 }

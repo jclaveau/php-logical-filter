@@ -16,9 +16,10 @@ class AndRuleTest extends \PHPUnit_Framework_TestCase
         $above = new AboveRule('field_name', 1);
 
         $this->assertEquals(
-            $equal,
-            (new AndRule([$below, $equal, $above]))->simplify()
-                // ->dump(true)
+            $equal->toArray(),
+            (new AndRule([$below, $equal, $above]))
+                ->simplify()
+                ->toArray()
         );
     }
 

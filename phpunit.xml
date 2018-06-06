@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <phpunit backupGlobals="false"
-         defaultTestSuite="unit"
+         defaultTestSuite="all_tests"
          backupStaticAttributes="true"
          colors="true"
+         syntaxCheck="true"
          bootstrap="./tests/bootstrap_phpunit.php"
          >
     <!--
         backupGlobals="false" is required to don't loose $link as link_identifier
-        backupStaticAttributes="false"
-        syntaxCheck="false"
     -->
 
     <testsuites>
-        <testsuite name="unit">
-            <directory>./tests</directory>
+        <testsuite name="all_tests">
+            <directory>./tests/unit tests</directory>
+            <!-- /!\ keep the public API after unit tests to ease debug -->
+            <directory>./tests/public api</directory>
         </testsuite>
     </testsuites>
 

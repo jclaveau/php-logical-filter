@@ -16,15 +16,15 @@ class AbstractOperationRuleTest extends \PHPUnit_Framework_TestCase
         // OrRule
         $orRule = new OrRule([$above]);
         $this->assertEquals(
-            $above,
-            $orRule->simplify()
+            $above->toArray(),
+            $orRule->simplify()->toArray()
         );
 
         // AndRule
         $andRule = new AndRule([$above]);
         $this->assertEquals(
-            $above,
-            $andRule->simplify()
+            $above->toArray(),
+            $andRule->simplify()->toArray()
         );
     }
 
