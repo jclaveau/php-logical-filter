@@ -35,8 +35,15 @@ class BelowRule extends AbstractAtomicRule
      */
     public function hasSolution()
     {
-        return !(is_infinite( $this->maximum ) && $this->maximum < 0)
-            && (!is_numeric( $this->maximum ) || !is_nan( $this->maximum ));
+        if (is_numeric( $this->maximum )) {
+            if (is_nan( $this->maximum ))
+                return false;
+
+            if (is_infinite( $this->maximum ) && $this->maximum < 0)
+                return false;
+        }
+
+        return true;
     }
 
     /**
