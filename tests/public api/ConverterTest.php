@@ -1,10 +1,10 @@
 <?php
-namespace JClaveau\LogicalFilter;
+namespace JClaveau\LogicalFilter\Converter;
 
 use JClaveau\VisibilityViolator\VisibilityViolator;
 use JClaveau\LogicalFilter\LogicalFilter;
 
-class CustomConverterTest extends \PHPUnit_Framework_TestCase
+class ConverterTest extends \PHPUnit_Framework_TestCase
 {
     /**
      */
@@ -59,6 +59,28 @@ class CustomConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             "( field_1 = 2  AND  field_2 > 4 ) OR ( field_1 = 2  AND  field_2 < -4 )",
             $mysql_where
+        );
+    }
+
+    /**
+     */
+    public function test_convert_with_sql_converter()
+    {
+        $filter = new LogicalFilter([
+            'and',
+            ['field_1', '=', 2],
+            [
+                'or',
+                ['field_2', '>', 4],
+                ['field_2', '<', -4],
+            ]
+        ]);
+
+        $inline_sql = (new InlineSqlMinimalConverter())->convert( $filter );
+
+        $this->assertEquals(
+            "( field_1 = 2  AND  field_2 > 4 ) OR ( field_1 = 2  AND  field_2 < -4 )",
+            $inline_sql
         );
     }
 
