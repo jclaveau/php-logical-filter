@@ -31,18 +31,6 @@ Properties
 * Visibility: **protected**
 
 
-### $ruleAliases
-
-    protected array $ruleAliases = array('!=' => 'not equal', '=' => 'equal', '>' => 'above', '>=' => 'above or equal', '<' => 'below', '<=' => 'below or equal')
-
-
-
-
-
-* Visibility: **protected**
-* This property is **static**.
-
-
 Methods
 -------
 
@@ -88,6 +76,22 @@ This method gathers different ways to define the rules of a LogicalFilter.
 
 
 
+### addRule
+
+    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::addRule(\JClaveau\LogicalFilter\Rule\AbstractRule $rule)
+
+Add one rule object
+
+
+
+* Visibility: **public**
+
+
+#### Arguments
+* $rule **[JClaveau\LogicalFilter\Rule\AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)**
+
+
+
 ### addCompositeRule_recursion
 
     \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::addCompositeRule_recursion(array $rules_composition, \JClaveau\LogicalFilter\Rule\AbstractOperationRule $recursion_position)
@@ -102,7 +106,7 @@ Recursion auxiliary of addCompositeRule.
 #### Arguments
 * $rules_composition **array** - &lt;p&gt;The description of the
                                                  rules to add.&lt;/p&gt;
-* $recursion_position **[JClaveau\LogicalFilter\Rule\AbstractOperationRule](JClaveau-LogicalFilter-Rule-AbstractOperationRule.md)** - &lt;p&gt;The position in the
+* $recursion_position **JClaveau\LogicalFilter\Rule\AbstractOperationRule** - &lt;p&gt;The position in the
                                                  tree where rules must
                                                  be added.&lt;/p&gt;
 
@@ -142,7 +146,7 @@ Includes all the rules of an other LogicalFilter into the current one.
 
 ### simplify
 
-    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::simplify()
+    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::simplify(array $options)
 
 Remove any constraint being a duplicate of another one.
 
@@ -150,6 +154,9 @@ Remove any constraint being a duplicate of another one.
 
 * Visibility: **public**
 
+
+#### Arguments
+* $options **array** - &lt;p&gt;stop_after | stop_before |&lt;/p&gt;
 
 
 
@@ -210,9 +217,9 @@ This method scans the rule tree recursivelly.
 
 
 
-### upLiftDisjunctions
+### rootifyDisjunctions
 
-    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::upLiftDisjunctions()
+    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::rootifyDisjunctions()
 
 Remove all OR rules so only one remain at the top of rules tree.
 
@@ -227,7 +234,7 @@ This method scans the rule tree recursivelly.
 
     \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::flushRules()
 
-Removes all the defined constraints.
+Removes all the defined rules.
 
 
 
@@ -246,5 +253,22 @@ Clone the current object and its rules.
 
 * Visibility: **public**
 
+
+
+
+### dump
+
+    mixed JClaveau\LogicalFilter\LogicalFilter::dump($exit, $debug)
+
+
+
+
+
+* Visibility: **public**
+
+
+#### Arguments
+* $exit **mixed**
+* $debug **mixed**
 
 

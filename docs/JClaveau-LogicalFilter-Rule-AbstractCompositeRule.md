@@ -34,6 +34,18 @@ Properties
 * Visibility: **private**
 
 
+### $ruleAliases
+
+    protected array $ruleAliases = array('!' => 'not', '=' => 'equal', '>' => 'above', '<' => 'below')
+
+
+
+
+
+* Visibility: **protected**
+* This property is **static**.
+
+
 Methods
 -------
 
@@ -75,6 +87,42 @@ atomic rules.
 
 * Visibility: **public**
 
+
+
+
+### findSymbolicOperator
+
+    mixed JClaveau\LogicalFilter\Rule\AbstractRule::findSymbolicOperator($english_operator)
+
+
+
+
+
+* Visibility: **public**
+* This method is **static**.
+* This method is defined by [JClaveau\LogicalFilter\Rule\AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)
+
+
+#### Arguments
+* $english_operator **mixed**
+
+
+
+### findEnglishOperator
+
+    mixed JClaveau\LogicalFilter\Rule\AbstractRule::findEnglishOperator($symbolic_operator)
+
+
+
+
+
+* Visibility: **public**
+* This method is **static**.
+* This method is defined by [JClaveau\LogicalFilter\Rule\AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)
+
+
+#### Arguments
+* $symbolic_operator **mixed**
 
 
 
@@ -132,9 +180,9 @@ Clones the rule with a chained syntax.
 
 ### dump
 
-    mixed JClaveau\LogicalFilter\Rule\AbstractRule::dump($exit)
+    mixed JClaveau\LogicalFilter\Rule\AbstractRule::dump($exit, $debug, $callstack_depth)
 
-var_dump() the rule with a chained syntax.
+var_export() the rule with a chained syntax.
 
 
 
@@ -144,6 +192,8 @@ var_dump() the rule with a chained syntax.
 
 #### Arguments
 * $exit **mixed**
+* $debug **mixed**
+* $callstack_depth **mixed**
 
 
 
@@ -170,6 +220,39 @@ For implementing JsonSerializable interface.
 
 
 * Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)
+
+
+
+
+### getInstanceId
+
+    string JClaveau\LogicalFilter\Rule\AbstractRule::getInstanceId()
+
+Returns an id describing the instance internally for debug purpose.
+
+
+
+* Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)
+
+
+
+
+### forceLogicalCore
+
+    \JClaveau\LogicalFilter\Rule\OrRule JClaveau\LogicalFilter\Rule\AbstractRule::forceLogicalCore()
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+This helpes to ease the result of simplify()
+
+* Visibility: **protected**
 * This method is defined by [JClaveau\LogicalFilter\Rule\AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)
 
 
