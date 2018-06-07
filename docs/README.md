@@ -5,6 +5,7 @@ API Index
     * JClaveau\LogicalFilter
         * JClaveau\LogicalFilter\Rule
             * [AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)
+            * [BetweenRule](JClaveau-LogicalFilter-Rule-BetweenRule.md)
             * [AbstractCompositeRule](JClaveau-LogicalFilter-Rule-AbstractCompositeRule.md)
             * [NotRule](JClaveau-LogicalFilter-Rule-NotRule.md)
             * [NotNullRule](JClaveau-LogicalFilter-Rule-NotNullRule.md)
@@ -17,7 +18,6 @@ API Index
             * [NullRule](JClaveau-LogicalFilter-Rule-NullRule.md)
             * [BelowRule](JClaveau-LogicalFilter-Rule-BelowRule.md)
         * [LogicalFilter](JClaveau-LogicalFilter-LogicalFilter.md)
-        * [BetweenRule](JClaveau-LogicalFilter-BetweenRule.md)
         * JClaveau\LogicalFilter\Converter
             * [CustomizableMinimalConverter](JClaveau-LogicalFilter-Converter-CustomizableMinimalConverter.md)
             * [InlineSqlMinimalConverter](JClaveau-LogicalFilter-Converter-InlineSqlMinimalConverter.md)

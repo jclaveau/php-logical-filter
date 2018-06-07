@@ -54,9 +54,9 @@ addRules() as paramater.
 
 ### addRules
 
-    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::addRules()
+    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::addRules(string $operation, array $rules_description)
 
-This method gathers different ways to define the rules of a LogicalFilter.
+This method parses different ways to define the rules of a LogicalFilter.
 
 + You can add N already instanciated Rules.
 + You can provide 3 arguments: $field, $operator, $value
@@ -71,24 +71,29 @@ This method gathers different ways to define the rules of a LogicalFilter.
      ['field_6', 'equal', 'b'],
  ]
 
-* Visibility: **public**
+* Visibility: **protected**
 
+
+#### Arguments
+* $operation **string** - &lt;p&gt;and | or&lt;/p&gt;
+* $rules_description **array** - &lt;p&gt;Rules description&lt;/p&gt;
 
 
 
 ### addRule
 
-    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::addRule(\JClaveau\LogicalFilter\Rule\AbstractRule $rule)
+    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::addRule(\JClaveau\LogicalFilter\Rule\AbstractRule $rule, string $operation)
 
-Add one rule object
+Add one rule object to the filter
 
 
 
-* Visibility: **public**
+* Visibility: **protected**
 
 
 #### Arguments
 * $rule **[JClaveau\LogicalFilter\Rule\AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)**
+* $operation **string**
 
 
 
@@ -109,6 +114,56 @@ Recursion auxiliary of addCompositeRule.
 * $recursion_position **JClaveau\LogicalFilter\Rule\AbstractOperationRule** - &lt;p&gt;The position in the
                                                  tree where rules must
                                                  be added.&lt;/p&gt;
+
+
+
+### and_
+
+    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::and_()
+
+This method parses different ways to define the rules of a LogicalFilter
+and add them as a new And part of the filter.
+
++ You can add N already instanciated Rules.
++ You can provide 3 arguments: $field, $operator, $value
++ You can provide a tree of rules:
+[
+     'or',
+     [
+         'and',
+         ['field_5', 'above', 'a'],
+         ['field_5', 'below', 'a'],
+     ],
+     ['field_6', 'equal', 'b'],
+ ]
+
+* Visibility: **public**
+
+
+
+
+### or_
+
+    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::or_()
+
+This method parses different ways to define the rules of a LogicalFilter
+and add them as a new Or part of the filter.
+
++ You can add N already instanciated Rules.
++ You can provide 3 arguments: $field, $operator, $value
++ You can provide a tree of rules:
+[
+     'or',
+     [
+         'and',
+         ['field_5', 'above', 'a'],
+         ['field_5', 'below', 'a'],
+     ],
+     ['field_6', 'equal', 'b'],
+ ]
+
+* Visibility: **public**
+
 
 
 
