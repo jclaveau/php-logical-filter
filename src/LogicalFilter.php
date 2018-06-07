@@ -353,7 +353,9 @@ class LogicalFilter implements \JsonSerializable
      */
     public function hasSolution()
     {
-        return $this->rules->hasSolution();
+        if (!$this->rules)
+            return true;
+        return $this->rules->copy()->simplify()->hasSolution();
     }
 
     /**

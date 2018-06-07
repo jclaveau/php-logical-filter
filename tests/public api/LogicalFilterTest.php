@@ -529,7 +529,6 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                 ['field_5', 'above', 'a'],
                 ['field_5', 'below', 'a'],
             ]))
-            ->simplify()
             ->hasSolution()
         );
 
@@ -539,7 +538,6 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                 ['field_5', 'equal', 'a'],
                 ['field_5', 'below', 'a'],
             ]))
-            ->simplify()
             ->hasSolution()
         );
 
@@ -549,7 +547,6 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                 ['field_5', 'equal', 'a'],
                 ['field_5', 'above', 'a'],
             ]))
-            ->simplify()
             ->hasSolution()
         );
 
@@ -563,9 +560,17 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                 ],
                 ['field_6', 'equal', 'b'],
             ]))
-            ->simplify()
             ->hasSolution()
         );
+    }
+
+    /**
+     */
+    public function test_hasSolution_on_null_filter()
+    {
+        // A filter has all solutions if it contains no rule.
+        $filter = new LogicalFilter;
+        $this->assertTrue( $filter->hasSolution() );
     }
 
     /**
