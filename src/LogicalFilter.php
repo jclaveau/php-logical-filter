@@ -38,11 +38,11 @@ class LogicalFilter implements \JsonSerializable
     public function __construct(array $rules=[])
     {
         if ($rules)
-            $this->addRules( $rules );
+            $this->and_( $rules );
     }
 
     /**
-     * This method gathers different ways to define the rules of a LogicalFilter.
+     * This method parses different ways to define the rules of a LogicalFilter.
      * + You can add N already instanciated Rules.
      * + You can provide 3 arguments: $field, $operator, $value
      * + You can provide a tree of rules:
@@ -56,46 +56,44 @@ class LogicalFilter implements \JsonSerializable
      *      ['field_6', 'equal', 'b'],
      *  ]
      *
-     * @param  mixed         Rules definition
-     * @param  array         $rules Rules description
+     * @param  string        $operation         and | or
+     * @param  array         $rules_description Rules description
      * @return LogicalFilter $this
      */
-    public function addRules()
+    protected function addRules( $operation, array $rules_description )
     {
-        $args = func_get_args();
-
-        if (count($args) == 3 && is_string($args[0]) && is_string($args[1])) {
+        if (count($rules_description) == 3 && is_string($rules_description[0]) && is_string($rules_description[1])) {
             // Atomic rules
-            $newRule = AbstractRule::generateSimpleRule(
-                $args[0], // field
-                $args[1], // operator
-                $args[2]  // value
+            $new_rule = AbstractRule::generateSimpleRule(
+                $rules_description[0], // field
+                $rules_description[1], // operator
+                $rules_description[2]  // value
             );
 
-            $this->addRule($newRule);
+            $this->addRule($new_rule, $operation);
         }
-        elseif (count($args) == count(array_filter($args, function($arg) {
+        elseif (count($rules_description) == count(array_filter($rules_description, function($arg) {
             return $arg instanceof AbstractRule;
         })) ) {
             // Already instanciated rules
-            foreach ($args as $i => $newRule) {
-                $this->addRule($newRule);
+            foreach ($rules_description as $i => $new_rule) {
+                $this->addRule( $new_rule, $operation);
             }
         }
-        elseif (count($args) == 1 && is_array($args[0])) {
-            $wrapper = new AndRule;
+        elseif (count($rules_description) == 1 && is_array($rules_description[0])) {
+            $fake_root = new AndRule;
 
             $this->addCompositeRule_recursion(
-                $args[0],
-                $wrapper
+                $rules_description[0],
+                $fake_root
             );
 
-            $this->rules = $wrapper->getOperands()[0];
+            $this->addRule( $fake_root->getOperands()[0], $operation );
         }
         else {
             throw new \InvalidArgumentException(
                 "Bad set of arguments provided for rules addition: "
-                .var_export($args, true)
+                .var_export($rules_description, true)
             );
         }
 
@@ -103,27 +101,41 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
-     * Add one rule object
+     * Add one rule object to the filter
      *
      * @param AbstractRule $rule
+     * @param string       $operation
      *
      * @return $this
      */
-    public function addRule( AbstractRule $rule )
+    protected function addRule( AbstractRule $rule, $operation=AndRule::operator )
     {
-        if ($this->rules instanceof AndRule && empty($this->rules->getOperands())) {
-            // An empty AndRule is a rule having no solution
+        if ( $this->rules instanceof AbstractOperationRule && !$this->rules->getOperands() ) {
             throw new \LogicException(
                  "You are trying to add rules to a LogicalFilter which had "
-                ."only contradictory rules that have been simplified."
+                ."only contradictory rules that have already been simplified: "
+                .$this->rules
             );
         }
 
         if ($this->rules === null) {
             $this->rules = $rule;
         }
-        elseif (!$this->rules instanceof AndRule) {
-            $this->rules = new AndRule([$this->rules, $rule]);
+        elseif (($tmp_rules = $this->rules) // $this->rules::operator not supported in PHP 5.6
+            &&  ($tmp_rules::operator != $operation)) {
+
+            if ($operation == AndRule::operator) {
+                $this->rules = new AndRule([$this->rules, $rule]);
+            }
+            elseif ($operation == OrRule::operator) {
+                $this->rules = new OrRule([$this->rules, $rule]);
+            }
+            else {
+                throw new \InvalidArgumentException(
+                    "\$operation must be '".AndRule::operator."' or '".OrRule::operator
+                    ."' instead of: ".var_export($operation, true)
+                );
+            }
         }
         else {
             $this->rules->addOperand($rule);
@@ -234,6 +246,60 @@ class LogicalFilter implements \JsonSerializable
             }
         }
 
+        return $this;
+    }
+
+    /**
+     * This method parses different ways to define the rules of a LogicalFilter
+     * and add them as a new And part of the filter.
+     * + You can add N already instanciated Rules.
+     * + You can provide 3 arguments: $field, $operator, $value
+     * + You can provide a tree of rules:
+     * [
+     *      'or',
+     *      [
+     *          'and',
+     *          ['field_5', 'above', 'a'],
+     *          ['field_5', 'below', 'a'],
+     *      ],
+     *      ['field_6', 'equal', 'b'],
+     *  ]
+     *
+     * @param  mixed The descriptions of the rules to add
+     * @return $this
+     *
+     * @todo remove the _ for PHP 7
+     */
+    public function and_()
+    {
+        $this->addRules( AndRule::operator, func_get_args());
+        return $this;
+    }
+
+    /**
+     * This method parses different ways to define the rules of a LogicalFilter
+     * and add them as a new Or part of the filter.
+     * + You can add N already instanciated Rules.
+     * + You can provide 3 arguments: $field, $operator, $value
+     * + You can provide a tree of rules:
+     * [
+     *      'or',
+     *      [
+     *          'and',
+     *          ['field_5', 'above', 'a'],
+     *          ['field_5', 'below', 'a'],
+     *      ],
+     *      ['field_6', 'equal', 'b'],
+     *  ]
+     *
+     * @param  mixed The descriptions of the rules to add
+     * @return $this
+     *
+     * @todo remove the _ for PHP 7
+     */
+    public function or_()
+    {
+        $this->addRules( OrRule::operator, func_get_args());
         return $this;
     }
 
@@ -369,7 +435,7 @@ class LogicalFilter implements \JsonSerializable
 
         return $newFilter
             ->flushRules()
-            ->addRules( $this->rules->copy() );
+            ->addRule( $this->rules->copy() );
     }
 
     /**
