@@ -12,14 +12,16 @@ class NotRule extends AbstractOperationRule
 
     /**
      */
-    public function __construct( AbstractRule $operand=null )
+    // public function __construct( AbstractRule $operand=null )
+    public function __construct( $operand=null )
     {
         if (!$operand)
             return;
 
         if (!$operand instanceof AbstractRule) {
             throw new \InvalidArgumentException(
-                "Operand of NOT must be an instance of AbstractRule"
+                "Operand of NOT must be an instance of AbstractRule instead of: "
+                .var_export($operand, true)
             );
         }
 
@@ -67,16 +69,6 @@ class NotRule extends AbstractOperationRule
                 new BelowRule($field, $operand->getValue()),
             ]);
         }
-        elseif ($operand instanceof InRule) {
-            // ! in [A, B, C] : !B && !A && !C
-            // In rule must remain before OrRule as it extends it
-            $possibilities = $operand->getPossibilities();
-
-            foreach ($possibilities as $i => $possibility)
-                $possibilities[$i] = new NotRule($possibility);
-
-            $new_rule = new AndRule($possibilities);
-        }
         elseif ($operand instanceof AndRule) {
             // ! (B && A) : (!B && A) || (B && !A) || (!B && !A)
             // TODO : n operands ?
@@ -105,20 +97,11 @@ class NotRule extends AbstractOperationRule
             ]);
         }
         elseif ($operand instanceof OrRule) {
-            // ! (B || A) : !B && !A
-            $child_operands = $operand->getOperands();
-
-            if (count($child_operands) > 2) {
-                throw new \ErrorException(
-                     'NotRule resolution of OrRule with more than 3 '
-                    .'operands is not implemented'
-                );
-            }
-
-            $new_rule = new AndRule([
-                new NotRule($child_operands[0]->copy()),
-                new NotRule($child_operands[1]->copy()),
-            ]);
+            // ! (A || B) : !A && !B
+            // ! (A || B || C || D) : !A && !B && !C && !D
+            $new_rule = new AndRule;
+            foreach ($operand->getOperands() as $operand)
+                $new_rule->addOperand( new NotRule($operand->copy()) );
         }
         elseif ($operand instanceof NotNullRule) {
             $new_rule = new NullRule($field);
@@ -155,30 +138,6 @@ class NotRule extends AbstractOperationRule
             $debug ? $this->getInstanceId() : self::operator,
             $this->operands[0]->toArray($debug)
         ];
-    }
-
-    /**
-     * Removes rule branches that cannot produce result like:
-     * A = 1 && ( (B < 2 && B > 3) || (C = 8 && C = 10) ) <=> A = 1
-     *
-     * @return null|OrRule The rule with removed invalid subrules or null
-     *                     if it's invalid itself.
-     * /
-    public function removeInvalidBranches()
-    {
-        $operand = $this->operands[0];
-
-        if ($operand instanceof AbstractOperationRule) {
-            if (!$operand->removeInvalidBranches())
-                unset($this->operands[0]);
-        }
-        else
-
-
-        if (empty($this->operands))
-            return null;
-
-        return $this;
     }
 
     /**/
