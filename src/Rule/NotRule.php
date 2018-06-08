@@ -71,15 +71,20 @@ class NotRule extends AbstractOperationRule
         }
         elseif ($operand instanceof AndRule) {
             // ! (B && A) : (!B && A) || (B && !A) || (!B && !A)
-            // TODO : n operands ?
+            // TODO :
+            // ! (A && B && C) :
+            //    (!A && !B && !C)
+            // || (!A && B && C) || (!A && !B && C) || (!A && B && !C)
+            // || (A && !B && C) || (!A && !B && C) || (A && !B && !C)
+            // || (A && B && !C) || (!A && B && !C) || (A && !B && !C)
             $child_operands = $operand->getOperands();
-
             if (count($child_operands) > 2) {
                 throw new \ErrorException(
-                     'NotRule resolution of AndRule with more than 3 '
+                     'NotRule resolution of AndRule with more than 2 '
                     .'operands is not implemented'
                 );
             }
+
 
             $new_rule = new OrRule([
                 new AndRule([

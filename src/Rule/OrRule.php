@@ -2,7 +2,7 @@
 namespace JClaveau\LogicalFilter\Rule;
 
 /**
- * Logical disjunction
+ * Logical inclusive disjunction
  *
  * This class represents a rule that expect a value to be one of the list of
  * possibilities only.
