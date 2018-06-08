@@ -177,11 +177,12 @@ abstract class AbstractOperationRule extends AbstractRule
             if ($operand instanceof NotRule) {
                 $this->operands[$i] = $operand->negateOperand();
             }
-            elseif ($operand instanceof AbstractOperationRule) {
-                $operand->removeNegations();
+
+            if ($this->operands[$i] instanceof AbstractOperationRule) {
+                $this->operands[$i]->removeNegations();
                 // try to remove negations twice as removing one can
                 // produce some new ones
-                $operand->removeNegations();
+                // $operand->removeNegations();
             }
         }
 
@@ -329,6 +330,8 @@ abstract class AbstractOperationRule extends AbstractRule
             return $this;
 
         $this->removeNegations();
+
+        // $this->dump(true);
 
         if ($step_to_stop_after  == self::remove_negations ||
             $step_to_stop_before == self::remove_operation_duplicates )

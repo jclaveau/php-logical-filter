@@ -16,7 +16,6 @@ class NotRuleTest extends \PHPUnit_Framework_TestCase
         $new_rule = $rule->negateOperand();
         $this->assertEquals(new NotNullRule('field'), $new_rule);
 
-
         // NotNullRule
         $rule = new NotRule(
             new NotNullRule('field')

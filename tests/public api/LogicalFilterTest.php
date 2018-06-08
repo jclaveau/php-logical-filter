@@ -1008,7 +1008,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_add_inRule()
+    public function test_add_InRule()
     {
         $filter = new LogicalFilter(
             ['field_1', 'in', ['a', 'b', 'c']]
@@ -1037,6 +1037,109 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                 ['field_1', '=', 'e'],
             ],
             $filter->simplify()->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_add_NotEqualRule()
+    {
+        $filter = new LogicalFilter(
+            ['field_1', '!=', 'a']
+        );
+
+        // toArray must be iso to the provided descrition
+        $this->assertEquals(
+            ['field_1', '!=', 'a'],
+            $filter->toArray()
+        );
+
+        $this->assertEquals(
+            [
+                'or',
+                ['field_1', '>', 'a'],
+                ['field_1', '<', 'a'],
+            ],
+            $filter->simplify()->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_add_AboveOrEqualRule()
+    {
+        $filter = new LogicalFilter(
+            ['field_1', '>=', 2]
+        );
+
+        // toArray must be iso to the provided descrition
+        $this->assertEquals(
+            ['field_1', '>=', 2],
+            $filter->toArray()
+        );
+
+        $this->assertEquals(
+            [
+                'or',
+                ['field_1', '>', 2],
+                ['field_1', '=', 2],
+            ],
+            $filter->simplify()->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_add_BelowOrEqualRule()
+    {
+        $filter = new LogicalFilter(
+            ['field_1', '<=', 2]
+        );
+
+        // toArray must be iso to the provided descrition
+        $this->assertEquals(
+            ['field_1', '<=', 2],
+            $filter->toArray()
+        );
+
+        $this->assertEquals(
+            [
+                'or',
+                ['field_1', '<', 2],
+                ['field_1', '=', 2],
+            ],
+            $filter->simplify()->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_add_NotInRule()
+    {
+        $filter = new LogicalFilter(
+            ['field_1', '!in', [2, 3]]
+        );
+
+        // toArray must be iso to the provided descrition
+        $this->assertEquals(
+            ['field_1', '!in', [2, 3]],
+            $filter->toArray()
+        );
+
+        $this->assertEquals(
+            [
+                'or',
+                ['field_1', '>', 3],
+                [
+                    'and',
+                    ['field_1', '>', 2],
+                    ['field_1', '<', 3],
+                ],
+                ['field_1', '<', 2],
+            ],
+            $filter->simplify()
+                // ->dump(true)
+                ->toArray()
         );
     }
 
