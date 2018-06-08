@@ -1,15 +1,15 @@
-JClaveau\LogicalFilter\Rule\OrRule
+JClaveau\LogicalFilter\Rule\BelowOrEqualRule
 ===============
 
-Logical inclusive disjunction
+a &lt;= x
 
 This class represents a rule that expect a value to be one of the list of
 possibilities only.
 
 
-* Class name: OrRule
+* Class name: BelowOrEqualRule
 * Namespace: JClaveau\LogicalFilter\Rule
-* Parent class: JClaveau\LogicalFilter\Rule\AbstractOperationRule
+* Parent class: [JClaveau\LogicalFilter\Rule\OrRule](JClaveau-LogicalFilter-Rule-OrRule.md)
 
 
 
@@ -31,11 +31,41 @@ Methods
 -------
 
 
-### rootifyDisjunctions
+### __construct
 
-    \JClaveau\LogicalFilter\Rule\OrRule JClaveau\LogicalFilter\Rule\OrRule::rootifyDisjunctions()
+    mixed JClaveau\LogicalFilter\Rule\BelowOrEqualRule::__construct(string $field, $maximum)
 
-Replace all the OrRules of the RuleTree by one OrRule at its root.
+
+
+
+
+* Visibility: **public**
+
+
+#### Arguments
+* $field **string** - &lt;p&gt;The field to apply the rule on.&lt;/p&gt;
+* $maximum **mixed**
+
+
+
+### getMaximum
+
+    mixed JClaveau\LogicalFilter\Rule\BelowOrEqualRule::getMaximum()
+
+
+
+
+
+* Visibility: **public**
+
+
+
+
+### getField
+
+    mixed JClaveau\LogicalFilter\Rule\BelowOrEqualRule::getField()
+
+
 
 
 
@@ -53,10 +83,25 @@ Replace all the OrRules of the RuleTree by one OrRule at its root.
 
 
 * Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\OrRule](JClaveau-LogicalFilter-Rule-OrRule.md)
 
 
 #### Arguments
 * $debug **mixed**
+
+
+
+### rootifyDisjunctions
+
+    \JClaveau\LogicalFilter\Rule\OrRule JClaveau\LogicalFilter\Rule\OrRule::rootifyDisjunctions()
+
+Replace all the OrRules of the RuleTree by one OrRule at its root.
+
+
+
+* Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\OrRule](JClaveau-LogicalFilter-Rule-OrRule.md)
+
 
 
 
@@ -70,6 +115,7 @@ to keep for a given field.
 It's used as a usort() parameter.
 
 * Visibility: **protected**
+* This method is defined by [JClaveau\LogicalFilter\Rule\OrRule](JClaveau-LogicalFilter-Rule-OrRule.md)
 
 
 #### Arguments
@@ -88,6 +134,7 @@ to keep for a given field.
 It's used as a usort() parameter.
 
 * Visibility: **protected**
+* This method is defined by [JClaveau\LogicalFilter\Rule\OrRule](JClaveau-LogicalFilter-Rule-OrRule.md)
 
 
 #### Arguments
@@ -106,6 +153,7 @@ A = 1 && ( (B < 2 && B > 3) || (C = 8 && C = 10) ) <=> A = 1
 
 
 * Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\OrRule](JClaveau-LogicalFilter-Rule-OrRule.md)
 
 
 
@@ -120,6 +168,7 @@ or if it contains contradictory rules.
 
 
 * Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\OrRule](JClaveau-LogicalFilter-Rule-OrRule.md)
 
 
 

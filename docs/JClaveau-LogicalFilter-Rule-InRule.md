@@ -25,6 +25,19 @@ Constants
 
 
 
+Properties
+----------
+
+
+### $field
+
+    protected string $field
+
+
+
+
+
+* Visibility: **protected**
 
 
 Methods
@@ -48,6 +61,19 @@ Methods
 
 
 
+### getField
+
+    string JClaveau\LogicalFilter\Rule\InRule::getField()
+
+
+
+
+
+* Visibility: **public**
+
+
+
+
 ### getPossibilities
 
     array JClaveau\LogicalFilter\Rule\InRule::getPossibilities()
@@ -63,7 +89,7 @@ Methods
 
 ### addPossibilities
 
-    array JClaveau\LogicalFilter\Rule\InRule::addPossibilities(array $possibilities)
+    \JClaveau\LogicalFilter\Rule\InRule JClaveau\LogicalFilter\Rule\InRule::addPossibilities(array $possibilities)
 
 
 
@@ -74,20 +100,6 @@ Methods
 
 #### Arguments
 * $possibilities **array**
-
-
-
-### rootifyDisjunctions
-
-    \JClaveau\LogicalFilter\Rule\OrRule JClaveau\LogicalFilter\Rule\OrRule::rootifyDisjunctions()
-
-Replace all the OrRules of the RuleTree by one OrRule at its root.
-
-
-
-* Visibility: **public**
-* This method is defined by [JClaveau\LogicalFilter\Rule\OrRule](JClaveau-LogicalFilter-Rule-OrRule.md)
-
 
 
 
@@ -105,6 +117,20 @@ Replace all the OrRules of the RuleTree by one OrRule at its root.
 
 #### Arguments
 * $debug **mixed**
+
+
+
+### rootifyDisjunctions
+
+    \JClaveau\LogicalFilter\Rule\OrRule JClaveau\LogicalFilter\Rule\OrRule::rootifyDisjunctions()
+
+Replace all the OrRules of the RuleTree by one OrRule at its root.
+
+
+
+* Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\OrRule](JClaveau-LogicalFilter-Rule-OrRule.md)
+
 
 
 

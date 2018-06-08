@@ -32,7 +32,7 @@ Methods
 
 ### __construct
 
-    mixed JClaveau\LogicalFilter\Rule\NotRule::__construct(\JClaveau\LogicalFilter\Rule\AbstractRule $operand)
+    mixed JClaveau\LogicalFilter\Rule\NotRule::__construct($operand)
 
 
 
@@ -42,7 +42,7 @@ Methods
 
 
 #### Arguments
-* $operand **[JClaveau\LogicalFilter\Rule\AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)**
+* $operand **mixed**
 
 
 

@@ -217,15 +217,21 @@ Remove any constraint being a duplicate of another one.
 
 ### hasSolution
 
-    boolean JClaveau\LogicalFilter\LogicalFilter::hasSolution()
+    boolean JClaveau\LogicalFilter\LogicalFilter::hasSolution($save_simplification)
 
 Checks if there is at least on set of conditions which is not
 contradictory.
 
-
+Checking if a filter has solutions require to simplify it first.
+To let the control on the balance between readability and
+performances, the required simplification can be saved or not
+depending on the $save_simplification parameter.
 
 * Visibility: **public**
 
+
+#### Arguments
+* $save_simplification **mixed**
 
 
 
