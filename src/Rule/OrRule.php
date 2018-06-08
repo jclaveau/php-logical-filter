@@ -43,6 +43,7 @@ class OrRule extends AbstractOperationRule
     }
 
     /**
+     * @param bool $debug=false
      */
     public function toArray($debug=false)
     {

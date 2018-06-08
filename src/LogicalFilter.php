@@ -4,7 +4,6 @@
  *
  * @package php-logical-filter
  * @author  Jean Claveau
- * @version 0.1.0 (29/05/2018)
  */
 namespace JClaveau\LogicalFilter;
 

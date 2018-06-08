@@ -1,4 +1,10 @@
 <?php
+/**
+ * InRule
+ *
+ * @package php-logical-filter
+ * @author  Jean Claveau
+ */
 namespace JClaveau\LogicalFilter\Rule;
 
 /**
@@ -24,12 +30,14 @@ class InRule extends OrRule
      */
     public function getPossibilities()
     {
-        return $this->operands;
+        $possibilities = [];
+        foreach ($this->operands as $operand)
+            $possibilities[] = $operand->getValue();
+
+        return $possibilities;
     }
 
     /**
-     * @return array
-     *
      * @param  array possibilities
      *
      * @return InRule $this
@@ -48,6 +56,20 @@ class InRule extends OrRule
         }
 
         return $this;
+    }
+
+    /**
+     * @param bool $debug=false
+     */
+    public function toArray($debug=false)
+    {
+        $description = [
+            $this->field,
+            $debug ? $this->getInstanceId() : self::operator,
+            $this->getPossibilities()
+        ];
+
+        return $description;
     }
 
     /**/

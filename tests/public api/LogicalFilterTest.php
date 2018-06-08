@@ -1006,5 +1006,39 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals( ['field_5', '=', 'a'], $filter->toArray() );
     }
 
+    /**
+     */
+    public function test_add_inRule()
+    {
+        $filter = new LogicalFilter(
+            ['field_1', 'in', ['a', 'b', 'c']]
+        );
+
+        // toArray must be iso to the provided descrition
+        $this->assertEquals(
+            ['field_1', 'in', ['a', 'b', 'c']],
+            $filter->toArray()
+        );
+
+        $filter->getRules(false)->addPossibilities(['d', 'e']);
+
+        $this->assertEquals(
+            ['a', 'b', 'c', 'd', 'e'],
+            $filter->getRules()->getPossibilities()
+        );
+
+        $this->assertEquals(
+            [
+                'or',
+                ['field_1', '=', 'a'],
+                ['field_1', '=', 'b'],
+                ['field_1', '=', 'c'],
+                ['field_1', '=', 'd'],
+                ['field_1', '=', 'e'],
+            ],
+            $filter->simplify()->toArray()
+        );
+    }
+
     /**/
 }
