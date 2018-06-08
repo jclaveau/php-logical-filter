@@ -1169,5 +1169,28 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     */
+    public function test_BelowRule_and_AboveRule_are_strictloy_compared()
+    {
+        $this->assertFalse(
+            (new LogicalFilter([
+                'and',
+                ['field_1', '=', 3],
+                ['field_1', '<', 3],
+            ]))
+            ->hasSolution()
+        );
+
+        $this->assertFalse(
+            (new LogicalFilter([
+                'and',
+                ['field_1', '=', 3],
+                ['field_1', '>', 3],
+            ]))
+            ->hasSolution()
+        );
+    }
+
     /**/
 }
