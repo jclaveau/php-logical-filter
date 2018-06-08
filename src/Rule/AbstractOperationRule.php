@@ -165,8 +165,6 @@ abstract class AbstractOperationRule extends AbstractRule
      * Replace NotRule objects by the negation of their operands.
      *
      * @return $this
-     *
-     * @todo Clean it
      */
     public function removeNegations()
     {
@@ -180,9 +178,6 @@ abstract class AbstractOperationRule extends AbstractRule
 
             if ($this->operands[$i] instanceof AbstractOperationRule) {
                 $this->operands[$i]->removeNegations();
-                // try to remove negations twice as removing one can
-                // produce some new ones
-                // $operand->removeNegations();
             }
         }
 

@@ -9,11 +9,11 @@ abstract class AbstractRule implements \JsonSerializable
         '='   => 'equal',
         '>'   => 'above',
         '<'   => 'below',
-
+        '><'  => 'between',
         '<='  => 'below_or_equal',
         '>='  => 'above_or_equal',
         '!='  => 'not_equal',
-
+        'in'  => 'in',
         '!in' => 'not_in',
     ];
 

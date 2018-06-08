@@ -1,52 +1,23 @@
 <?php
+/**
+ * BetweenRule
+ *
+ * @package php-logical-filter
+ * @author  Jean Claveau
+ */
 namespace JClaveau\LogicalFilter\Rule;
 
-class BetweenRule extends Rule
+class BetweenRule extends AndRule
 {
-    /** @var mixed $maximum */
-    protected $maximum;
-
-    /** @var mixed $minimum */
-    protected $minimum;
+    /** @var string operator */
+    const operator = '><';
 
     /**
      */
-    public function __construct( $maximum, $minimum )
+    public function __construct( $field, array $limits )
     {
-        if (!is_scalar($minimum)) {
-            throw new \InvalidArgumentException(
-                "Minimum parameter must be a scalar"
-            );
-        }
-
-        if (!is_scalar($maximum)) {
-            throw new \InvalidArgumentException(
-                "Maximum parameter must be a scalar"
-            );
-        }
-
-        $this->maximum = $maximum;
-        $this->minimum = $minimum;
-    }
-
-    /**
-     * @return $this
-     */
-    public function combineWith( Rule $other_rule )
-    {
-        if ($other_rule instanceof AboveRule) {
-            if ($other_rule->getLimit() > $this->limit)
-                $this->limit = $other_rule->getLimit();
-
-        } elseif ($other_rule instanceof InRule) {
-            // In rule cannot change the limit of in rule
-        } else {
-            throw new \Exception(
-                'Rule combination with '.get_class($other_rule).' not implemented'
-            );
-        }
-
-        return $this;
+        $this->addOperand( new AboveRule($field, $limits[0]) );
+        $this->addOperand( new BelowRule($field, $limits[1]) );
     }
 
     /**
@@ -54,7 +25,7 @@ class BetweenRule extends Rule
      */
     public function getMinimum()
     {
-        return $this->minimum;
+        return $this->operands[0]->getMinimum();
     }
 
     /**
@@ -62,7 +33,27 @@ class BetweenRule extends Rule
      */
     public function getMaximum()
     {
-        return $this->maximum;
+        return $this->operands[1]->getMaximum();
+    }
+
+    /**
+     */
+    public function getField()
+    {
+        $field1 = $this->operands[0]->getField();
+        $field2 = $this->operands[1]->getField();
+
+        if ($field1 != $field2) {
+            // TODO if this case occures, the current object should be
+            // replaced by a simple OrRule
+            throw new \RuntimeException(
+                "The field of the AboveRule (".var_export($field1, true).") "
+                ."and the field of the BelowRule (".var_export($field2, true).") "
+                ."of an ". __CLASS__ ." do not match anymore"
+            );
+        }
+
+        return $field1;
     }
 
     /**
@@ -72,9 +63,26 @@ class BetweenRule extends Rule
      */
     public function hasSolution()
     {
-        return is_null($this->maximum)
-            || is_null($this->minimum)
-            || $this->maximum > $this->minimum;
+        return is_null($this->getMaximum())
+            || is_null($this->getMinimum())
+            || $this->getMaximum() > $this->getMinimum();
+    }
+
+    /**
+     * @param bool $debug=false
+     */
+    public function toArray($debug=false)
+    {
+        $description = [
+            $this->getField(),
+            $debug ? $this->getInstanceId() : self::operator,
+            [
+                $this->getMinimum(),
+                $this->getMaximum(),
+            ]
+        ];
+
+        return $description;
     }
 
     /**/

@@ -1143,5 +1143,31 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     */
+    public function test_add_BetweenRule()
+    {
+        $filter = new LogicalFilter(
+            ['field_1', '><', [2, 3]]
+        );
+
+        // toArray must be iso to the provided descrition
+        $this->assertEquals(
+            ['field_1', '><', [2, 3]],
+            $filter->toArray()
+        );
+
+        $this->assertEquals(
+            [
+                'and',
+                ['field_1', '>', 2],
+                ['field_1', '<', 3],
+            ],
+            $filter->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
     /**/
 }
