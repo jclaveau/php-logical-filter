@@ -574,6 +574,29 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     */
+    public function test_hasSolution_saving_simplification()
+    {
+        $filter = new LogicalFilter([
+            'and',
+            ['filed_1', '=', 'a'],
+            ['filed_2', '=', 'b'],
+        ]);
+
+        // don't save simplifications
+        $this->assertFalse( $filter->hasSolution(false) );
+        $this->assertEquals([
+            'and',
+            ['filed_1', '=', 'a'],
+            ['filed_2', '=', 'b'],
+        ], $filter->toArray() );
+
+        // saving simplifications
+        $this->assertFalse( $filter->hasSolution() );
+        $this->assertEquals( ['and'], $filter->toArray() );
+    }
+
+    /**
      * @see https://secure.php.net/manual/en/jsonserializable.jsonserialize.php
      */
     public function test_jsonSerialize()

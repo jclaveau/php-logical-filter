@@ -349,12 +349,25 @@ class LogicalFilter implements \JsonSerializable
      * Checks if there is at least on set of conditions which is not
      * contradictory.
      *
+     * Checking if a filter has solutions require to simplify it first.
+     * To let the control on the balance between readability and
+     * performances, the required simplification can be saved or not
+     * depending on the $save_simplification parameter.
+     *
+     * @param  $save_simplification
+     *
      * @return bool
      */
-    public function hasSolution()
+    public function hasSolution($save_simplification=true)
     {
         if (!$this->rules)
             return true;
+
+        if ($save_simplification) {
+            $this->simplify();
+            return $this->rules->hasSolution();
+        }
+
         return $this->rules->copy()->simplify()->hasSolution();
     }
 
