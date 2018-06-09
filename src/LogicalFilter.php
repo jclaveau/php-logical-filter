@@ -72,6 +72,14 @@ class LogicalFilter implements \JsonSerializable
             $this->addRule($new_rule, $operation);
         }
         elseif (count($rules_description) == count(array_filter($rules_description, function($arg) {
+            return $arg instanceof LogicalFilter;
+        })) ) {
+            // Already instanciated rules
+            foreach ($rules_description as $i => $filter) {
+                $this->addRule( $filter->getRules(), $operation);
+            }
+        }
+        elseif (count($rules_description) == count(array_filter($rules_description, function($arg) {
             return $arg instanceof AbstractRule;
         })) ) {
             // Already instanciated rules
@@ -312,17 +320,6 @@ class LogicalFilter implements \JsonSerializable
     public function getRules($copy = true)
     {
         return $copy && $this->rules ? $this->rules->copy() : $this->rules;
-    }
-
-    /**
-     * Includes all the rules of an other LogicalFilter into the current one.
-     *
-     * @param  LogicalFilter $filterToCombine
-     * @return LogicalFilter $this
-     */
-    public function intersectWith( LogicalFilter $filterToCombine )
-    {
-        return $this->and_( $filterToCombine->getRules() );
     }
 
     /**

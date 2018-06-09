@@ -1194,7 +1194,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_intersectWith()
+    public function test_and_ofLogicalFilter()
     {
         $filter  = new LogicalFilter( ['field_1', '=', 3] );
         $filter2 = new LogicalFilter( ['field_2', '=', 12] );
@@ -1206,7 +1206,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                 ['field_2', '=', 12],
             ],
             $filter
-                ->intersectWith( $filter2 )
+                ->and_( $filter2 )
                 // ->dump()
                 ->toArray()
         );
