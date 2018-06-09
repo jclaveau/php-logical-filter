@@ -320,9 +320,9 @@ class LogicalFilter implements \JsonSerializable
      * @param  LogicalFilter $filterToCombine
      * @return LogicalFilter $this
      */
-    public function combineWith( LogicalFilter $filterToCombine )
+    public function intersectWith( LogicalFilter $filterToCombine )
     {
-        return $this->addRules( $filterToCombine->getRules() );
+        return $this->and_( $filterToCombine->getRules() );
     }
 
     /**

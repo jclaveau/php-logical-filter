@@ -20,9 +20,9 @@ class InRule extends OrRule
 
     /**
      * @param string $field         The field to apply the rule on.
-     * @param array  $possibilities The values the field can belong to.
+     * @param mixed  $possibilities The values the field can belong to.
      */
-    public function __construct( $field, array $possibilities )
+    public function __construct( $field, $possibilities )
     {
         $this->field = $field;
         $this->addPossibilities( $possibilities );
@@ -61,12 +61,15 @@ class InRule extends OrRule
     }
 
     /**
-     * @param  array possibilities
+     * @param  mixed possibilities
      *
      * @return InRule $this
      */
-    public function addPossibilities(array $possibilities)
+    public function addPossibilities($possibilities)
     {
+        if (!is_array($possibilities))
+            $possibilities = [$possibilities];
+
         foreach ($possibilities as $possibility) {
             if ($possibility instanceof AbstractRule) {
                 throw new \InvalidArgumentException(
