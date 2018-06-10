@@ -1197,7 +1197,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_and_ofLogicalFilter()
+    public function test_and_of_LogicalFilter()
     {
         $filter  = new LogicalFilter( ['field_1', '=', 3] );
         $filter2 = new LogicalFilter( ['field_2', '=', 12] );
@@ -1210,6 +1210,28 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             ],
             $filter
                 ->and_( $filter2 )
+                // ->dump()
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_and_of_AbstractRules()
+    {
+        $filter = new LogicalFilter( ['field_1', '=', 3] );
+        $rule1  = new EqualRule( 'field_2', 12 );
+        $rule2  = new AboveRule( 'field_3', 'abc' );
+
+        $this->assertEquals(
+            [
+                'and',
+                ['field_1', '=', 3],
+                ['field_2', '=', 12],
+                ['field_3', '>', 'abc'],
+            ],
+            $filter
+                ->and_( $rule1, $rule2 )
                 // ->dump()
                 ->toArray()
         );
