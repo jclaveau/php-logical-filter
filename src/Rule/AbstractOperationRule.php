@@ -215,6 +215,8 @@ abstract class AbstractOperationRule extends AbstractRule
     /**
      * Simplify the current AbstractOperationRule.
      *
+     * @todo   Rename in unifyAtomicOperands()
+     *
      * @return AbstractOperationRule the simplified rule
      */
     public function unifyOperands($unifyDifferentOperands = true)
@@ -228,6 +230,7 @@ abstract class AbstractOperationRule extends AbstractRule
         }
 
         $operandsByFields = $this->groupOperandsByFieldAndOperator();
+        // var_dump($operandsByFields);
 
         // unifying same operands
         foreach ($operandsByFields as $field => $operandsByOperator) {
@@ -240,7 +243,11 @@ abstract class AbstractOperationRule extends AbstractRule
                     usort($operands, [$this, 'belowRuleUnifySorter']);
                     $operands = [reset($operands)];
                 }
+                // elseif ($operator == NotIsNull::operator) {
+
+                // }
                 elseif ($operator == EqualRule::operator) {
+                    // TODO strict comparison in case of null
                     $operandsTmp = array_map(function($operand) {
                         return serialize($operand);
                     }, $operands);
@@ -280,7 +287,7 @@ abstract class AbstractOperationRule extends AbstractRule
     {
         $this->moveSimplificationStepForward( self::remove_monooperand_operations );
 
-        if ($this instanceof NotRule) {
+        if ($this instanceof NotRule && $this->getValue() !== null) {
             throw new LogicException(
                 "NotRule MUST have been already removed here"
             );

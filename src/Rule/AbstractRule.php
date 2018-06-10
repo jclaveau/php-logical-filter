@@ -168,6 +168,14 @@ abstract class AbstractRule implements \JsonSerializable
             }
             $ruleTree = $this;
         }
+        elseif ($this instanceof NotEqualRule && $this->getValue() === null) {
+            // Non-simplified NotRules are not supported BUT the not of NULL
+            $ruleTree = new OrRule([
+                new AndRule([
+                    $this
+                ])
+            ]);
+        }
         else {
             throw new \LogicException(
                 "Unhandled type of simplified rules provided for conversion: "

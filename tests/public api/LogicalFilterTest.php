@@ -1180,6 +1180,82 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
+    public function test_NotRule_of_null()
+    {
+        $filter = (new LogicalFilter(
+            ['field_1', '!=', null]
+        ));
+
+        $this->assertEquals(
+            ['field_1', '!=', null],
+            $filter->toArray()
+        );
+
+        $this->assertEquals(
+            ['field_1', '!=', null],
+            $filter
+                ->simplify()
+                // ->dump(!true)
+                ->toArray()
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ['field_1', '!=', null],
+                ],
+            ],
+            $filter
+                ->simplify(['force_logical_core' => true])
+                // ->dump(!true)
+                ->toArray()
+        );
+
+        $filter = (new LogicalFilter(
+            ['not', ['field_1', '=', null]]
+        ))
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            ['not', ['field_1', '=', null]],
+            $filter
+                ->toArray()
+        );
+
+        $this->assertEquals(
+            ['field_1', '!=', null],
+            $filter
+                ->simplify()
+                ->dump()
+                ->toArray()
+        );
+    }
+
+    /**
+     * /
+    public function test_hasSolution_between_NullRule_and_BelowRule()
+    {
+        $filter = (new LogicalFilter(
+            ['field_1', '=', null]
+        ))
+        ->and_(['field_1', '<', 3])
+        ->dump()
+        ->simplify()
+        ->dump(true)
+        ;
+
+        $this->assertFalse( $filter->hasSolution() );
+
+
+
+        return;
+
+
+    }
+
+    /**
+     */
     public function test_add_BetweenRule()
     {
         $filter = new LogicalFilter(

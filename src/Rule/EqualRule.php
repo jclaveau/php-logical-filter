@@ -18,12 +18,6 @@ class EqualRule extends AbstractAtomicRule
      */
     public function __construct( $field, $value )
     {
-        if (is_null($value)) {
-            throw new \InvalidArgumentException(
-                "Value parameter cannot be null, please use NullRule instead"
-            );
-        }
-
         $this->field = $field;
         $this->value = $value;
     }

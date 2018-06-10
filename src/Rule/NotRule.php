@@ -40,6 +40,9 @@ class NotRule extends AbstractOperationRule
      */
     public function negateOperand($remove_generated_negations=false)
     {
+        if (!$this->operands)
+            return $this;
+
         $operand = $this->operands[0];
 
         if (!$operand instanceof AbstractOperationRule)
@@ -61,6 +64,9 @@ class NotRule extends AbstractOperationRule
         elseif ($operand instanceof NotRule) {
             // ! (  !  a) : a
             $new_rule = $operand->getOperands()[0];
+        }
+        elseif ($operand instanceof EqualRule && $operand->getValue() === null) {
+            $new_rule = new NotEqualRule($field, null);
         }
         elseif ($operand instanceof EqualRule) {
             // ! (v =  a) : (v < a) || (v > a)
@@ -108,12 +114,6 @@ class NotRule extends AbstractOperationRule
             foreach ($operand->getOperands() as $operand)
                 $new_rule->addOperand( new NotRule($operand->copy()) );
         }
-        elseif ($operand instanceof NotNullRule) {
-            $new_rule = new NullRule($field);
-        }
-        elseif ($operand instanceof NullRule) {
-            $new_rule = new NotNullRule($field);
-        }
         else {
             throw new \ErrorException(
                 'Removing NotRule of ' . get_class($operand)
@@ -131,9 +131,24 @@ class NotRule extends AbstractOperationRule
      */
     public function unifyOperands($unifyDifferentOperands = true)
     {
-        $this->moveSimplificationStepForward( self::atomic_operands_unified );
+        $this->moveSimplificationStepForward( self::unify_atomic_operands );
         return $this;
     }
+
+    /**
+     * Replace all the OrRules of the RuleTree by one OrRule at its root.
+     *
+     * @todo rename as RootifyDisjunjctions?
+     * @todo return $this (implements a Rule monad?)
+     *
+     * @return OrRule copied operands with one OR at its root
+     * /
+    public function rootifyDisjunctions()
+    {
+        $this->moveSimplificationStepForward( self::rootify_disjunctions );
+        if ()
+    }
+
 
     /**
      */

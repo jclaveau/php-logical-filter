@@ -9,21 +9,6 @@ class NotRuleTest extends \PHPUnit_Framework_TestCase
      */
     public function test_negateOperand()
     {
-        // NullRule
-        $rule = new NotRule(
-            new NullRule('field')
-        );
-        $new_rule = $rule->negateOperand();
-        $this->assertEquals(new NotNullRule('field'), $new_rule);
-
-        // NotNullRule
-        $rule = new NotRule(
-            new NotNullRule('field')
-        );
-        $new_rule = $rule->negateOperand();
-        $this->assertEquals(new NullRule('field'), $new_rule);
-
-
         // AboveRule
         $rule = new NotRule(
             new AboveRule('field', 3)
@@ -64,6 +49,15 @@ class NotRuleTest extends \PHPUnit_Framework_TestCase
             new BelowRule('field', 3),
         ]), $new_rule);
 
+        // EqualRule null
+        $rule = new NotRule(
+            new EqualRule('field', null)
+        );
+        $new_rule = $rule->negateOperand();
+        $this->assertEquals(
+            new NotEqualRule('field', null),
+            $new_rule
+        );
 
         // AndRule (2 operands only)
         $rule = new NotRule(
@@ -130,16 +124,6 @@ class NotRuleTest extends \PHPUnit_Framework_TestCase
                 new EqualRule('field', 10)
             ),
         ]);
-
-        // var_dump('$new_rule');
-        // var_dump($new_rule);
-
-        // var_dump('$expected');
-        // var_dump($expected);
-
-        // var_dump('$expected == $new_rule');
-        // var_dump($expected == $new_rule);
-        // exit;
 
         $this->assertEquals($expected, $new_rule);
 
