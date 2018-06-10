@@ -351,7 +351,7 @@ abstract class AbstractOperationRule extends AbstractRule
             $instance = $this;
         }
 
-        // $instance->dump(true, false);
+        // $instance->dump(true);
 
         if ($step_to_stop_after  == self::rootify_disjunctions ||
             $step_to_stop_before == self::unify_atomic_operands )
@@ -359,7 +359,7 @@ abstract class AbstractOperationRule extends AbstractRule
 
         $instance->unifyAtomicOperands();
 
-        // $instance->dump(true, false);
+        // $instance->dump(true);
 
         if ($step_to_stop_after  == self::unify_atomic_operands ||
             $step_to_stop_before == self::remove_monooperand_operations )

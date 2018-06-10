@@ -1319,6 +1319,26 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
+    public function test_simplify_between_EqualRule_of_null_and_NotEqualRule_of_null()
+    {
+        $filter = (new LogicalFilter(
+            ['field_1', '=', null]
+        ))
+        ->and_(['field_1', '!=', null])
+        ;
+
+        $this->assertEquals(
+            ['and'],
+            $filter
+                // ->dump(true)
+                ->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
     public function test_simplify_between_EqualRule_of_null_and_equal()
     {
         $filter = (new LogicalFilter(

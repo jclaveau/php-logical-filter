@@ -49,6 +49,11 @@ class AndRule extends AbstractOperationRule
         foreach ($upLiftedOperands as $i => $operand) {
 
             if ($operand instanceof NotRule) {
+                if ($operand instanceof NotEqualRule && $operand->getValue() === null) {
+                    $upLifdtedOperand->addOperand( $operand->copy() );
+                    continue;
+                }
+
                 throw new \LogicException(
                     'UpLifting disjunctions MUST be done after negations removal'
                 );
@@ -165,6 +170,14 @@ class AndRule extends AbstractOperationRule
 
                 if (   !empty($operandsByOperator[ AboveRule::operator ])
                     && $equalRule->getValue() <= reset($operandsByOperator[ AboveRule::operator ])->getMinimum()
+                ) {
+                    $this->operands = [];
+                    return $this;
+                }
+
+                if (   !empty($operandsByOperator[ NotEqualRule::operator ])
+                    && $equalRule->getValue() === null
+                    && reset($operandsByOperator[ NotEqualRule::operator ])->getValue() === null
                 ) {
                     $this->operands = [];
                     return $this;
@@ -295,7 +308,8 @@ class AndRule extends AbstractOperationRule
                         );
                     }
 
-                    unset($operandsByFields[ $field ][ NotEqualRule::operator ]);
+                    if (reset($operandsByOperator[ EqualRule::operator ])->getValue() !== null)
+                        unset($operandsByFields[ $field ][ NotEqualRule::operator ]);
                 }
             }
         }
