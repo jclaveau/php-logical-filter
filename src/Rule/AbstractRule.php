@@ -171,7 +171,7 @@ abstract class AbstractRule implements \JsonSerializable
         else {
             throw new \LogicException(
                 "Unhandled type of simplified rules provided for conversion: "
-                .$this->toArray()
+                .$this
             );
         }
 

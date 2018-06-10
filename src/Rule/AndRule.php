@@ -136,6 +136,7 @@ class AndRule extends AbstractOperationRule
                     }
                     $previousEqualRule = $equalRule;
                 }
+                unset($previousEqualRule);
 
                 $equalRule = reset($operandsByOperator[ EqualRule::operator ]);
 

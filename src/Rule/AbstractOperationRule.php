@@ -340,6 +340,8 @@ abstract class AbstractOperationRule extends AbstractRule
             $step_to_stop_before == self::rootify_disjunctions )
             return $this;
 
+        // $this->dump(true);
+
         // FIXME return $this while RootifyingDisjunctions!
         if (method_exists($this, 'rootifyDisjunctions')) {
             $instance = $this->rootifyDisjunctions();
@@ -348,7 +350,7 @@ abstract class AbstractOperationRule extends AbstractRule
             $instance = $this;
         }
 
-        // $instance->dump(!true, false);
+        // $instance->dump(true, false);
 
         if ($step_to_stop_after  == self::rootify_disjunctions ||
             $step_to_stop_before == self::unify_atomic_operands )
@@ -356,15 +358,15 @@ abstract class AbstractOperationRule extends AbstractRule
 
         $instance->unifyOperands();
 
+        // $instance->dump(true, false);
+
         if ($step_to_stop_after  == self::unify_atomic_operands ||
             $step_to_stop_before == self::remove_monooperand_operations )
             return $instance;
 
-        // $instance->dump(!true, false);
-
         $instance = $instance->removeMonooperandOperations();
 
-        // $instance->dump(true, false);
+        // $instance->dump(!true);
 
         if ($step_to_stop_after  == self::remove_monooperand_operations ||
             $step_to_stop_before == self::remove_invalid_branches )
@@ -376,12 +378,12 @@ abstract class AbstractOperationRule extends AbstractRule
             $instance = $instance->removeMonooperandOperations();
         }
 
+        // $instance->dump(true);
+
         if ($force_logical_core)
             $instance = $instance->forceLogicalCore();
 
         // $instance->dump(true);
-
-        // $instance->moveSimplificationStepForward( self::simplified );
 
         return $instance;
     }
