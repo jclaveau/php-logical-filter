@@ -55,23 +55,23 @@ abstract class AbstractRule implements \JsonSerializable
     }
 
     /**
-     * @param  string rule type
+     * @param  string $rule_operator
      *
-     * @return string corresponding rule class type
+     * @return string Class corresponding to the given operator
      */
-    public static function getRuleClass($rule_type)
+    public static function getRuleClass($rule_operator)
     {
-        $rule_type = self::findEnglishOperator($rule_type);
+        $english_rule_operator = self::findEnglishOperator($rule_operator);
 
         $rule_class = __NAMESPACE__
             . '\\'
-            . str_replace('_', '', ucwords($rule_type, '_'))
+            . str_replace('_', '', ucwords($english_rule_operator, '_'))
             . 'Rule';
 
         if (!class_exists( $rule_class)) {
             throw new \InvalidArgumentException(
-                "No rule class corresponding to the expected type: '$rule_type'. "
-                ."Looking for '$rule_class'"
+                "The class '$rule_class' corresponding to the  operator "
+                ."'$rule_operator' / '$english_rule_operator' cannot be found."
             );
         }
 
