@@ -579,16 +579,16 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new LogicalFilter([
             'and',
-            ['filed_1', '=', 'a'],
-            ['filed_2', '=', 'b'],
+            ['field_1', '=', 'a'],
+            ['field_1', '=', 'b'],
         ]);
 
         // don't save simplifications
         $this->assertFalse( $filter->hasSolution(false) );
         $this->assertEquals([
             'and',
-            ['filed_1', '=', 'a'],
-            ['filed_2', '=', 'b'],
+            ['field_1', '=', 'a'],
+            ['field_1', '=', 'b'],
         ], $filter->toArray() );
 
         // saving simplifications
