@@ -1275,6 +1275,28 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
+    public function test_addRule_with_bad_operation()
+    {
+        $filter = new LogicalFilter( ['field_1', '=', 3] );
+
+        try {
+            VisibilityViolator::callHiddenMethod(
+                $filter, 'addRule', [new EqualRule('field', 2), 'bad_operator']
+            );
+
+            $this->assertTrue(
+                false,
+                "An exception claiming that an invaid operator is given "
+                ."should have been thrown here"
+            );
+        }
+        catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true, "InvalidArgumentException throw: ".$e->getMessage());
+        }
+    }
+
+    /**
+     */
     public function test_forceLogicalCore_with_AtomicRule_at_root()
     {
         $filter = new LogicalFilter( ['field_1', '=', 3] );
