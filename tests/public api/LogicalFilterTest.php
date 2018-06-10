@@ -1148,6 +1148,38 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
+    public function test_AboveRule_with_null_as_value()
+    {
+        try {
+            $filter = (new LogicalFilter(
+                ['field_1', '>', null]
+            ));
+            $this->assertTrue(false, "An exception should be throw here");
+        }
+        catch (\InvalidArgumentException $e) {
+            // InvalidArgumentException: Minimum parameter must be a scalar
+            $this->assertTrue(true, "Exception thrown: ".$e->getMessage());
+        }
+    }
+
+    /**
+     */
+    public function test_BelowRule_with_null_as_value()
+    {
+        try {
+            $filter = (new LogicalFilter(
+                ['field_1', '<', null]
+            ));
+            $this->assertTrue(false, "An exception should be throw here");
+        }
+        catch (\InvalidArgumentException $e) {
+            // InvalidArgumentException: Maximum parameter must be a scalar
+            $this->assertTrue(true, "Exception thrown: ".$e->getMessage());
+        }
+    }
+
+    /**
+     */
     public function test_add_BetweenRule()
     {
         $filter = new LogicalFilter(
