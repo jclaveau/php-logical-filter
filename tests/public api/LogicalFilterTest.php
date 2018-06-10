@@ -1239,6 +1239,25 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
+    public function test_and_of_invalid_rules_description_throws_exception()
+    {
+        $filter = new LogicalFilter( ['field_1', '=', 3] );
+
+        try {
+            $filter->and_('a', '=', '3', 'lalalalala');
+            $this->assertTrue(
+                false,
+                "An exception claiming that bad arguments are provided "
+                ."should have been thrown here"
+            );
+        }
+        catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true, "InvalidArgumentException throw: ".$e->getMessage());
+        }
+    }
+
+    /**
+     */
     public function test_forceLogicalCore_with_AtomicRule_at_root()
     {
         $filter = new LogicalFilter( ['field_1', '=', 3] );
