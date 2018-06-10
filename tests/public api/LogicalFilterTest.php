@@ -1388,5 +1388,77 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @todo debug the runInseparateProcess of php to test the exit call.
+     * @ runInSeparateProcess
+     */
+    public function test_dump()
+    {
+        ob_start();
+        $filter = (new LogicalFilter( ['field_1', '=', 3] ))
+            ->dump()
+            ;
+        $dump = ob_get_clean();
+
+        // simple chained dump
+        $this->assertEquals(
+            str_replace('    ', '', "
+                /home/jean/dev/mediabong/apps/php-logical-filter/tests/public api/LogicalFilterTest.php:XX
+                array (
+                  0 => 'field_1',
+                  1 => '=',
+                  2 => 3,
+                )
+
+                "
+            ),
+            preg_replace('/:\d+/', ':XX', $dump)
+        );
+
+        // instance debuging enabled
+        ob_start();
+        $filter = (new LogicalFilter( ['field_1', '=', 3] ))
+            ->dump(false, true)
+            ;
+        $dump = ob_get_clean();
+        $this->assertEquals(
+            str_replace('    ', '', "
+                /home/jean/dev/mediabong/apps/php-logical-filter/tests/public api/LogicalFilterTest.php:XX
+                array (
+                  0 => 'field_1',
+                  1 => 'JClaveau\\\\LogicalFilter\\\\Rule\\\\EqualRule:XX',
+                  2 => 3,
+                )
+
+                "
+            ),
+            preg_replace('/:\d+/', ':XX', $dump)
+        );
+
+        // exit once dumped
+        // TODO this makes phpunit bug while echoing text before calling exit;
+        // ob_start();
+        // $filter = (new LogicalFilter( ['field_1', '=', 3] ))
+            // ->dump(true)
+            // ;
+            // echo 'plop';
+            // exit;
+        // $dump = ob_get_clean();
+        // $this->assertEquals(
+            // str_replace('    ', '', "
+                // /home/jean/dev/mediabong/apps/php-logical-filter/tests/public api/LogicalFilterTest.php:XX
+                // array (
+                  // 0 => 'field_1',
+                  // 1 => '=',
+                  // 2 => 3,
+                // )
+
+                // "
+            // ),
+            // preg_replace('/:\d+/', ':XX', $dump)
+        // );
+
+    }
+
     /**/
 }
