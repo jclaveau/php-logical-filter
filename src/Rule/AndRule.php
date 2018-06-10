@@ -113,7 +113,7 @@ class AndRule extends AbstractOperationRule
         $this->moveSimplificationStepForward(self::remove_invalid_branches);
 
         foreach ($this->operands as $i => $operand) {
-            if ($operand instanceof AbstractOperationRule) {
+            if ($operand instanceof AndRule || $operand instanceof OrRule ) {
                 $this->operands[$i] = $operand->removeInvalidBranches();
                 if (!$this->operands[$i]->hasSolution()) {
                     $this->operands = [];
@@ -124,12 +124,14 @@ class AndRule extends AbstractOperationRule
 
         $operandsByFields = $this->groupOperandsByFieldAndOperator();
 
+        // $this->dump(true);
+
         foreach ($operandsByFields as $field => $operandsByOperator) {
 
             if (!empty($operandsByOperator[ EqualRule::operator ])) {
 
                 foreach ($operandsByOperator[ EqualRule::operator ] as $equalRule) {
-                    // Multiple equal rules with same value is invalid
+                    // Multiple equal rules without the same value is invalid
                     if (isset($previousEqualRule) && $previousEqualRule->getValue() != $equalRule->getValue()) {
                         $this->operands = [];
                         return $this;
@@ -141,7 +143,21 @@ class AndRule extends AbstractOperationRule
                 $equalRule = reset($operandsByOperator[ EqualRule::operator ]);
 
                 if (   !empty($operandsByOperator[ BelowRule::operator ])
+                    && $equalRule->getValue() === null
+                ) {
+                    $this->operands = [];
+                    return $this;
+                }
+
+                if (   !empty($operandsByOperator[ BelowRule::operator ])
                     && $equalRule->getValue() >= reset($operandsByOperator[ BelowRule::operator ])->getMaximum()
+                ) {
+                    $this->operands = [];
+                    return $this;
+                }
+
+                if (   !empty($operandsByOperator[ AboveRule::operator ])
+                    && $equalRule->getValue() === null
                 ) {
                     $this->operands = [];
                     return $this;
@@ -203,6 +219,8 @@ class AndRule extends AbstractOperationRule
     protected function simplifyDifferentOperands(array $operandsByFields)
     {
         foreach ($operandsByFields as $field => $operandsByOperator) {
+
+            // EqualRule comparisons
             if (!empty($operandsByOperator[ EqualRule::operator ])) {
                 if (count($operandsByOperator[ EqualRule::operator ]) != 1) {
                     // Multiple Equal rules for one field with different values has no sense
@@ -233,6 +251,51 @@ class AndRule extends AbstractOperationRule
                     $belowRule = reset($operandsByOperator[ BelowRule::operator ]);
                     if ($equalRule->getValue() !== null && $belowRule->getMaximum() > $equalRule->getValue())
                         unset($operandsByFields[ $field ][ BelowRule::operator ]);
+                }
+            }
+
+            // NotEqualRule comparisons
+            if (!empty($operandsByOperator[ NotEqualRule::operator ])) {
+                $notEqualRule = reset( $operandsByOperator[ NotEqualRule::operator ] );
+                if ($notEqualRule->getValue() !== null) {
+                    throw new \ErrorException(
+                        "\$notEqualRule should only remain for null once "
+                        . AbstractOperationRule::remove_negations . " ran "
+                        ." (instead of {$notEqualRule->getValue()})."
+                    );
+                }
+
+                if (!empty($operandsByOperator[ AboveRule::operator ])) {
+                    if (count($operandsByOperator[ AboveRule::operator ]) != 1) {
+                        throw new \LogicException(
+                            // TODO we are currently in unifyAtomicOperands() :/
+                            __METHOD__ . " MUST be called after unifyAtomicOperands()"
+                        );
+                    }
+
+                    unset($operandsByFields[ $field ][ NotEqualRule::operator ]);
+                }
+
+                if (!empty($operandsByOperator[ BelowRule::operator ])) {
+                    if (count($operandsByOperator[ BelowRule::operator ]) != 1) {
+                        throw new \LogicException(
+                            // TODO we are currently in unifyAtomicOperands() :/
+                            __METHOD__ . " MUST be called after unifyAtomicOperands()"
+                        );
+                    }
+
+                    unset($operandsByFields[ $field ][ NotEqualRule::operator ]);
+                }
+
+                if (!empty($operandsByOperator[ EqualRule::operator ])) {
+                    if (count($operandsByOperator[ EqualRule::operator ]) != 1) {
+                        throw new \LogicException(
+                            // TODO we are currently in unifyAtomicOperands() :/
+                            __METHOD__ . " MUST be called after unifyAtomicOperands()"
+                        );
+                    }
+
+                    unset($operandsByFields[ $field ][ NotEqualRule::operator ]);
                 }
             }
         }

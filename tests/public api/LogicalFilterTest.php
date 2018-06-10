@@ -1227,31 +1227,113 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             ['field_1', '!=', null],
             $filter
                 ->simplify()
-                ->dump()
+                // ->dump()
                 ->toArray()
         );
     }
 
     /**
-     * /
-    public function test_hasSolution_between_NullRule_and_BelowRule()
+     */
+    public function test_simplify_between_EqualRule_of_null_and_above_or_below()
     {
         $filter = (new LogicalFilter(
             ['field_1', '=', null]
         ))
         ->and_(['field_1', '<', 3])
-        ->dump()
-        ->simplify()
-        ->dump(true)
         ;
 
-        $this->assertFalse( $filter->hasSolution() );
+        $this->assertEquals(
+            ['and'],
+            $filter
+                ->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
 
+        $filter = (new LogicalFilter(
+            ['field_1', '=', null]
+        ))
+        ->and_(['field_1', '>', 3])
+        ;
 
+        $this->assertEquals(
+            ['and'],
+            $filter
+                ->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
+    }
 
-        return;
+    /**
+     */
+    public function test_simplify_between_NotEqualRule_of_null_and_above_or_below()
+    {
+        $filter = (new LogicalFilter(
+            ['field_1', '!=', null]
+        ))
+        ->and_(['field_1', '<', 3])
+        ;
 
+        $this->assertEquals(
+            ['field_1', '<', 3],
+            $filter
+                ->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
 
+        $filter = (new LogicalFilter(
+            ['field_1', '!=', null]
+        ))
+        ->and_(['field_1', '>', 3])
+        ;
+
+        $this->assertEquals(
+            ['field_1', '>', 3],
+            $filter
+                ->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify_between_NotEqualRule_of_null_and_equal()
+    {
+        $filter = (new LogicalFilter(
+            ['field_1', '!=', null]
+        ))
+        ->and_(['field_1', '=', 3])
+        ;
+
+        $this->assertEquals(
+            ['field_1', '=', 3],
+            $filter
+                ->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify_between_EqualRule_of_null_and_equal()
+    {
+        $filter = (new LogicalFilter(
+            ['field_1', '=', null]
+        ))
+        ->and_(['field_1', '=', 3])
+        ;
+
+        $this->assertEquals(
+            ['and'],
+            $filter
+                ->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
     }
 
     /**

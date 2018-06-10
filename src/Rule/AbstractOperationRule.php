@@ -213,7 +213,7 @@ abstract class AbstractOperationRule extends AbstractRule
     }
 
     /**
-     * Simplify the current AbstractOperationRule.
+     * Removes duplicates between the current AbstractOperationRule.
      *
      * @return AbstractOperationRule the simplified rule
      */
@@ -241,11 +241,7 @@ abstract class AbstractOperationRule extends AbstractRule
                     usort($operands, [$this, 'belowRuleUnifySorter']);
                     $operands = [reset($operands)];
                 }
-                // elseif ($operator == NotIsNull::operator) {
-
-                // }
                 elseif ($operator == EqualRule::operator) {
-                    // TODO strict comparison in case of null
                     $operandsTmp = array_map(function($operand) {
                         return serialize($operand);
                     }, $operands);
