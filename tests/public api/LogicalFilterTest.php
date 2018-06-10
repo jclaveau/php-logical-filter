@@ -1403,7 +1403,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         // simple chained dump
         $this->assertEquals(
             str_replace('    ', '', "
-                /home/jean/dev/mediabong/apps/php-logical-filter/tests/public api/LogicalFilterTest.php:XX
+                ". __FILE__ .":XX
                 array (
                   0 => 'field_1',
                   1 => '=',
@@ -1423,7 +1423,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         $dump = ob_get_clean();
         $this->assertEquals(
             str_replace('    ', '', "
-                /home/jean/dev/mediabong/apps/php-logical-filter/tests/public api/LogicalFilterTest.php:XX
+                ". __FILE__ .":XX
                 array (
                   0 => 'field_1',
                   1 => 'JClaveau\\\\LogicalFilter\\\\Rule\\\\EqualRule:XX',
