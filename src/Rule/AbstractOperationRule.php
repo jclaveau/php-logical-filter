@@ -215,17 +215,15 @@ abstract class AbstractOperationRule extends AbstractRule
     /**
      * Simplify the current AbstractOperationRule.
      *
-     * @todo   Rename in unifyAtomicOperands()
-     *
      * @return AbstractOperationRule the simplified rule
      */
-    public function unifyOperands($unifyDifferentOperands = true)
+    public function unifyAtomicOperands($unifyDifferentOperands = true)
     {
         $this->moveSimplificationStepForward( self::unify_atomic_operands );
 
         foreach ($this->operands as $operand) {
             if ($operand instanceof AbstractOperationRule) {
-                $operand->unifyOperands();
+                $operand->unifyAtomicOperands();
             }
         }
 
@@ -363,7 +361,7 @@ abstract class AbstractOperationRule extends AbstractRule
             $step_to_stop_before == self::unify_atomic_operands )
             return $instance;
 
-        $instance->unifyOperands();
+        $instance->unifyAtomicOperands();
 
         // $instance->dump(true, false);
 

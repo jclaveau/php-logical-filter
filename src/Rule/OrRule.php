@@ -57,7 +57,7 @@ class OrRule extends AbstractOperationRule
     }
 
     /**
-     * This is called by the unifyOperands() method to choose which AboveRule
+     * This is called by the unifyAtomicOperands() method to choose which AboveRule
      * to keep for a given field.
      *
      * It's used as a usort() parameter.
@@ -73,7 +73,7 @@ class OrRule extends AbstractOperationRule
     }
 
     /**
-     * This is called by the unifyOperands() method to choose which BelowRule
+     * This is called by the unifyAtomicOperands() method to choose which BelowRule
      * to keep for a given field.
      *
      * It's used as a usort() parameter.

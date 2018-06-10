@@ -214,7 +214,7 @@ class AndRule extends AbstractOperationRule
                 if (!empty($operandsByOperator[ AboveRule::operator ])) {
                     if (count($operandsByOperator[ AboveRule::operator ]) != 1) {
                         throw new \LogicException(
-                            __METHOD__ . " MUST be called after unifyOperands()"
+                            __METHOD__ . " MUST be called after unifyAtomicOperands()"
                         );
                     }
 
@@ -226,7 +226,7 @@ class AndRule extends AbstractOperationRule
                 if (!empty($operandsByOperator[ BelowRule::operator ])) {
                     if (count($operandsByOperator[ BelowRule::operator ]) != 1) {
                         throw new \LogicException(
-                            __METHOD__ . " MUST be called after unifyOperands()"
+                            __METHOD__ . " MUST be called after unifyAtomicOperands()"
                         );
                     }
 
@@ -241,7 +241,7 @@ class AndRule extends AbstractOperationRule
     }
 
     /**
-     * This is called by the unifyOperands() method to choose which AboveRule
+     * This is called by the unifyAtomicOperands() method to choose which AboveRule
      * to keep for a given field.
      *
      * It's used as a usort() parameter.
@@ -257,7 +257,7 @@ class AndRule extends AbstractOperationRule
     }
 
     /**
-     * This is called by the unifyOperands() method to choose which BelowRule
+     * This is called by the unifyAtomicOperands() method to choose which BelowRule
      * to keep for a given field.
      *
      * It's used as a usort() parameter.

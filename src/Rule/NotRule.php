@@ -129,7 +129,7 @@ class NotRule extends AbstractOperationRule
      *
      * @return $this
      */
-    public function unifyOperands($unifyDifferentOperands = true)
+    public function unifyAtomicOperands($unifyDifferentOperands = true)
     {
         $this->moveSimplificationStepForward( self::unify_atomic_operands );
         return $this;
