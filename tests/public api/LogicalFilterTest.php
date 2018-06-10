@@ -1258,6 +1258,23 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
+    public function test_and_of_invalid_rules_description_containing_unhandled_operation()
+    {
+        try {
+            $filter = new LogicalFilter( ['operator_of_unhandled_operation', ['filed_1', '=', 3]] );
+            $this->assertTrue(
+                false,
+                "An exception claiming that an unhandled operation is described "
+                ."into a rules description should have been thrown here"
+            );
+        }
+        catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true, "InvalidArgumentException throw: ".$e->getMessage());
+        }
+    }
+
+    /**
+     */
     public function test_forceLogicalCore_with_AtomicRule_at_root()
     {
         $filter = new LogicalFilter( ['field_1', '=', 3] );

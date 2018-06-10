@@ -209,7 +209,10 @@ class LogicalFilter implements \JsonSerializable
                 $rule = new OrRule();
             }
             else {
-                throw new \Exception("Unhandled operation");
+                throw new \InvalidArgumentException(
+                    "A rule description seems to be an operation but do "
+                    ."not contains a valid operator: ".var_export($rules_composition, true)
+                );
             }
 
             $operator = $rule::operator;
