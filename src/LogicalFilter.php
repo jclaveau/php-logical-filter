@@ -390,41 +390,6 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
-     * Replaces every negation operation rules by its opposit not negated
-     * one.
-     *
-     * This method scans the rule tree recursivelly.
-     *
-     * @return $this
-     */
-    public function removeNegations()
-    {
-        if ($this->rules) {
-            $this->rules = (new AndRule([$this->rules]))
-                ->removeNegations()
-                // ->dump(true, false)
-                ->getOperands()[0];
-        }
-
-        return $this;
-    }
-
-    /**
-     * Remove all OR rules so only one remain at the top of rules tree.
-     *
-     * This method scans the rule tree recursivelly.
-     *
-     * @return $this
-     */
-    public function rootifyDisjunctions()
-    {
-        if ($this->rules)
-            $this->rules = $this->rules->rootifyDisjunctions();
-
-        return $this;
-    }
-
-    /**
      * Removes all the defined rules.
      *
      * @return $this
