@@ -219,7 +219,7 @@ class AndRule extends AbstractOperationRule
                     }
 
                     $aboveRule = reset($operandsByOperator[ AboveRule::operator ]);
-                    if ($aboveRule->getMinimum() < $equalRule->getValue())
+                    if ($equalRule->getValue() !== null && $aboveRule->getMinimum() < $equalRule->getValue())
                         unset($operandsByFields[ $field ][ AboveRule::operator ]);
                 }
 
@@ -231,7 +231,7 @@ class AndRule extends AbstractOperationRule
                     }
 
                     $belowRule = reset($operandsByOperator[ BelowRule::operator ]);
-                    if ($belowRule->getMaximum() > $equalRule->getValue())
+                    if ($equalRule->getValue() !== null && $belowRule->getMaximum() > $equalRule->getValue())
                         unset($operandsByFields[ $field ][ BelowRule::operator ]);
                 }
             }
