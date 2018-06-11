@@ -32,7 +32,7 @@ Methods
 
 ### __construct
 
-    mixed JClaveau\LogicalFilter\Rule\NotRule::__construct($operand)
+    mixed JClaveau\LogicalFilter\Rule\NotRule::__construct(\JClaveau\LogicalFilter\Rule\AbstractRule $operand)
 
 
 
@@ -42,7 +42,7 @@ Methods
 
 
 #### Arguments
-* $operand **mixed**
+* $operand **[JClaveau\LogicalFilter\Rule\AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)**
 
 
 
@@ -81,9 +81,9 @@ Not rules can only have one operand.
 
 ### toArray
 
-    \JClaveau\LogicalFilter\Rule\OrRule JClaveau\LogicalFilter\Rule\NotRule::toArray($debug)
+    mixed JClaveau\LogicalFilter\Rule\NotRule::toArray($debug)
 
-Replace all the OrRules of the RuleTree by one OrRule at its root.
+
 
 
 

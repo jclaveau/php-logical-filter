@@ -25,4 +25,9 @@ API Index
             * [ConverterInterface](JClaveau-LogicalFilter-Converter-ConverterInterface.md)
             * [MinimalConverter](JClaveau-LogicalFilter-Converter-MinimalConverter.md)
             * [ElasticSearchMinimalConverter](JClaveau-LogicalFilter-Converter-ElasticSearchMinimalConverter.md)
+        * JClaveau\LogicalFilter\Filterer
+            * [Filterer](JClaveau-LogicalFilter-Filterer-Filterer.md)
+            * [PhpFilterer](JClaveau-LogicalFilter-Filterer-PhpFilterer.md)
+            * [FiltererInterface](JClaveau-LogicalFilter-Filterer-FiltererInterface.md)
+            * [CustomizableFilterer](JClaveau-LogicalFilter-Filterer-CustomizableFilterer.md)
 
