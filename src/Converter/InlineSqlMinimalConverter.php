@@ -49,13 +49,28 @@ class InlineSqlMinimalConverter extends MinimalConverter implements ConverterInt
     public function onAndPossibility($field, $operator, $operand, array $allOperandsByField)
     {
         if ($operator == '=') {
-            $new_rule = " $field = {$operand->getValue()} ";
+            if ($operand->getValue() === null)
+                $new_rule = "$field IS NULL";
+            else
+                $new_rule = "$field = {$operand->getValue()}";
+        }
+        elseif ($operator == '!=') {
+            if ($operand->getValue() === null) {
+                $new_rule = "$field IS NOT NULL";
+            }
+            else {
+                throw new \InvalidArgumentException(
+                    "This case shouldn't happend before new simplification"
+                    ." strategies support"
+                );
+                // $new_rule = " $field = {$operand->getValue()} ";
+            }
         }
         elseif ($operator == '<') {
-            $new_rule = " $field < {$operand->getMaximum()} ";
+            $new_rule = "$field < {$operand->getMaximum()}";
         }
         elseif ($operator == '>') {
-            $new_rule = " $field > {$operand->getMinimum()} ";
+            $new_rule = "$field > {$operand->getMinimum()}";
         }
 
         $this->appendToLastOrOperandKey($new_rule);

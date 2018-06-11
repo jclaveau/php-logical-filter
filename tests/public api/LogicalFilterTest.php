@@ -1296,6 +1296,41 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                 // ->dump(true)
                 ->toArray()
         );
+
+        // within OrRule
+        $filter = (new LogicalFilter(
+            ['field_1', '!=', null]
+        ))
+        ->or_(['field_1', '<', 3])
+        ;
+
+        $this->assertEquals(
+            ['or',
+                ['field_1', '!=', null],
+                ['field_1', '<', 3],
+            ],
+            $filter
+                ->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
+
+        $filter = (new LogicalFilter(
+            ['field_1', '!=', null]
+        ))
+        ->or_(['field_1', '>', 3])
+        ;
+
+        $this->assertEquals(
+            ['or',
+                ['field_1', '!=', null],
+                ['field_1', '>', 3],
+            ],
+            $filter
+                ->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
     }
 
     /**
@@ -1319,7 +1354,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_simplify_between_EqualRule_of_null_and_NotEqualRule_of_null()
+    public function test_simplify_between_EqualRule_of_null_and_NotEqualRule_of_null_giving_false()
     {
         $filter = (new LogicalFilter(
             ['field_1', '=', null]
@@ -1329,6 +1364,35 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             ['and'],
+            $filter
+                // ->dump(true)
+                ->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify_between_EqualRule_of_null_and_NotEqualRule_of_null_giving_true()
+    {
+        $this->markTestSkipped('Requires the support operands being TRUE or FALSE');
+        // TODO this filter should just value true as it doesn't filter
+        // anything. @see https://github.com/jclaveau/php-logical-filter/issues/38
+        // to replace the OrRule by a TrueRule
+        $filter = (new LogicalFilter(
+            ['field_1', '=', null]
+        ))
+        ->or_(['field_1', '!=', null])
+        ;
+
+        $this->assertEquals(
+            [
+                'or',
+                true,
+                // ['field_1', '=', null],
+                // ['field_1', '!=', null],
+            ],
             $filter
                 // ->dump(true)
                 ->simplify()

@@ -45,18 +45,22 @@ class AndRule extends AbstractOperationRule
             $firstAndOperand
         ]);
 
+        // var_dump($upLiftedOperands);
+        // $this->dump(true);
 
         foreach ($upLiftedOperands as $i => $operand) {
 
             if ($operand instanceof NotRule) {
                 if ($operand instanceof NotEqualRule && $operand->getValue() === null) {
-                    $upLifdtedOperand->addOperand( $operand->copy() );
-                    continue;
+                    foreach ($upLiftedOr->getOperands() as $upLifdtedOperand) {
+                        $upLifdtedOperand->addOperand( $operand->copy() );
+                    }
                 }
-
-                throw new \LogicException(
-                    'UpLifting disjunctions MUST be done after negations removal'
-                );
+                else {
+                    throw new \LogicException(
+                        'UpLifting disjunctions MUST be done after negations removal'
+                    );
+                }
             }
             elseif ($operand instanceof OrRule) {
                 // If an operand is an Or, me transform the current

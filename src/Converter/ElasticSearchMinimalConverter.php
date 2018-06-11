@@ -61,11 +61,21 @@ class ElasticSearchMinimalConverter extends MinimalConverter implements Converte
     public function onAndPossibility($field, $operator, $operand, array $allOperandsByField)
     {
         if ($operator == '=') {
-            $new_rule = [
-                'term' => [
-                    $field => $operand->getValue()
-                ]
-            ];
+            if ($operand->getValue() === null) {
+                // https://www.elastic.co/guide/en/elasticsearch/guide/current/_dealing_with_null_values.html#_missing_query
+                $new_rule = [
+                    'missing' => [
+                         'field' => $field,
+                    ],
+                ];
+            }
+            else {
+                $new_rule = [
+                    'term' => [
+                        $field => $operand->getValue()
+                    ]
+                ];
+            }
         }
         elseif ($operator == '<') {
             $new_rule = [
@@ -84,6 +94,19 @@ class ElasticSearchMinimalConverter extends MinimalConverter implements Converte
                     ],
                 ]
             ];
+        }
+        elseif ($operator == '!=' && $operand->getValue() === null) {
+            // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html
+            $new_rule = [
+                'exists' => [
+                     'field' => $field,
+                ],
+            ];
+        }
+        else {
+            throw new \InvalidArgumentException(
+                "Unhandled operator '$operator' during ES query generation"
+            );
         }
 
         $this->appendToLastOrOperandKey($new_rule);

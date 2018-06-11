@@ -66,20 +66,24 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function test_convert_with_sql_converter()
     {
-        $filter = new LogicalFilter([
+        $filter = (new LogicalFilter([
             'and',
             ['field_1', '=', 2],
             [
                 'or',
                 ['field_2', '>', 4],
                 ['field_2', '<', -4],
-            ]
-        ]);
+            ],
+            ['field_3', '=', null],
+            ['field_4', '!=', null],
+        ]))
+        // ->dump()
+        ;
 
         $inline_sql = (new InlineSqlMinimalConverter())->convert( $filter );
 
         $this->assertEquals(
-            "( field_1 = 2  AND  field_2 > 4 ) OR ( field_1 = 2  AND  field_2 < -4 )",
+            "(field_1 = 2 AND field_2 > 4 AND field_3 IS NULL AND field_4 IS NOT NULL) OR (field_1 = 2 AND field_2 < -4 AND field_3 IS NULL AND field_4 IS NOT NULL)",
             $inline_sql
         );
     }
@@ -88,15 +92,19 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function test_convert_with_elasticsearch_converter()
     {
-        $filter = new LogicalFilter([
+        $filter = (new LogicalFilter([
             'and',
             ['field_1', '=', 2],
             [
                 'or',
                 ['field_2', '>', 4],
                 ['field_2', '<', -4],
-            ]
-        ]);
+            ],
+            ['field_3', '=', null],
+            ['field_4', '!=', null],
+        ]))
+        // ->dump(true)
+        ;
 
         $es_filter = (new ElasticSearchMinimalConverter())->convert( $filter );
 
@@ -110,39 +118,59 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
                                 'must' => [
                                     [
                                         "term" => [
-                                            "field_1" => 2
-                                        ]
+                                            "field_1" => 2,
+                                        ],
                                     ],
                                     [
                                         "range" => [
                                             "field_2" => [
-                                                "gt" => 4
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
+                                                "gt" => 4,
+                                            ],
+                                        ],
+                                    ],
+                                    [
+                                        "missing" => [
+                                            "field" => 'field_3',
+                                        ],
+                                    ],
+                                    [
+                                        "exists" => [
+                                            "field" => 'field_4',
+                                        ],
+                                    ],
+                                ],
+                            ],
                         ],
                         [
                             'bool' => [
                                 'must' => [
                                     [
                                         "term" => [
-                                            "field_1" => 2
-                                        ]
+                                            "field_1" => 2,
+                                        ],
                                     ],
                                     [
                                         "range" => [
                                             "field_2" => [
-                                                "lt" => -4
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
+                                                "lt" => -4,
+                                            ],
+                                        ],
+                                    ],
+                                    [
+                                        "missing" => [
+                                            "field" => 'field_3',
+                                        ],
+                                    ],
+                                    [
+                                        "exists" => [
+                                            "field" => 'field_4',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
             ],
             $es_filter
         );

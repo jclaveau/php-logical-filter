@@ -100,7 +100,7 @@ class OrRule extends AbstractOperationRule
 
         foreach ($this->operands as $i => $operand) {
 
-            if ($operand instanceof AbstractOperationRule) {
+            if ($operand instanceof AndRule || $operand instanceof OrRule) {
                 $this->operands[$i] = $operand->removeInvalidBranches();
                 if (!$this->operands[$i]->getOperands()) {
                     unset($this->operands[$i]);
