@@ -6,9 +6,6 @@
          syntaxCheck="true"
          bootstrap="./tests/bootstrap_phpunit.php"
          >
-    <!--
-        backupGlobals="false" is required to don't loose $link as link_identifier
-    -->
 
     <testsuites>
         <testsuite name="all_tests">
@@ -23,12 +20,10 @@
         <!-- /!\ whitelist will exclude every outside class from coverage -->
         <whitelist>
             <directory suffix=".php">./src</directory>
+<!--
             <directory suffix=".php">./tests</directory>
+-->
         </whitelist>
-        <!--blacklist>
-            <directory>./vendor</directory>
-            <directory>./tests/coverage</directory>
-        </blacklist-->
     </filter>
 
     <logging>

@@ -17,9 +17,8 @@ class NotRule extends AbstractOperationRule
         if (!$operand)
             return;
 
-        // negation has only one operand
-        // TODO support multiple operands for not adding implicitely an
-        // AndRule as operand
+        // Negation has only one operand. If more is required, group them
+        // into an AndRule
         $this->operands = [$operand];
     }
 
