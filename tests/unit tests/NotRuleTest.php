@@ -66,30 +66,35 @@ class NotRuleTest extends \PHPUnit_Framework_TestCase
                 new AboveRule('field', 10),
             ])
         );
-        $new_rule = $rule->negateOperand();
-        $this->assertEquals(new OrRule([
-            new AndRule([
-                new EqualRule('field', 3),
-                new NotRule(
-                    new AboveRule('field', 10)
-                ),
-            ]),
-            new AndRule([
-                new NotRule(
-                    new EqualRule('field', 3)
-                ),
-                new AboveRule('field', 10)
-            ]),
-            new AndRule([
-                new NotRule(
-                    new EqualRule('field', 3)
-                ),
-                new NotRule(
-                    new AboveRule('field', 10)
-                ),
-            ]),
-        ]), $new_rule);
 
+        $this->assertEquals(
+            (new OrRule([
+                new AndRule([
+                    new NotRule(
+                        new EqualRule('field', 3)
+                    ),
+                    new AboveRule('field', 10),
+                ]),
+                new AndRule([
+                    new EqualRule('field', 3),
+                    new NotRule(
+                        new AboveRule('field', 10)
+                    ),
+                ]),
+                new AndRule([
+                    new NotRule(
+                        new EqualRule('field', 3)
+                    ),
+                    new NotRule(
+                        new AboveRule('field', 10)
+                    ),
+                ]),
+            ]))
+            ->toArray(),
+            $rule
+                ->negateOperand()
+                ->toArray()
+        );
 
         // OrRule (2 operands only)
         $rule = new NotRule(
@@ -127,6 +132,26 @@ class NotRuleTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $new_rule);
 
+    }
+
+    /**
+     */
+    public function test_negateOperand_with_bad_operand_type()
+    {
+        $rule = new NotRule();
+        VisibilityViolator::setHiddenProperty($rule, 'operands', ['dsfghjk']);
+
+        try {
+            $rule->negateOperand();
+            $this->assertTrue(
+                false, "NotRule should have thrown an exceptrion as its "
+                . "operand is neither null either an AbstractRule"
+
+            );
+        }
+        catch (\LogicException $e) {
+            $this->assertTrue(true, "Exception thrown: ".$e->getMessage());
+        }
     }
 
     /**/

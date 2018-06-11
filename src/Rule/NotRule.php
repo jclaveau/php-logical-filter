@@ -12,20 +12,14 @@ class NotRule extends AbstractOperationRule
 
     /**
      */
-    // public function __construct( AbstractRule $operand=null )
-    public function __construct( $operand=null )
+    public function __construct( AbstractRule $operand=null )
     {
         if (!$operand)
             return;
 
-        if (!$operand instanceof AbstractRule) {
-            throw new \InvalidArgumentException(
-                "Operand of NOT must be an instance of AbstractRule instead of: "
-                .var_export($operand, true)
-            );
-        }
-
         // negation has only one operand
+        // TODO support multiple operands for not adding implicitely an
+        // AndRule as operand
         $this->operands = [$operand];
     }
 
@@ -45,7 +39,7 @@ class NotRule extends AbstractOperationRule
 
         $operand = $this->operands[0];
 
-        if (!$operand instanceof AbstractOperationRule)
+        if (method_exists($operand, 'getField'))
             $field = $operand->getField();
 
         if ($operand instanceof AboveRule) {
@@ -76,36 +70,54 @@ class NotRule extends AbstractOperationRule
             ]);
         }
         elseif ($operand instanceof AndRule) {
+            // @see https://github.com/jclaveau/php-logical-filter/issues/40
             // ! (B && A) : (!B && A) || (B && !A) || (!B && !A)
-            // TODO :
             // ! (A && B && C) :
             //    (!A && !B && !C)
             // || (!A && B && C) || (!A && !B && C) || (!A && B && !C)
             // || (A && !B && C) || (!A && !B && C) || (A && !B && !C)
             // || (A && B && !C) || (!A && B && !C) || (A && !B && !C)
+
+            // We combine all possibilities of rules and themselves negated
+            $new_rule = new OrRule;
             $child_operands = $operand->getOperands();
-            if (count($child_operands) > 2) {
-                throw new \ErrorException(
-                     'NotRule resolution of AndRule with more than 2 '
-                    .'operands is not implemented'
-                );
+
+            $current_operand = array_shift($child_operands);
+            $current_operand_possibilities = new OrRule([
+                new AndRule([
+                    $current_operand->copy(),
+                ]),
+                new AndRule([
+                    new NotRule($current_operand->copy())
+                ])
+            ]);
+
+            // for every remaining operand, we duplicate the already made
+            // combinations and add on half of them !$next_operand
+            // and $next_operand on the other half
+            while ($next_operand = array_shift($child_operands)) {
+
+                $next_operand_possibilities = $current_operand_possibilities->copy();
+
+                $tmp = [];
+                foreach ($current_operand_possibilities->getOperands() as $current_operand_possibility) {
+                    $tmp[] = $current_operand_possibility->addOperand( $next_operand->copy() );
+                }
+                $current_operand_possibilities->setOperands($tmp);
+
+                foreach ($next_operand_possibilities->getOperands() as $next_operand_possibility) {
+                    $current_operand_possibilities->addOperand(
+                        $next_operand_possibility->addOperand( new NotRule($next_operand->copy()) )
+                    );
+                }
             }
 
-
-            $new_rule = new OrRule([
-                new AndRule([
-                    $child_operands[0]->copy(),
-                    new NotRule($child_operands[1]->copy()),
-                ]),
-                new AndRule([
-                    new NotRule($child_operands[0]->copy()),
-                    $child_operands[1]->copy(),
-                ]),
-                new AndRule([
-                    new NotRule($child_operands[0]->copy()),
-                    new NotRule($child_operands[1]->copy()),
-                ]),
-            ]);
+            // We remove the only possibility where no rule is negated
+            $combinations = $current_operand_possibilities->getOperands();
+            array_shift($combinations); // The first rule contains no negation
+            $new_rule->setOperands( $combinations )
+                // ->dump(true)
+                ;
         }
         elseif ($operand instanceof OrRule) {
             // ! (A || B) : !A && !B
@@ -115,8 +127,8 @@ class NotRule extends AbstractOperationRule
                 $new_rule->addOperand( new NotRule($operand->copy()) );
         }
         else {
-            throw new \ErrorException(
-                'Removing NotRule of ' . get_class($operand)
+            throw new \LogicException(
+                'Removing NotRule(' . var_export($operand, true) . ') '
                 . ' not implemented'
             );
         }
@@ -134,21 +146,6 @@ class NotRule extends AbstractOperationRule
         $this->moveSimplificationStepForward( self::unify_atomic_operands );
         return $this;
     }
-
-    /**
-     * Replace all the OrRules of the RuleTree by one OrRule at its root.
-     *
-     * @todo rename as RootifyDisjunjctions?
-     * @todo return $this (implements a Rule monad?)
-     *
-     * @return OrRule copied operands with one OR at its root
-     * /
-    public function rootifyDisjunctions()
-    {
-        $this->moveSimplificationStepForward( self::rootify_disjunctions );
-        if ()
-    }
-
 
     /**
      */
