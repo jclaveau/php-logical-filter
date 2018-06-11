@@ -69,7 +69,7 @@ class AboveOrEqualRule extends OrRule
                 $this->getMinimum(),
             ];
         }
-        catch (RuntimeException $e) {
+        catch (\RuntimeException $e) {
             return parent::toArray();
         }
     }

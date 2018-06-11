@@ -13,8 +13,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $filter = new LogicalFilter([
             'and',
             ['field_1', '=', 2],
-            [
-                'or',
+            ['or',
                 ['field_2', '>', 4],
                 ['field_2', '<', -4],
             ]
@@ -69,8 +68,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $filter = (new LogicalFilter([
             'and',
             ['field_1', '=', 2],
-            [
-                'or',
+            ['or',
                 ['field_2', '>', 4],
                 ['field_2', '<', -4],
             ],

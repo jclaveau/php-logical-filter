@@ -69,7 +69,7 @@ class BelowOrEqualRule extends OrRule
                 $this->getMaximum(),
             ];
         }
-        catch (RuntimeException $e) {
+        catch (\RuntimeException $e) {
             return parent::toArray();
         }
     }
