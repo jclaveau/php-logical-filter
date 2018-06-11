@@ -89,7 +89,7 @@ Methods
 
 ### getRuleClass
 
-    string JClaveau\LogicalFilter\Rule\AbstractRule::getRuleClass($rule_type)
+    string JClaveau\LogicalFilter\Rule\AbstractRule::getRuleClass(string $rule_operator)
 
 
 
@@ -100,7 +100,7 @@ Methods
 
 
 #### Arguments
-* $rule_type **mixed**
+* $rule_operator **string**
 
 
 

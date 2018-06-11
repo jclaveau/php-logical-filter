@@ -136,7 +136,7 @@ Atomic rules are always simplified
 
 ### getRuleClass
 
-    string JClaveau\LogicalFilter\Rule\AbstractRule::getRuleClass($rule_type)
+    string JClaveau\LogicalFilter\Rule\AbstractRule::getRuleClass(string $rule_operator)
 
 
 
@@ -148,7 +148,7 @@ Atomic rules are always simplified
 
 
 #### Arguments
-* $rule_type **mixed**
+* $rule_operator **string**
 
 
 

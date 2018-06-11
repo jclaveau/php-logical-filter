@@ -24,6 +24,19 @@ Constants
 
 
 
+Properties
+----------
+
+
+### $null_field
+
+    protected string $null_field = null
+
+
+
+
+
+* Visibility: **protected**
 
 
 Methods
@@ -44,6 +57,19 @@ Methods
 
 #### Arguments
 * $operand **mixed**
+
+
+
+### rootifyDisjunctions
+
+    \JClaveau\LogicalFilter\Rule\OrRule JClaveau\LogicalFilter\Rule\NotEqualRule::rootifyDisjunctions()
+
+Replace all the OrRules of the RuleTree by one OrRule at its root.
+
+
+
+* Visibility: **public**
+
 
 
 
@@ -75,9 +101,9 @@ Methods
 
 ### toArray
 
-    mixed JClaveau\LogicalFilter\Rule\NotRule::toArray($debug)
+    \JClaveau\LogicalFilter\Rule\OrRule JClaveau\LogicalFilter\Rule\NotRule::toArray($debug)
 
-
+Replace all the OrRules of the RuleTree by one OrRule at its root.
 
 
 
@@ -121,9 +147,9 @@ atomic rules.
 
 
 
-### unifyOperands
+### unifyAtomicOperands
 
-    \JClaveau\LogicalFilter\Rule\NotRule JClaveau\LogicalFilter\Rule\NotRule::unifyOperands($unifyDifferentOperands)
+    \JClaveau\LogicalFilter\Rule\NotRule JClaveau\LogicalFilter\Rule\NotRule::unifyAtomicOperands($unifyDifferentOperands)
 
 Not rules can only have one operand.
 

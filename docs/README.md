@@ -9,7 +9,6 @@ API Index
             * [AboveOrEqualRule](JClaveau-LogicalFilter-Rule-AboveOrEqualRule.md)
             * [BetweenRule](JClaveau-LogicalFilter-Rule-BetweenRule.md)
             * [NotRule](JClaveau-LogicalFilter-Rule-NotRule.md)
-            * [NotNullRule](JClaveau-LogicalFilter-Rule-NotNullRule.md)
             * [InRule](JClaveau-LogicalFilter-Rule-InRule.md)
             * [OrRule](JClaveau-LogicalFilter-Rule-OrRule.md)
             * [NotInRule](JClaveau-LogicalFilter-Rule-NotInRule.md)
@@ -18,7 +17,6 @@ API Index
             * [BelowOrEqualRule](JClaveau-LogicalFilter-Rule-BelowOrEqualRule.md)
             * [AbstractAtomicRule](JClaveau-LogicalFilter-Rule-AbstractAtomicRule.md)
             * [AndRule](JClaveau-LogicalFilter-Rule-AndRule.md)
-            * [NullRule](JClaveau-LogicalFilter-Rule-NullRule.md)
             * [BelowRule](JClaveau-LogicalFilter-Rule-BelowRule.md)
         * [LogicalFilter](JClaveau-LogicalFilter-LogicalFilter.md)
         * JClaveau\LogicalFilter\Converter

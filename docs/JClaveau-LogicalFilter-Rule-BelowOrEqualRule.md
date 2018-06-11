@@ -109,7 +109,7 @@ Replace all the OrRules of the RuleTree by one OrRule at its root.
 
     integer JClaveau\LogicalFilter\Rule\OrRule::aboveRuleUnifySorter(\JClaveau\LogicalFilter\Rule\AboveRule $a, \JClaveau\LogicalFilter\Rule\AboveRule $b)
 
-This is called by the unifyOperands() method to choose which AboveRule
+This is called by the unifyAtomicOperands() method to choose which AboveRule
 to keep for a given field.
 
 It's used as a usort() parameter.
@@ -128,7 +128,7 @@ It's used as a usort() parameter.
 
     integer JClaveau\LogicalFilter\Rule\OrRule::belowRuleUnifySorter(\JClaveau\LogicalFilter\Rule\BelowRule $a, \JClaveau\LogicalFilter\Rule\BelowRule $b)
 
-This is called by the unifyOperands() method to choose which BelowRule
+This is called by the unifyAtomicOperands() method to choose which BelowRule
 to keep for a given field.
 
 It's used as a usort() parameter.

@@ -183,22 +183,6 @@ Retrieve all the rules.
 
 
 
-### combineWith
-
-    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::combineWith(\JClaveau\LogicalFilter\LogicalFilter $filterToCombine)
-
-Includes all the rules of an other LogicalFilter into the current one.
-
-
-
-* Visibility: **public**
-
-
-#### Arguments
-* $filterToCombine **[JClaveau\LogicalFilter\LogicalFilter](JClaveau-LogicalFilter-LogicalFilter.md)**
-
-
-
 ### simplify
 
     \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::simplify(array $options)
@@ -258,33 +242,6 @@ Returns an array describing the rule tree of the Filter.
 For implementing JsonSerializable interface.
 
 
-
-* Visibility: **public**
-
-
-
-
-### removeNegations
-
-    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::removeNegations()
-
-Replaces every negation operation rules by its opposit not negated
-one.
-
-This method scans the rule tree recursivelly.
-
-* Visibility: **public**
-
-
-
-
-### rootifyDisjunctions
-
-    \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::rootifyDisjunctions()
-
-Remove all OR rules so only one remain at the top of rules tree.
-
-This method scans the rule tree recursivelly.
 
 * Visibility: **public**
 
