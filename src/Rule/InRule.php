@@ -71,7 +71,10 @@ class InRule extends OrRule
             $possibilities = [$possibilities];
 
         foreach ($possibilities as $possibility) {
-            if ($possibility instanceof AbstractRule) {
+            if ($possibility instanceof EqualRule && $possibility->getField() == $this->getField()) {
+                $possibility = $possibility->getValue();
+            }
+            elseif ($possibility instanceof AbstractRule) {
                 throw new \InvalidArgumentException(
                     "A possibility cannot be a rule: "
                     . var_export($possibility, true)
