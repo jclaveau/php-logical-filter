@@ -13,7 +13,7 @@ use       JClaveau\LogicalFilter\LogicalFilter;
  * Basic tools to implements minimal converters: Converters that can
  * handle simplified filters with or/and/atomic structure.
  */
-abstract class MinimalConverter
+abstract class MinimalConverter implements ConverterInterface
 {
     /**
      * @param LogicalFilter $filter

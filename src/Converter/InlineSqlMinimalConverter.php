@@ -6,13 +6,12 @@
  * @author  Jean Claveau
  */
 namespace JClaveau\LogicalFilter\Converter;
-use       JClaveau\LogicalFilter\Converter\ConverterInterface;
 use       JClaveau\LogicalFilter\LogicalFilter;
 
 /**
  * This class implements a converter for MySQL.
  */
-class InlineSqlMinimalConverter extends MinimalConverter implements ConverterInterface
+class InlineSqlMinimalConverter extends MinimalConverter
 {
     /** @var array $output */
     protected $output = [];

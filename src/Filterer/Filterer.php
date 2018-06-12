@@ -16,7 +16,7 @@ use       JClaveau\LogicalFilter\Rule\NotEqualRule;
 
 /**
  */
-abstract class Filterer
+abstract class Filterer implements FiltererInterface
 {
     /**
      * @param LogicalFilter $filter
@@ -63,7 +63,7 @@ abstract class Filterer
                     elseif ($operand instanceof NotEqualRule) {
                         if (null !== $operands_by_fields[ $field ][ $operator ] = $operand->getValue()) {
                             throw new \ErrorException(
-                                "NotEqualRule is only used for nullk values after simplification"
+                                "NotEqualRule is only used for null values after simplification"
                             );
                         }
                     }

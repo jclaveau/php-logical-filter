@@ -6,12 +6,11 @@
  * @author  Jean Claveau
  */
 namespace JClaveau\LogicalFilter\Filterer;
-use       JClaveau\LogicalFilter\Filterer\FiltererInterface;
 use       JClaveau\LogicalFilter\LogicalFilter;
 
 /**
  */
-class CustomizableFilterer extends Filterer implements FiltererInterface
+class CustomizableFilterer extends Filterer
 {
     protected $rule_validator;
 

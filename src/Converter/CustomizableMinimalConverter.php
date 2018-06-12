@@ -6,13 +6,12 @@
  * @author  Jean Claveau
  */
 namespace JClaveau\LogicalFilter\Converter;
-use       JClaveau\LogicalFilter\Converter\ConverterInterface;
 
 /**
  * This class implements a converter using callbacks for every pseudo-event
  * related to the rules parsing.
  */
-class CustomizableMinimalConverter extends MinimalConverter implements ConverterInterface
+class CustomizableMinimalConverter extends MinimalConverter
 {
     /** @var protected array $callbacks */
     protected $callbacks = [];

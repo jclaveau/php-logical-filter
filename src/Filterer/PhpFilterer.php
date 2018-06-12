@@ -6,7 +6,6 @@
  * @author  Jean Claveau
  */
 namespace JClaveau\LogicalFilter\Filterer;
-use       JClaveau\LogicalFilter\Filterer\FiltererInterface;
 use       JClaveau\LogicalFilter\LogicalFilter;
 use       JClaveau\LogicalFilter\Rule\EqualRule;
 use       JClaveau\LogicalFilter\Rule\BelowRule;
@@ -15,7 +14,7 @@ use       JClaveau\LogicalFilter\Rule\NotEqualRule;
 
 /**
  */
-class PhpFilterer extends Filterer implements FiltererInterface
+class PhpFilterer extends Filterer
 {
     /**
      */

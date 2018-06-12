@@ -6,13 +6,12 @@
  * @author  Jean Claveau
  */
 namespace JClaveau\LogicalFilter\Converter;
-use       JClaveau\LogicalFilter\Converter\ConverterInterface;
 use       JClaveau\LogicalFilter\LogicalFilter;
 
 /**
  * This class implements a converter for ElasticSearch.
  */
-class ElasticSearchMinimalConverter extends MinimalConverter implements ConverterInterface
+class ElasticSearchMinimalConverter extends MinimalConverter
 {
     /** @var array $output */
     protected $output = [];
