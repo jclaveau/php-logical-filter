@@ -957,10 +957,13 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_simplify_multiple_aboves()
+    public function test_simplify_unify_multiple_aboves_or_below()
     {
+        // above in and
+        /**/
         $filter = (new LogicalFilter([
             'and',
+            ['field_5', '>', null],  // equivalent to true
             ['field_5', '>', 3],
             ['field_5', '>', 5],
             ['field_5', '>', 5],
@@ -973,17 +976,33 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             ['field_5', '>', 5],
             $filter->getRules()->toArray()
         );
-    }
+        /**/
 
-    /**
-     */
-    public function test_simplify_multiple_below()
-    {
+        // above in or
+        $filter = (new LogicalFilter([
+            'or',
+            ['field_5', '>', null],  // equivalent to true
+            ['field_5', '>', 3],
+            ['field_5', '>', 5],
+            ['field_5', '>', 5],
+        ]))
+        ->simplify()
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            ['field_5', '>', 3],
+            $filter->getRules()->toArray()
+        );
+        /**/
+
+        // below in and
         $filter = (new LogicalFilter([
             'and',
             ['field_5', '<', 3],
             ['field_5', '<', 5],
             ['field_5', '<', 5],
+            ['field_5', '<', null],  // equivalent to true
         ]))
         ->simplify()
         // ->dump(!true)
@@ -993,6 +1012,25 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             ['field_5', '<', 3],
             $filter->getRules()->toArray()
         );
+        /**/
+
+        // below in or
+        $filter = (new LogicalFilter([
+            'or',
+            ['field_5', '<', 3],
+            ['field_5', '<', 5],
+            ['field_5', '<', 5],
+            ['field_5', '<', null],  // equivalent to true
+        ]))
+        ->simplify()
+        // ->dump(!true)
+        ;
+
+        $this->assertEquals(
+            ['field_5', '<', 5],
+            $filter->getRules()->toArray()
+        );
+        /**/
     }
 
     /**
@@ -1222,11 +1260,18 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_AboveRule_with_null_as_value()
+    public function test_AboveRule_with_non_scalar()
     {
+        $filter = (new LogicalFilter([
+            'and',
+            ['field_1', '<', null],
+            ['field_2', '<', 'a'],
+            ['field_5', '<', 3],
+        ]));
+
         try {
             $filter = (new LogicalFilter(
-                ['field_1', '>', null]
+                ['field_1', '>', [12, 45]]
             ));
             $this->assertTrue(false, "An exception should be throw here");
         }
@@ -1238,11 +1283,18 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_BelowRule_with_null_as_value()
+    public function test_BelowRule_with_non_scalar()
     {
+        $filter = (new LogicalFilter([
+            'and',
+            ['field_1', '<', null],
+            ['field_2', '<', 'a'],
+            ['field_5', '<', 3],
+        ]));
+
         try {
             $filter = (new LogicalFilter(
-                ['field_1', '<', null]
+                ['field_1', '<', ['lalala', 2]]
             ));
             $this->assertTrue(false, "An exception should be throw here");
         }
@@ -1590,7 +1642,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_BelowRule_and_AboveRule_are_strictloy_compared()
+    public function test_BelowRule_and_AboveRule_are_strictly_compared()
     {
         $this->assertFalse(
             (new LogicalFilter([

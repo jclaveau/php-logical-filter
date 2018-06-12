@@ -18,9 +18,10 @@ class AboveRule extends AbstractAtomicRule
      */
     public function __construct( $field, $minimum )
     {
-        if (!is_scalar($minimum)) {
+        if (!is_scalar($minimum) && $minimum !== null) {
             throw new \InvalidArgumentException(
-                "Minimum parameter must be a scalar"
+                "Minimum parameter must be a scalar or null instead of: "
+                .var_export($minimum, true)
             );
         }
 
@@ -42,6 +43,7 @@ class AboveRule extends AbstractAtomicRule
      */
     public function hasSolution()
     {
+        // if minimum is null, the rule is equivalent to true
         if (is_numeric( $this->minimum )) {
             if (is_nan( $this->minimum ))
                 return false;

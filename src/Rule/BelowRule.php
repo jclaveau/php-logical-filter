@@ -18,9 +18,10 @@ class BelowRule extends AbstractAtomicRule
      */
     public function __construct( $field, $maximum )
     {
-        if (!is_scalar($maximum)) {
+        if (!is_scalar($maximum) && null !== $maximum) {
             throw new \InvalidArgumentException(
-                "Maximum parameter must be a scalar"
+                "Maximum parameter must be a scalar or null instead of: "
+                .var_export($maximum, true)
             );
         }
 
@@ -35,6 +36,7 @@ class BelowRule extends AbstractAtomicRule
      */
     public function hasSolution()
     {
+        // if minimum is null, the rule is equivalent to true
         if (is_numeric( $this->maximum )) {
             if (is_nan( $this->maximum ))
                 return false;

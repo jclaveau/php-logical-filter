@@ -331,7 +331,7 @@ class AndRule extends AbstractOperationRule
      */
     protected function aboveRuleUnifySorter( AboveRule $a, AboveRule $b)
     {
-        if ($a->getMinimum() > $b->getMinimum())
+        if ($a->getMinimum() !== null || $a->getMinimum() > $b->getMinimum())
             return -1;
 
         return 1;
@@ -347,6 +347,12 @@ class AndRule extends AbstractOperationRule
      */
     protected function belowRuleUnifySorter( BelowRule $a, BelowRule $b)
     {
+        if ($a->getMaximum() === null)
+            return 1;
+
+        if ($b->getMaximum() === null)
+            return -1;
+
         if ($a->getMaximum() < $b->getMaximum())
             return -1;
 

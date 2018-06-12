@@ -66,6 +66,12 @@ class OrRule extends AbstractOperationRule
      */
     protected function aboveRuleUnifySorter( AboveRule $a, AboveRule $b)
     {
+        if ($a->getMinimum() === null)
+            return 1;
+
+        if ($b->getMinimum() === null)
+            return -1;
+
         if ($a->getMinimum() < $b->getMinimum())
             return -1;
 
@@ -82,6 +88,12 @@ class OrRule extends AbstractOperationRule
      */
     protected function belowRuleUnifySorter( BelowRule $a, BelowRule $b)
     {
+        if ($a->getMaximum() === null)
+            return 1;
+
+        if ($b->getMaximum() === null)
+            return -1;
+
         if ($a->getMaximum() > $b->getMaximum())
             return -1;
 

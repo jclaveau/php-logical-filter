@@ -17,14 +17,15 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     protected $operands = [];
 
-    const remove_negations              = 'remove_negations';
-    const remove_operation_duplicates   = 'remove_operation_duplicates';
-    const rootify_disjunctions          = 'rootify_disjunctions';
-    const unify_atomic_operands         = 'unify_atomic_operands';
-    const remove_monooperand_operations = 'remove_monooperand_operations';
-    const remove_invalid_branches       = 'remove_invalid_branches';    // simplified after this step
+    const remove_negations                = 'remove_negations';
+    const remove_operation_duplicates     = 'remove_operation_duplicates';
+    const rootify_disjunctions            = 'rootify_disjunctions';
+    const remove_monooperand_operations_1 = 'remove_monooperand_operations_1';
+    const unify_atomic_operands           = 'unify_atomic_operands';
+    const remove_monooperand_operations_2 = 'remove_monooperand_operations_2';
+    const remove_invalid_branches         = 'remove_invalid_branches';    // simplified after this step
 
-    const simplified                    = self::remove_invalid_branches;
+    const simplified                      = self::remove_invalid_branches;
 
     /**
      * The order is important!
@@ -35,8 +36,9 @@ abstract class AbstractOperationRule extends AbstractRule
         self::remove_negations,
         self::remove_operation_duplicates,
         self::rootify_disjunctions,
+        self::remove_monooperand_operations_1,
         self::unify_atomic_operands,
-        self::remove_monooperand_operations,
+        self::remove_monooperand_operations_2,
         self::remove_invalid_branches,
     ];
 
@@ -239,6 +241,8 @@ abstract class AbstractOperationRule extends AbstractRule
     {
         $this->moveSimplificationStepForward( self::unify_atomic_operands );
 
+        // $this->dump(true);
+
         foreach ($this->operands as $operand) {
             if ($operand instanceof AbstractOperationRule) {
                 $operand->unifyAtomicOperands();
@@ -250,7 +254,9 @@ abstract class AbstractOperationRule extends AbstractRule
 
         // unifying same operands
         foreach ($operandsByFields as $field => $operandsByOperator) {
+
             foreach ($operandsByOperator as $operator => $operands) {
+
                 if ($operator == AboveRule::operator) {
                     usort($operands, [$this, 'aboveRuleUnifySorter']);
                     $operands = [reset($operands)];
@@ -295,9 +301,9 @@ abstract class AbstractOperationRule extends AbstractRule
 
     /**
      */
-    public function removeMonooperandOperations()
+    public function removeMonooperandOperations($step)
     {
-        $this->moveSimplificationStepForward( self::remove_monooperand_operations );
+        $this->moveSimplificationStepForward( $step );
 
         if ($this instanceof NotRule && $this->getValue() !== null) {
             throw new LogicException(
@@ -307,7 +313,7 @@ abstract class AbstractOperationRule extends AbstractRule
 
         foreach ($this->operands as $i => $operand) {
             if ($operand instanceof AbstractOperationRule) {
-                $this->operands[$i] = $operand->removeMonooperandOperations();
+                $this->operands[$i] = $operand->removeMonooperandOperations($step);
             }
         }
 
@@ -370,31 +376,41 @@ abstract class AbstractOperationRule extends AbstractRule
         }
 
         // $instance->dump(true);
+        $instance = $instance->removeMonooperandOperations(
+            self::remove_monooperand_operations_1
+        );
 
         if ($step_to_stop_after  == self::rootify_disjunctions ||
             $step_to_stop_before == self::unify_atomic_operands )
             return $instance;
 
-        $instance->unifyAtomicOperands();
+        if (!$instance instanceof AbstractAtomicRule) {
 
-        // $instance->dump(true);
+            $instance->unifyAtomicOperands();
 
-        if ($step_to_stop_after  == self::unify_atomic_operands ||
-            $step_to_stop_before == self::remove_monooperand_operations )
-            return $instance;
+            // $instance->dump(true);
 
-        $instance = $instance->removeMonooperandOperations();
+            if ($step_to_stop_after  == self::unify_atomic_operands ||
+                $step_to_stop_before == self::remove_monooperand_operations_2 )
+                return $instance;
 
-        // $instance->dump(!true);
+            $instance = $instance->removeMonooperandOperations(
+                self::remove_monooperand_operations_2
+            );
 
-        if ($step_to_stop_after  == self::remove_monooperand_operations ||
-            $step_to_stop_before == self::remove_invalid_branches )
-            return $instance;
+            // $instance->dump(!true);
 
-        if (method_exists($instance, 'removeInvalidBranches')) {
-            $instance->removeInvalidBranches();
-            // Monooperands can be recreated by removeInvalidBranches
-            $instance = $instance->removeMonooperandOperations();
+            if ($step_to_stop_after  == self::remove_monooperand_operations_2 ||
+                $step_to_stop_before == self::remove_invalid_branches )
+                return $instance;
+
+            if (method_exists($instance, 'removeInvalidBranches')) {
+                $instance->removeInvalidBranches();
+                // Monooperands can be recreated by removeInvalidBranches
+                $instance = $instance->removeMonooperandOperations(
+                    self::remove_monooperand_operations_2
+                );
+            }
         }
 
         // $instance->dump(true);
