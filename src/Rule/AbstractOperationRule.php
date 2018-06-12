@@ -103,6 +103,21 @@ abstract class AbstractOperationRule extends AbstractRule
     }
 
     /**
+     * @return string $this
+     */
+    public final function renameFields(array $renamings)
+    {
+        foreach ($this->operands as $operand) {
+            if (method_exists($operand, 'renameField'))
+                $operand->renameField($renamings);
+            else
+                $operand->renameFields($renamings);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param string $step_to_go_to
      */
     public function moveSimplificationStepForward($step_to_go_to)

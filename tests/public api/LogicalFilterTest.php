@@ -733,6 +733,48 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
+    public function test_renameFields()
+    {
+        $filter = new LogicalFilter(
+            ['and',
+                ['or',
+                    ['field_5', '>', 'a'],
+                    ['field_3', '<', 'a'],
+                ],
+                ['not',
+                    ['and',
+                        ['field_5', '>', 'a'],
+                        ['field_4', '=', 'a'],
+                    ],
+                ],
+            ]
+        );
+
+        $this->assertEquals(
+            ['and',
+                ['or',
+                    ['field_five', '>', 'a'],
+                    ['field_three', '<', 'a'],
+                ],
+                ['not',
+                    ['and',
+                        ['field_five', '>', 'a'],
+                        ['field_4', '=', 'a'],
+                    ],
+                ],
+            ],
+            $filter
+                ->renameFields([
+                    'field_5' => 'field_five',
+                    'field_3' => 'field_three',
+                ])
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
     public function test_simplify_basic()
     {
         // $filter = (new LogicalFilter([

@@ -24,6 +24,17 @@ abstract class AbstractAtomicRule extends AbstractRule
     }
 
     /**
+     * @return AbstractAtomicRule $this
+     */
+    public final function renameField(array $renamings)
+    {
+        if (isset($renamings[$this->field]))
+            $this->field = $renamings[$this->field];
+
+        return $this;
+    }
+
+    /**
      * Atomic rules are always simplified
      *
      * @return bool

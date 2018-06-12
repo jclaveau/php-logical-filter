@@ -411,6 +411,19 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     * @return string $this
+     */
+    public final function renameFields(array $renamings)
+    {
+        if (method_exists($this->rules, 'renameField'))
+            $this->rules->renameField($renamings);
+        elseif ($this->rules)
+            $this->rules->renameFields($renamings);
+
+        return $this;
+    }
+
+    /**
      * Clone the current object and its rules.
      *
      * @return LogicalFilter A copy of the current instance with a copied ruletree
