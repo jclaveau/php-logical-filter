@@ -108,7 +108,7 @@ abstract class AbstractOperationRule extends AbstractRule
      *
      * @return string $this
      */
-    public final function renameFields($renamings)
+    public function renameFields($renamings)
     {
         foreach ($this->operands as $operand) {
             if (method_exists($operand, 'renameField'))

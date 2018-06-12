@@ -747,6 +747,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                         ['field_4', '=', 'a'],
                     ],
                 ],
+                ['field_5', 'in', ['a', 'b', 'c']],
             ]
         );
 
@@ -762,6 +763,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                         ['field_4', '=', 'a'],
                     ],
                 ],
+                ['field_five', 'in', ['a', 'b', 'c']],
             ],
             $filter
                 ->copy()
@@ -785,6 +787,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                         ['property_4', '=', 'a'],
                     ],
                 ],
+                ['property_5', 'in', ['a', 'b', 'c']],
             ],
             $filter
                 ->copy()

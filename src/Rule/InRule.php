@@ -41,11 +41,39 @@ class InRule extends OrRule
         if (count($fields) > 1) {
             throw new \RuntimeException(
                 "Unable to retrieve the field of an " . __CLASS__ . " as "
-                ."it contains now operands related to multiple fields"
+                ."it contains now operands related to multiple fields: "
+                .implode(', ', $fields)
             );
         }
 
         return reset($fields);
+    }
+
+    /**
+     * @param  array|callable Associative array of renamings or callable
+     *                        that would rename the fields.
+     *
+     * @return AbstractAtomicRule $this
+     */
+    public final function renameFields($renamings)
+    {
+        if (is_callable($renamings)) {
+            $this->field = call_user_func($renamings, $this->field);
+        }
+        elseif (is_array($renamings)) {
+            if (isset($renamings[$this->field]))
+                $this->field = $renamings[$this->field];
+        }
+        else {
+            throw new \InvalidArgumentException(
+                "\$renamings MUST be a callable or an associative array "
+                ."instead of: " . var_export($renamings, true)
+            );
+        }
+
+        parent::renameFields($renamings);
+
+        return $this;
     }
 
     /**
