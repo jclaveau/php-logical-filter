@@ -16,34 +16,57 @@ class FiltererTest extends \PHPUnit_Framework_TestCase
             ['or',
                 ['field_2', '>', 4],
                 ['field_2', '<', -4],
-            ]
+            ],
+            ['field_3', '=', null],
+            ['field_4', '!=', null],
         ]);
 
         $data_to_filter = [
             [
-                'name'    => 'valid row 1',
+                'name'    => '1: valid row',
                 'field_1' => 2,
                 'field_2' => 12,
+                // no filed 3 <=> null
+                'field_4' => 12,
             ],
             [
-                'name'    => 'invalid row 1',
+                'name'    => '2: field_1 invalid',
                 'field_1' => 3,
                 'field_2' => 12,
+                'field_4' => "aze",
             ],
             [
-                'name'    => 'invalid row 2',
+                'name'    => '3: field_2 invalid',
                 'field_1' => 2,
                 'field_2' => 2,
+                'field_4' => "aze",
             ],
             [
-                'name'    => 'valid row 2',
+                'name'    => '4: valid row',
                 'field_1' => 2,
                 'field_2' => -12,
+                'field_3' => null,
+                'field_4' => 0,
             ],
             [
-                'name'    => 'invalid row 3',
+                'name'    => '5: field_2 invalid',
                 'field_1' => 3,
                 'field_2' => 2,
+                'field_3' => null,
+                'field_4' => 'abc',
+            ],
+            [
+                'name'    => '6: field_3 invalid && filed_4 valid',
+                'field_1' => 2,
+                'field_2' => -12,
+                'field_3' => -12,
+                'field_4' => 0, // != null
+            ],
+            [
+                'name'    => '7: field_4 invalid',
+                'field_1' => 2,
+                'field_2' => -12, // invalid
+                'field_4' => null,
             ],
         ];
 
@@ -54,14 +77,17 @@ class FiltererTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 0 => [
-                    'name'    => 'valid row 1',
+                'name'    => '1: valid row',
                     'field_1' => 2,
                     'field_2' => 12,
+                    'field_4' => 12,
                 ],
                 3 => [
-                    'name'    => 'valid row 2',
+                'name'    => '4: valid row',
                     'field_1' => 2,
                     'field_2' => -12,
+                    'field_3' => null,
+                    'field_4' => 0,
                 ],
             ],
             $filtered_data
@@ -78,41 +104,64 @@ class FiltererTest extends \PHPUnit_Framework_TestCase
             ['or',
                 ['field_2', '>', 4],
                 ['field_2', '<', -4],
-            ]
+            ],
+            ['field_3', '=', null],
+            ['field_4', '!=', null],
         ]);
 
         $data_to_filter = [
             [
-                'name'    => 'valid row 1',
+                'name'    => '1: valid row',
                 'field_1' => 2,
                 'field_2' => 12,
+                // no filed 3 <=> null
+                'field_4' => 12,
             ],
             [
-                'name'    => 'invalid row 1',
+                'name'    => '2: field_1 invalid',
                 'field_1' => 3,
                 'field_2' => 12,
+                'field_4' => "aze",
             ],
             [
-                'name'    => 'invalid row 2',
+                'name'    => '3: field_2 invalid',
                 'field_1' => 2,
                 'field_2' => 2,
+                'field_4' => "aze",
             ],
             [
-                'name'    => 'valid row 2',
+                'name'    => '4: valid row',
                 'field_1' => 2,
                 'field_2' => -12,
+                'field_3' => null,
+                'field_4' => 0,
             ],
             [
-                'name'    => 'invalid row 3',
+                'name'    => '5: field_2 invalid',
                 'field_1' => 3,
                 'field_2' => 2,
+                'field_3' => null,
+                'field_4' => 'abc',
+            ],
+            [
+                'name'    => '6: field_3 invalid && filed_4 valid',
+                'field_1' => 2,
+                'field_2' => -12,
+                'field_3' => -12,
+                'field_4' => 0, // != null
+            ],
+            [
+                'name'    => '7: field_4 invalid',
+                'field_1' => 2,
+                'field_2' => -12, // invalid
+                'field_4' => null,
             ],
         ];
 
         $filterer = new CustomizableFilterer(
             function ($field, $operator, $value, $row, $allOperandsByField) {
 
-                if ($operator == '=') {
+                if ($operator === '=') {
                     if ($value === null) {
                         return !isset($row[$field]);
                     }
@@ -120,13 +169,13 @@ class FiltererTest extends \PHPUnit_Framework_TestCase
                         return $row[$field] == $value;
                     }
                 }
-                elseif ($operator == '<') {
+                elseif ($operator === '<') {
                     return $row[$field] < $value;
                 }
-                elseif ($operator == '>') {
+                elseif ($operator === '>') {
                     return $row[$field] > $value;
                 }
-                elseif ($operator == '!=') {
+                elseif ($operator === '!=') {
                     if ($value === null) {
                         return isset($row[$field]);
                     }
@@ -145,14 +194,17 @@ class FiltererTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 0 => [
-                    'name'    => 'valid row 1',
+                'name'    => '1: valid row',
                     'field_1' => 2,
                     'field_2' => 12,
+                    'field_4' => 12,
                 ],
                 3 => [
-                    'name'    => 'valid row 2',
+                'name'    => '4: valid row',
                     'field_1' => 2,
                     'field_2' => -12,
+                    'field_3' => null,
+                    'field_4' => 0,
                 ],
             ],
             $filtered_data

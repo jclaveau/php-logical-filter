@@ -8,6 +8,10 @@
 namespace JClaveau\LogicalFilter\Filterer;
 use       JClaveau\LogicalFilter\Filterer\FiltererInterface;
 use       JClaveau\LogicalFilter\LogicalFilter;
+use       JClaveau\LogicalFilter\Rule\EqualRule;
+use       JClaveau\LogicalFilter\Rule\BelowRule;
+use       JClaveau\LogicalFilter\Rule\AboveRule;
+use       JClaveau\LogicalFilter\Rule\NotEqualRule;
 
 /**
  */
@@ -17,21 +21,22 @@ class PhpFilterer extends Filterer implements FiltererInterface
      */
     public function validateRule ($field, $operator, $value, $row, $all_operands)
     {
-        if ($operator == '=') {
+        if ($operator === EqualRule::operator) {
             if ($value === null) {
                 return !isset($row[$field]);
             }
             else {
+                // TODO support strict comparisons
                 return $row[$field] == $value;
             }
         }
-        elseif ($operator == '<') {
+        elseif ($operator === BelowRule::operator) {
             return $row[$field] < $value;
         }
-        elseif ($operator == '>') {
+        elseif ($operator === AboveRule::operator) {
             return $row[$field] > $value;
         }
-        elseif ($operator == '!=') {
+        elseif ($operator === NotEqualRule::operator) {
             if ($value === null) {
                 return isset($row[$field]);
             }
@@ -44,7 +49,7 @@ class PhpFilterer extends Filterer implements FiltererInterface
         }
         else {
             throw new \InvalidArgumentException(
-                "Unhandled operator"
+                "Unhandled operator: " . $operator
             );
         }
     }
