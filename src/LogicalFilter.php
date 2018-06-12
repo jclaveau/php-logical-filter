@@ -411,9 +411,12 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     * @param  array|callable Associative array of renamings or callable
+     *                        that would rename the fields.
+     *
      * @return string $this
      */
-    public final function renameFields(array $renamings)
+    public final function renameFields($renamings)
     {
         if (method_exists($this->rules, 'renameField'))
             $this->rules->renameField($renamings);

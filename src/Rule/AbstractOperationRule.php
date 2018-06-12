@@ -103,9 +103,12 @@ abstract class AbstractOperationRule extends AbstractRule
     }
 
     /**
+     * @param  array|callable Associative array of renamings or callable
+     *                        that would rename the fields.
+     *
      * @return string $this
      */
-    public final function renameFields(array $renamings)
+    public final function renameFields($renamings)
     {
         foreach ($this->operands as $operand) {
             if (method_exists($operand, 'renameField'))

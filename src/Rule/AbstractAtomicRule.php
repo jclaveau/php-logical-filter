@@ -24,12 +24,26 @@ abstract class AbstractAtomicRule extends AbstractRule
     }
 
     /**
+     * @param  array|callable Associative array of renamings or callable
+     *                        that would rename the fields.
+     *
      * @return AbstractAtomicRule $this
      */
-    public final function renameField(array $renamings)
+    public final function renameField($renamings)
     {
-        if (isset($renamings[$this->field]))
-            $this->field = $renamings[$this->field];
+        if (is_callable($renamings)) {
+            $this->field = call_user_func($renamings, $this->field);
+        }
+        elseif (is_array($renamings)) {
+            if (isset($renamings[$this->field]))
+                $this->field = $renamings[$this->field];
+        }
+        else {
+            throw new \InvalidArgumentException(
+                "\$renamings MUST be a callable or an associative array "
+                ."instead of: " . var_export($renamings, true)
+            );
+        }
 
         return $this;
     }
