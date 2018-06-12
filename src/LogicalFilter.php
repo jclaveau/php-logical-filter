@@ -13,6 +13,10 @@ use JClaveau\LogicalFilter\Rule\AndRule;
 use JClaveau\LogicalFilter\Rule\OrRule;
 use JClaveau\LogicalFilter\Rule\NotRule;
 
+use JClaveau\LogicalFilter\Filterer\Filterer;
+use JClaveau\LogicalFilter\Filterer\PhpFilterer;
+use JClaveau\LogicalFilter\Filterer\CustomizableFilterer;
+
 /**
  * LogicalFilter describes a set of logical rules structured by
  * conjunctions and disjunctions (AND and OR).
@@ -424,6 +428,32 @@ class LogicalFilter implements \JsonSerializable
     {
         $this->getRules()->dump($exit, $debug, 3);
         return $this;
+    }
+
+    /**
+     * Applies the current instance to a set of data.
+     *
+     * @param  mixed                  $data_to_filter
+     * @param  Filterer|callable|null $filterer
+     *
+     * @return mixed The filtered data
+     */
+    public function applyOn($data_to_filter, $filterer=null)
+    {
+        if ($filterer === null) {
+            $filterer = new PhpFilterer();
+        }
+        elseif (is_callable($filterer)) {
+            $filterer = new CustomizableFilterer($filterer);
+        }
+        elseif (!$filterer instanceof Filterer) {
+            throw new \InvalidArgumentException(
+                 "The given $filterer must be null or a callable or a instance "
+                ."of Filterer instead of: ".var_export($filterer, true)
+            );
+        }
+
+        return $filterer->apply( $this, $data_to_filter );
     }
 
     /**/

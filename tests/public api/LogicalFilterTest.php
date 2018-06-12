@@ -1802,5 +1802,89 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     */
+    public function test_applyOn_without_filterer()
+    {
+        $filtered_data = (new LogicalFilter([
+            'and',
+            ['field_1', '=', 2],
+            ['or',
+                ['field_2', '>', 4],
+                ['field_2', '<', -4],
+            ],
+            ['field_3', '=', null],
+            ['field_4', '!=', null],
+        ]))
+        ->applyOn([
+            [
+                'name'    => '1: valid row',
+                'field_1' => 2,
+                'field_2' => 12,
+                // no filed 3 <=> null
+                'field_4' => 12,
+            ],
+            [
+                'name'    => '2: field_1 invalid',
+                'field_1' => 3,
+                'field_2' => 12,
+                'field_4' => "aze",
+            ],
+            [
+                'name'    => '3: field_2 invalid',
+                'field_1' => 2,
+                'field_2' => 2,
+                'field_4' => "aze",
+            ],
+            [
+                'name'    => '4: valid row',
+                'field_1' => 2,
+                'field_2' => -12,
+                'field_3' => null,
+                'field_4' => 0,
+            ],
+            [
+                'name'    => '5: field_2 invalid',
+                'field_1' => 3,
+                'field_2' => 2,
+                'field_3' => null,
+                'field_4' => 'abc',
+            ],
+            [
+                'name'    => '6: field_3 invalid && filed_4 valid',
+                'field_1' => 2,
+                'field_2' => -12,
+                'field_3' => -12,
+                'field_4' => 0, // != null
+            ],
+            [
+                'name'    => '7: field_4 invalid',
+                'field_1' => 2,
+                'field_2' => -12, // invalid
+                'field_4' => null,
+            ],
+        ]);
+
+        $this->assertEquals(
+            [
+                0 => [
+                'name'    => '1: valid row',
+                    'field_1' => 2,
+                    'field_2' => 12,
+                    'field_4' => 12,
+                ],
+                3 => [
+                'name'    => '4: valid row',
+                    'field_1' => 2,
+                    'field_2' => -12,
+                    'field_3' => null,
+                    'field_4' => 0,
+                ],
+            ],
+            $filtered_data
+        );
+    }
+
+
     /**/
 }
