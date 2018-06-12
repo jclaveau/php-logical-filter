@@ -21,8 +21,8 @@ class InRuleTest extends \PHPUnit_Framework_TestCase
             $rule->addPossibilities([ new BelowRule('field', 3) ]);
             $this->assertTrue(
                 false,
-                "An exception explaining that you cannot add something else "
-                ." than values or an EqualRule having the same field"
+                 "An exception explaining that you cannot add something else "
+                ."than values or an EqualRule having the same field"
             );
         }
         catch (\Exception $e) {
@@ -33,14 +33,20 @@ class InRuleTest extends \PHPUnit_Framework_TestCase
             $rule->addPossibilities([ new EqualRule('field_2', 3) ]);
             $this->assertTrue(
                 false,
-                "An exception explaining that you cannot add something else "
-                ." than values or an EqualRule having the same field"
+                 "An exception explaining that you cannot add something else "
+                ."than values or an EqualRule having the same field"
             );
         }
         catch (\Exception $e) {
             $this->assertTrue(true, "Exception thrown: ".$e->getMessage());
         }
+    }
 
+    /**
+     */
+    public function test_getField()
+    {
+        $rule = new InRule('field', [4, 5, 6]);
 
         $operands = $rule->getOperands();
         $operands[0] = new BelowRule('field_2', 3);
@@ -50,13 +56,12 @@ class InRuleTest extends \PHPUnit_Framework_TestCase
             $this->assertFalse( $rule->getField() );
             $this->assertTrue(
                 false,
-                "An exception explaining that the two operands hjave different fields "
+                "An exception explaining that the two operands have different fields "
             );
         }
         catch (\Exception $e) {
             $this->assertTrue(true, "Exception thrown: ".$e->getMessage());
         }
-
     }
 
     /**/

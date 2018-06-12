@@ -63,9 +63,7 @@ class BetweenRule extends AndRule
      */
     public function hasSolution()
     {
-        return is_null($this->getMaximum())
-            || is_null($this->getMinimum())
-            || $this->getMaximum() > $this->getMinimum();
+        return $this->getMaximum() > $this->getMinimum();
     }
 
     /**
