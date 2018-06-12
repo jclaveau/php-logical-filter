@@ -642,6 +642,12 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             spl_object_hash($filter->getRules(false)),
             spl_object_hash($filter2->getRules(false))
         );
+
+        // copy filter with no rule
+        $filter = new LogicalFilter();
+        $filter->copy();
+
+        $this->assertNull( $filter->getRules() );
     }
 
     /**
