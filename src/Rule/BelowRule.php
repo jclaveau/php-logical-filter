@@ -18,9 +18,13 @@ class BelowRule extends AbstractAtomicRule
      */
     public function __construct( $field, $maximum )
     {
-        if (!is_scalar($maximum) && null !== $maximum) {
+        if (    !is_scalar($maximum)
+            &&  !$maximum instanceof \DateTimeInterface
+            &&  null !== $maximum
+        ) {
             throw new \InvalidArgumentException(
-                "Maximum parameter must be a scalar or null instead of: "
+                 "Maximum parameter must be a scalar or null "
+                ."or implements DateTimeInterface instead of: "
                 .var_export($maximum, true)
             );
         }

@@ -1264,9 +1264,11 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = (new LogicalFilter([
             'and',
-            ['field_1', '<', null],
-            ['field_2', '<', 'a'],
-            ['field_5', '<', 3],
+            ['field_1', '>', null],
+            ['field_2', '>', 'a'],
+            ['field_5', '>', 3],
+            ['field_5', '>', new \DateTime('2018-06-11')],
+            ['field_5', '>', new \DateTimeImmutable('2018-06-11')],
         ]));
 
         try {
@@ -1290,6 +1292,8 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             ['field_1', '<', null],
             ['field_2', '<', 'a'],
             ['field_5', '<', 3],
+            ['field_5', '<', new \DateTime('2018-06-11')],
+            ['field_5', '<', new \DateTimeImmutable('2018-06-11')],
         ]));
 
         try {
