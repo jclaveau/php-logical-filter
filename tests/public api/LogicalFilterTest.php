@@ -797,6 +797,15 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
                 // ->dump(true)
                 ->toArray()
         );
+
+        try {
+            $filter->renameFields('sdfghjk');
+            $this->assertTrue(false, "An exception should be throw here");
+        }
+        catch (\InvalidArgumentException $e) {
+            // InvalidArgumentException: Minimum parameter must be a scalar
+            $this->assertTrue(true, "Exception thrown: ".$e->getMessage());
+        }
     }
 
     /**
