@@ -325,13 +325,22 @@ class AndRule extends AbstractOperationRule
      * This is called by the unifyAtomicOperands() method to choose which AboveRule
      * to keep for a given field.
      *
-     * It's used as a usort() parameter.
+     * It's used as a usort() parameter:
+     * + return -1 that moves the $b variable down the array
+     * + return  1 moves $b up the array
+     * + return  0 keeps $b in the same place.
      *
      * @return int -1|0|1
      */
-    protected function aboveRuleUnifySorter( AboveRule $a, AboveRule $b)
+    protected function aboveRuleUnifySorter( AboveRule $a, AboveRule $b )
     {
-        if ($a->getMinimum() !== null || $a->getMinimum() > $b->getMinimum())
+        if ($a->getMinimum() === null)
+            return 1;
+
+        if ($b->getMinimum() === null)
+            return -1;
+
+        if ($a->getMinimum() > $b->getMinimum())
             return -1;
 
         return 1;
@@ -341,11 +350,14 @@ class AndRule extends AbstractOperationRule
      * This is called by the unifyAtomicOperands() method to choose which BelowRule
      * to keep for a given field.
      *
-     * It's used as a usort() parameter.
+     * It's used as a usort() parameter:
+     * + return -1 that moves the $b variable down the array
+     * + return  1 moves $b up the array
+     * + return  0 keeps $b in the same place.
      *
      * @return int -1|0|1
      */
-    protected function belowRuleUnifySorter( BelowRule $a, BelowRule $b)
+    protected function belowRuleUnifySorter( BelowRule $a, BelowRule $b )
     {
         if ($a->getMaximum() === null)
             return 1;
