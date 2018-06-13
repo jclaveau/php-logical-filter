@@ -160,7 +160,9 @@ class RuleFilterer extends Filterer
             );
         }
 
-        return reset( parent::apply($filter, $ruleTree_to_filter) );
+        $result = parent::apply($filter, $ruleTree_to_filter);
+
+        return reset( $result );
     }
 
     /**/
