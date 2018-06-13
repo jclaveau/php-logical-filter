@@ -15,21 +15,33 @@ use       JClaveau\LogicalFilter\Rule\AboveRule;
 use       JClaveau\LogicalFilter\Rule\NotEqualRule;
 
 /**
+ * Parses an iterable going down to its children
  */
 abstract class Filterer implements FiltererInterface
 {
     /**
+     */
+    public function getChildren($row)
+    {
+        return null;
+    }
+
+    /**
+     */
+    public function setChildren(&$row, $filtered_children)
+    {
+    }
+
+    /**
      * @param LogicalFilter $filter
      */
-    public function apply( LogicalFilter $filter, $data_to_filter )
+    public function apply( LogicalFilter $filter, $ruleTree_to_filter )
     {
-        if (!is_iterable($data_to_filter)) {
-            throw new \InvalidArgumentException(
-                "The data to filter must be an iterable"
-            );
-        }
-
-        $root_OrRule = $filter->simplify(['force_logical_core' => true])->getRules();
+        $root_OrRule = $filter
+            ->simplify(['force_logical_core' => true])
+            ->getRules()
+            // ->dump(true)
+            ;
 
         if (!$root_OrRule->hasSolution())
             return null;
@@ -38,6 +50,9 @@ abstract class Filterer implements FiltererInterface
         foreach ($root_OrRule->getOperands() as $andOperand) {
 
             $operands_by_fields = $andOperand->groupOperandsByFieldAndOperator();
+
+            // operation rules have no fields
+            unset($operands_by_fields['']);
 
             foreach ($operands_by_fields as $field => $operands_by_operator) {
                 foreach ($operands_by_operator as $operator => $operands_of_operator) {
@@ -73,14 +88,29 @@ abstract class Filterer implements FiltererInterface
             $root_cases[] = $operands_by_fields;
         }
 
+        return $this->applyRecursion(
+            $root_cases,
+            $ruleTree_to_filter,
+            $depth=0
+        )
+        ;
+    }
+
+    /**
+     * @todo use array_filter
+     */
+    protected function applyRecursion(array $root_cases, $ruleTree_to_filter, $depth=0)
+    {
         // Once the rules are prepared, we parse the data
-        foreach ($data_to_filter as $row_index => $row_to_filter) {
+        foreach ($ruleTree_to_filter as $row_index => $row_to_filter) {
             $operands_validation_row_cache = [];
 
             $root_cases_validity_count = count($root_cases);
 
             foreach ($root_cases as $case_index => $operands_by_fields) {
+
                 foreach ($operands_by_fields as $field => $operands_by_operator) {
+
                     foreach ($operands_by_operator as $operator => $value) {
 
                         $cache_key = $case_index.'~|~'.$field.'~|~'.$operator;
@@ -93,6 +123,7 @@ abstract class Filterer implements FiltererInterface
                             $operator,
                             $value,
                             $row_to_filter,
+                            $depth,
                             $operands_by_fields
                         );
 
@@ -106,11 +137,17 @@ abstract class Filterer implements FiltererInterface
                 }
             }
 
-            if ( ! $root_cases_validity_count)
-                unset($data_to_filter[$row_index]);
+
+            if ( ! $root_cases_validity_count) {
+                unset($ruleTree_to_filter[$row_index]);
+            }
+            elseif ($children = $this->getChildren($row_to_filter)) {
+                $filtered_children = $this->applyRecursion( $root_cases, $children, $depth++ );
+                $this->setChildren($ruleTree_to_filter[$row_index], $filtered_children);
+            }
         }
 
-        return $data_to_filter;
+        return $ruleTree_to_filter;
     }
 
     /**/

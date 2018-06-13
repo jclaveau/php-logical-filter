@@ -23,7 +23,7 @@ class CustomizableFilterer extends Filterer
 
     /**
      */
-    public function validateRule ($field, $operator, $value, $row, $all_operands)
+    public function validateRule ($field, $operator, $value, $row, $depth, $all_operands)
     {
         return call_user_func_array( $this->rule_validator, get_defined_vars() );
     }

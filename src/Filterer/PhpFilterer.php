@@ -18,7 +18,7 @@ class PhpFilterer extends Filterer
 {
     /**
      */
-    public function validateRule ($field, $operator, $value, $row, $all_operands)
+    public function validateRule ($field, $operator, $value, $row, $depth, $all_operands)
     {
         if ($operator === EqualRule::operator) {
             if ($value === null) {

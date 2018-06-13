@@ -12,9 +12,12 @@ use JClaveau\LogicalFilter\Rule\EqualRule;
 use JClaveau\LogicalFilter\Rule\AboveRule;
 use JClaveau\LogicalFilter\Rule\BelowRule;
 
+require  __DIR__ . "/LogicalFilterTest_removesRules_trait.php";
 
 class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 {
+    use LogicalFilterTest_removesRules_trait;
+
     public static function setUpBeforeClass()
     {
     }
@@ -196,6 +199,18 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
             );
             return;
         }
+    }
+
+    /**
+     */
+    public function test_addRules_requiring_strict_check_of_operators()
+    {
+        $this->assertEquals(
+            ['not', ['depth', '=', 0]],
+            (new LogicalFilter(['not', ['depth', '=', 0]]))
+            // ->dump(true)
+            ->toArray()
+        );
     }
 
     /**
@@ -1075,7 +1090,7 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      */
-    public function test_simplify_with_negation_without_logicalCore()
+    public function test_simplify_with_negation()
     {
         $filter = (new LogicalFilter([
             'and',
@@ -1090,6 +1105,23 @@ class LogicalFilterTest extends \PHPUnit_Framework_TestCase
         ;
 
         $this->assertEquals( ['field_5', '>', 'a'], $filter->toArray() );
+    }
+
+    /**
+     */
+    public function test_simplify_with_logicalCore()
+    {
+        $filter = (new LogicalFilter(
+            ['field_5', '>', 'a']
+        ))
+        ->simplify(['force_logical_core' => true])
+        // ->dump(false, false)
+        ;
+
+        $this->assertEquals( ['or', ['and', ['field_5', '>', 'a']]], $filter->toArray() );
+        // This second assertion checks that the simplify process went
+        // to its last step
+        $this->assertTrue( $filter->hasSolution() );
     }
 
     /**

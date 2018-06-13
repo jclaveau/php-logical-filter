@@ -16,6 +16,7 @@ use JClaveau\LogicalFilter\Rule\NotRule;
 use JClaveau\LogicalFilter\Filterer\Filterer;
 use JClaveau\LogicalFilter\Filterer\PhpFilterer;
 use JClaveau\LogicalFilter\Filterer\CustomizableFilterer;
+use JClaveau\LogicalFilter\Filterer\RuleFilterer;
 
 use JClaveau\VisibilityViolator\VisibilityViolator;
 
@@ -67,7 +68,10 @@ class LogicalFilter implements \JsonSerializable
      */
     protected function addRules( $operation, array $rules_description )
     {
-        if (count($rules_description) == 3 && is_string($rules_description[0]) && is_string($rules_description[1])) {
+        if (    count($rules_description) == 3
+            &&  is_string($rules_description[0])
+            &&  is_string($rules_description[1])
+        ) {
             // Atomic rules
             $new_rule = AbstractRule::generateSimpleRule(
                 $rules_description[0], // field
@@ -183,14 +187,13 @@ class LogicalFilter implements \JsonSerializable
             );
         }
         elseif (    count($rules_composition) == 3
-            &&  !in_array( AndRule::operator, $rules_composition )
-            &&  !in_array( OrRule::operator,  $rules_composition )
-            &&  !in_array( NotRule::operator, $rules_composition )
-            &&  !in_array( AbstractRule::findSymbolicOperator( AndRule::operator ), $rules_composition )
-            &&  !in_array( AbstractRule::findSymbolicOperator( OrRule::operator ),  $rules_composition )
-            &&  !in_array( AbstractRule::findSymbolicOperator( NotRule::operator ), $rules_composition )
+            &&  !in_array( AndRule::operator, $rules_composition, true )
+            &&  !in_array( OrRule::operator,  $rules_composition, true )
+            &&  !in_array( NotRule::operator, $rules_composition, true )
+            &&  !in_array( AbstractRule::findSymbolicOperator( AndRule::operator ), $rules_composition, true )
+            &&  !in_array( AbstractRule::findSymbolicOperator( OrRule::operator ),  $rules_composition, true )
+            &&  !in_array( AbstractRule::findSymbolicOperator( NotRule::operator ), $rules_composition, true )
         ) {
-
             // atomic or composit rules
             $operand_left  = $rules_composition[0];
             $operation     = $rules_composition[1];
@@ -208,7 +211,7 @@ class LogicalFilter implements \JsonSerializable
                 $rule = new NotRule();
             }
             elseif (in_array( AndRule::operator, $rules_composition )
-                ||  in_array( AbstractRule::findSymbolicOperator( AndRule::operator ), $rules_composition ) ) {
+                ||  in_array( AbstractRule::findSymbolicOperator( AndRule::operator ), $rules_composition )) {
                 $rule = new AndRule();
             }
             elseif (in_array( OrRule::operator, $rules_composition )
@@ -240,8 +243,8 @@ class LogicalFilter implements \JsonSerializable
 
             if ($remaining_operations) {
                 throw new \InvalidArgumentException(
-                    "Mixing different operations in the same rule level not implemented: \n"
-                    . implode(', ', $remaining_operations)."\n"
+                    "Mixing different operations in the same rule level not implemented: \n["
+                    . implode(', ', $remaining_operations)."]\n"
                     . 'in ' . var_export($rules_composition, true)
                 );
             }
@@ -416,12 +419,29 @@ class LogicalFilter implements \JsonSerializable
      *
      * @return string $this
      */
-    public final function renameFields($renamings)
+    public function renameFields($renamings)
     {
         if (method_exists($this->rules, 'renameField'))
             $this->rules->renameField($renamings);
         elseif ($this->rules)
             $this->rules->renameFields($renamings);
+
+        return $this;
+    }
+
+    /**
+     * @param  array|callable Associative array of renamings or callable
+     *                        that would rename the fields.
+     *
+     * @return string $this
+     */
+    public function removeRules($filter)
+    {
+        $filter = new LogicalFilter(['not', $filter]);
+
+        if ($this->rules) {
+            $this->rules = (new RuleFilterer)->apply($filter, $this->rules);
+        }
 
         return $this;
     }
@@ -448,7 +468,8 @@ class LogicalFilter implements \JsonSerializable
      */
     public function dump($exit=false, $debug=false)
     {
-        $this->getRules()->dump($exit, $debug, 3);
+        if ($this->rules)
+            $this->rules->dump($exit, $debug, 3);
         return $this;
     }
 

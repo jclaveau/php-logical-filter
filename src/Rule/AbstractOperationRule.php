@@ -125,7 +125,7 @@ abstract class AbstractOperationRule extends AbstractRule
     /**
      * @param string $step_to_go_to
      */
-    public function moveSimplificationStepForward($step_to_go_to)
+    public function moveSimplificationStepForward($step_to_go_to, $force=false)
     {
         if (!in_array($step_to_go_to, self::simplification_steps)) {
             throw new \InvalidArgumentException(
@@ -133,9 +133,9 @@ abstract class AbstractOperationRule extends AbstractRule
             );
         }
 
-        $steps_indices = array_flip(self::simplification_steps);
+        if (!$force && $this->current_simplification_step != null) {
+            $steps_indices = array_flip(self::simplification_steps);
 
-        if ($this->current_simplification_step != null) {
             $current_index = $steps_indices[ $this->current_simplification_step ];
             $target_index  = $steps_indices[ $step_to_go_to ];
 
@@ -415,8 +415,15 @@ abstract class AbstractOperationRule extends AbstractRule
 
         // $instance->dump(true);
 
-        if ($force_logical_core)
+        if ($force_logical_core) {
             $instance = $instance->forceLogicalCore();
+            // for the simplification status at
+            foreach ($operands = $instance->getOperands() as &$andOperand) {
+                $andOperand->moveSimplificationStepForward(self::simplified, true);
+            }
+            $instance->setOperands($operands);
+            $instance->moveSimplificationStepForward(self::simplified, true);
+        }
 
         // $instance->dump(true);
 
