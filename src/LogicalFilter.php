@@ -123,7 +123,7 @@ class LogicalFilter implements \JsonSerializable
      */
     protected function addRule( AbstractRule $rule, $operation=AndRule::operator )
     {
-        if ( ($this->rules instanceof AndRule || $this->rules instanceof AndRule)
+        if ( ($this->rules instanceof AndRule || $this->rules instanceof OrRule)
             && !$this->rules->getOperands() ) {
             throw new \LogicException(
                  "You are trying to add rules to a LogicalFilter which had "
