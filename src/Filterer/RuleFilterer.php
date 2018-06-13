@@ -148,7 +148,7 @@ class RuleFilterer extends Filterer
     /**
      * @param LogicalFilter $filter
      */
-    public function apply( LogicalFilter $filter, $ruleTree_to_filter )
+    public function apply( LogicalFilter $filter, $ruleTree_to_filter, $action_on_matches=null )
     {
         if ($ruleTree_to_filter instanceof AbstractRule)
             $ruleTree_to_filter = [$ruleTree_to_filter];
@@ -160,8 +160,8 @@ class RuleFilterer extends Filterer
             );
         }
 
-        $result = parent::apply($filter, $ruleTree_to_filter);
-
+        //Produces "Only variables should be passed by reference" on Travis
+        $result = parent::apply($filter, $ruleTree_to_filter, $action_on_matches);
         return reset( $result );
     }
 

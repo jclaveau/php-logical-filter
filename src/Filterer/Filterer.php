@@ -35,7 +35,7 @@ abstract class Filterer implements FiltererInterface
     /**
      * @param LogicalFilter $filter
      */
-    public function apply( LogicalFilter $filter, $ruleTree_to_filter )
+    public function apply( LogicalFilter $filter, $ruleTree_to_filter, $action_on_matches=null )
     {
         $root_OrRule = $filter
             ->simplify(['force_logical_core' => true])
@@ -91,6 +91,7 @@ abstract class Filterer implements FiltererInterface
         return $this->applyRecursion(
             $root_cases,
             $ruleTree_to_filter,
+            $action_on_matches,
             $depth=0
         )
         ;
@@ -99,7 +100,7 @@ abstract class Filterer implements FiltererInterface
     /**
      * @todo use array_filter
      */
-    protected function applyRecursion(array $root_cases, $ruleTree_to_filter, $depth=0)
+    protected function applyRecursion(array $root_cases, $ruleTree_to_filter, $action_on_matches, $depth=0)
     {
         // Once the rules are prepared, we parse the data
         foreach ($ruleTree_to_filter as $row_index => $row_to_filter) {
@@ -138,12 +139,30 @@ abstract class Filterer implements FiltererInterface
             }
 
 
-            if ( ! $root_cases_validity_count) {
+            if ( ! $root_cases_validity_count && !$action_on_matches) {
                 unset($ruleTree_to_filter[$row_index]);
+                continue;
             }
-            elseif ($children = $this->getChildren($row_to_filter)) {
-                $filtered_children = $this->applyRecursion( $root_cases, $children, $depth++ );
-                $this->setChildren($ruleTree_to_filter[$row_index], $filtered_children);
+
+            if ($children = $this->getChildren($row_to_filter)) {
+                $filtered_children = $this->applyRecursion( $root_cases, $children, $action_on_matches, $depth++ );
+                // $this->setChildren($ruleTree_to_filter[$row_index], $filtered_children);
+                $this->setChildren($row_to_filter, $filtered_children);
+            }
+
+            $ruleTree_to_filter[$row_index] = $row_to_filter;
+
+            if ($root_cases_validity_count > 0 && $action_on_matches) {
+                $argumentes = [
+                    &$ruleTree_to_filter,
+                    $row_index,
+                    &$row_to_filter
+                ];
+
+                call_user_func_array(
+                    $action_on_matches,
+                    $argumentes
+                );
             }
         }
 

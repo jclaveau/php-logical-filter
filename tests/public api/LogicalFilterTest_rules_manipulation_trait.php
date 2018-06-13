@@ -2,7 +2,7 @@
 namespace JClaveau\LogicalFilter;
 
 
-trait LogicalFilterTest_removesRules_trait
+trait LogicalFilterTest_rules_manipulation_trait
 {
     /**
      */
@@ -293,6 +293,60 @@ trait LogicalFilterTest_removesRules_trait
                     // ['or'], ['or'], ['or'], ['or'], ['or'], ['or'], ['or'], ['or'],
                 // ],
             ]
+        );
+    }
+
+    /**
+     */
+    public function test_filterRules_multiple()
+    {
+        $filter = (new LogicalFilter(
+            ['and',
+                ['or',
+                    ['field_3', '<', 'a'],
+                    ['field_5', '=', 12],
+                ],
+                ['field_5', '>', 11],
+            ]
+        ));
+
+        $rules = $filter->listRulesMatching([
+            ['field', '=', 'field_5'],
+            'and',
+            ['operator', '=', '>'],
+        ])
+        ;
+
+        $this->assertEquals( 1, count($rules) );
+
+        $this->assertEquals(
+            ['field_5', '>', 11],
+            $rules[0]->toArray()
+        );
+
+        // checks that the filtered row is a reference of the one in the filter
+        $this->assertEquals(
+            $filter->getRules(false)
+                ->getOperands()[1]
+                // ->dump()
+                ,
+            $rules[0]
+        );
+
+        // copying rules
+        $rules = $filter->listRulesMatching([
+            ['field', '=', 'field_5'],
+            'and',
+            ['operator', '=', '>'],
+        ], false)
+        ;
+
+        $this->assertSame(
+            $filter->getRules(false)
+                ->getOperands()[1]
+                ->dump()
+                ,
+            $rules[0]
         );
     }
 

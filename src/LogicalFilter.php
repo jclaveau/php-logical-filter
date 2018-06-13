@@ -447,6 +447,39 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     * @param  array|callable Associative array of renamings or callable
+     *                        that would rename the fields.
+     *
+     * @return array The rules matching the filter
+     *
+     *
+     * @todo Merge with rules
+     */
+    public function listRulesMatching($filter, $copy=true)
+    {
+        $filter = (new LogicalFilter($filter))
+        // ->dump()
+        ;
+
+        $out = [];
+        (new RuleFilterer)->apply(
+            $filter,
+            $this->rules,
+            function($ruleTree_to_filter, $row_index, $matching_rule) use (&$out, $copy) {
+                var_dump( get_class($matching_rule) );
+                if (    !$matching_rule instanceof AndRule
+                    &&  !$matching_rule instanceof OrRule
+                    &&  !$matching_rule instanceof NotRule
+                ) {
+                    $out[] = $copy ? $matching_rule->copy() : $matching_rule;
+                }
+            }
+        );
+
+        return $out;
+    }
+
+    /**
      * Clone the current object and its rules.
      *
      * @return LogicalFilter A copy of the current instance with a copied ruletree
