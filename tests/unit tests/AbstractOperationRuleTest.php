@@ -17,7 +17,10 @@ class AbstractOperationRuleTest extends \PHPUnit_Framework_TestCase
         $orRule = new OrRule([$above]);
         $this->assertEquals(
             $above->toArray(),
-            $orRule->simplify()->toArray()
+            $orRule
+                ->simplify()
+                // ->dump()
+                ->toArray()
         );
 
         // AndRule
@@ -56,7 +59,9 @@ class AbstractOperationRuleTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $expectedOrRule->toArray(),
-            $orRule->simplify()->toArray()
+            $orRule
+                ->simplify()
+                ->toArray()
         );
 
         // AndRule
@@ -72,8 +77,13 @@ class AbstractOperationRuleTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->assertEquals(
-            $expectedAndRule->toArray(),
-            $andRule->simplify()->toArray()
+            $expectedAndRule
+                // ->dump()
+                ->toArray(),
+            $andRule
+                ->simplify()
+                // ->dump()
+                ->toArray()
         );
     }
 

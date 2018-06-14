@@ -17,15 +17,12 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     protected $operands = [];
 
-    const remove_negations                = 'remove_negations';
-    const remove_operation_duplicates     = 'remove_operation_duplicates';
-    const rootify_disjunctions            = 'rootify_disjunctions';
-    const remove_monooperand_operations_1 = 'remove_monooperand_operations_1';
-    const unify_atomic_operands           = 'unify_atomic_operands';
-    const remove_monooperand_operations_2 = 'remove_monooperand_operations_2';
-    const remove_invalid_branches         = 'remove_invalid_branches';    // simplified after this step
+    const remove_negations        = 'remove_negations';
+    const rootify_disjunctions    = 'rootify_disjunctions';
+    const unify_atomic_operands   = 'unify_atomic_operands';
+    const remove_invalid_branches = 'remove_invalid_branches';    // simplified after this step
 
-    const simplified                      = self::remove_invalid_branches;
+    const simplified              = self::remove_invalid_branches;
 
     /**
      * The order is important!
@@ -34,11 +31,8 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     const simplification_steps = [
         self::remove_negations,
-        self::remove_operation_duplicates,
         self::rootify_disjunctions,
-        self::remove_monooperand_operations_1,
         self::unify_atomic_operands,
-        self::remove_monooperand_operations_2,
         self::remove_invalid_branches,
     ];
 
@@ -205,15 +199,66 @@ abstract class AbstractOperationRule extends AbstractRule
     }
 
     /**
+     * Operation cleaning consists of removing operation with one operand
+     * and removing operations having a same type of operation as operand.
+     *
+     * This operation has been required between every steps until now.
+     *
+     * @toopt Trigger cleaning requirement during simplification steps
+     *
+     * @return $this;
      */
-    public function removeOperationDuplicates()
+    public function cleanOperations()
     {
-        $this->moveSimplificationStepForward( self::remove_operation_duplicates );
-
         foreach ($this->operands as $i => $operand) {
-            if ($operand instanceof AbstractOperationRule)
-                $operand->removeOperationDuplicates();
+            if ($operand instanceof AbstractOperationRule) {
+                $this->operands[$i] = $operand->cleanOperations();
+            }
         }
+
+        $this->removeSameOperationOperands();
+        $this->removeMonooperandOperationsOperands();
+
+        return $this;
+    }
+
+    /**
+     * If a child is an OrRule or an AndRule and has only one child,
+     * replace it by its child.
+     *
+     * @used-by removeSameOperationOperands() Ping-pong recursion
+     *
+     * @return $thi_s;
+     */
+    public function removeMonooperandOperationsOperands()
+    {
+        foreach ($this->operands as $i => $operand) {
+            if (!method_exists($operand, 'getOperands'))
+                continue;
+
+            $sub_operands = $operand->getOperands();
+            if (
+                    ($operand instanceof AndRule || $operand instanceof OrRule)
+                &&  count($sub_operands) == 1
+            ) {
+                $this->operands[$i] = reset($sub_operands);
+                $possible_same_operations_operands = true;
+            }
+        }
+
+        if (isset($possible_same_operations_operands)) {
+            $this->removeSameOperationOperands();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @used-by removeMonooperandOperationsOperands() Ping-pong recursion
+     */
+    public function removeSameOperationOperands()
+    {
+        $this->is_clean = true;
 
         if ($this instanceof NotRule)
             return $this;
@@ -225,8 +270,14 @@ abstract class AbstractOperationRule extends AbstractRule
                     $this->addOperand( $sub_operand->copy() );
                 }
                 unset($this->operands[$i]);
-            }
 
+                // possibility of mono-operand
+                $possible_monooperands = true;
+            }
+        }
+
+        if (isset($possible_monooperands)) {
+            $this->removeMonooperandOperationsOperands();
         }
 
         return $this;
@@ -300,30 +351,6 @@ abstract class AbstractOperationRule extends AbstractRule
     }
 
     /**
-     */
-    public function removeMonooperandOperations($step)
-    {
-        $this->moveSimplificationStepForward( $step );
-
-        if ($this instanceof NotRule && $this->getValue() !== null) {
-            throw new LogicException(
-                "NotRule MUST have been already removed here"
-            );
-        }
-
-        foreach ($this->operands as $i => $operand) {
-            if ($operand instanceof AbstractOperationRule) {
-                $this->operands[$i] = $operand->removeMonooperandOperations($step);
-            }
-        }
-
-        if (count($this->operands) == 1)
-            return reset($this->operands);
-
-        return $this;
-    }
-
-    /**
      * Simplify the current OperationRule.
      * + If an OrRule or an AndRule contains only one operand, it's equivalent
      *   to it.
@@ -354,19 +381,12 @@ abstract class AbstractOperationRule extends AbstractRule
         // $this->dump(true);
 
         if ($step_to_stop_after  == self::remove_negations ||
-            $step_to_stop_before == self::remove_operation_duplicates )
-            return $this;
-
-        // $this->dump(true);
-
-        $this->removeOperationDuplicates();
-
-        if ($step_to_stop_after  == self::remove_operation_duplicates ||
             $step_to_stop_before == self::rootify_disjunctions )
             return $this;
 
         // $this->dump(true);
 
+        $this->cleanOperations();
         // FIXME return $this while RootifyingDisjunctions!
         if (method_exists($this, 'rootifyDisjunctions')) {
             $instance = $this->rootifyDisjunctions();
@@ -376,9 +396,6 @@ abstract class AbstractOperationRule extends AbstractRule
         }
 
         // $instance->dump(true);
-        $instance = $instance->removeMonooperandOperations(
-            self::remove_monooperand_operations_1
-        );
 
         if ($step_to_stop_after  == self::rootify_disjunctions ||
             $step_to_stop_before == self::unify_atomic_operands )
@@ -386,34 +403,42 @@ abstract class AbstractOperationRule extends AbstractRule
 
         if (!$instance instanceof AbstractAtomicRule) {
 
+            $instance->cleanOperations();
             $instance->unifyAtomicOperands();
 
             // $instance->dump(true);
 
             if ($step_to_stop_after  == self::unify_atomic_operands ||
-                $step_to_stop_before == self::remove_monooperand_operations_2 )
-                return $instance;
-
-            $instance = $instance->removeMonooperandOperations(
-                self::remove_monooperand_operations_2
-            );
-
-            // $instance->dump(!true);
-
-            if ($step_to_stop_after  == self::remove_monooperand_operations_2 ||
                 $step_to_stop_before == self::remove_invalid_branches )
                 return $instance;
 
+            $instance->cleanOperations();
             if (method_exists($instance, 'removeInvalidBranches')) {
                 $instance->removeInvalidBranches();
-                // Monooperands can be recreated by removeInvalidBranches
-                $instance = $instance->removeMonooperandOperations(
-                    self::remove_monooperand_operations_2
-                );
             }
         }
 
         // $instance->dump(true);
+        $instance->cleanOperations();
+
+        // the root rule cannot be cleaned so we wrap it and apply a
+        // last non recursive clean
+        // TODO kind of monad|become|cese
+        //@see https://github.com/jclaveau/php-logical-filter/issues/20
+        if ($instance instanceof AndRule || $instance instanceof OrRule ) {
+
+            if (!$instance->getOperands())
+                return $instance;
+
+            $operands = (new AndRule([$instance]))
+                ->removeSameOperationOperands()
+                ->removeMonooperandOperationsOperands()
+                // ->dump(true)
+                ->getOperands();
+
+            if (count($operands) == 1)
+                $instance = reset($operands);
+        }
 
         if ($force_logical_core) {
             $instance = $instance->forceLogicalCore();
@@ -424,8 +449,6 @@ abstract class AbstractOperationRule extends AbstractRule
             $instance->setOperands($operands);
             $instance->moveSimplificationStepForward(self::simplified, true);
         }
-
-        // $instance->dump(true);
 
         return $instance;
     }

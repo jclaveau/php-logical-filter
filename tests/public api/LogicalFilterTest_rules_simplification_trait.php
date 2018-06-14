@@ -75,7 +75,7 @@ trait LogicalFilterTest_rules_simplification_trait
                 ['field_7', '>', 5],
             ],
         ]))
-        ->simplify( ['stop_before' => AbstractOperationRule::rootify_disjunctions] )
+        ->simplify()
         ;
 
         $this->assertEquals( [
@@ -84,7 +84,9 @@ trait LogicalFilterTest_rules_simplification_trait
                 ['field_6', '>', 3],
                 ['field_7', '>', 5],
             ],
-            $filter->toArray()
+            $filter
+                // ->dump(true)
+                ->toArray()
         );
 
         $filter = (new LogicalFilter([
@@ -101,7 +103,7 @@ trait LogicalFilterTest_rules_simplification_trait
                 ],
             ],
         ]))
-        ->simplify( ['stop_before' => AbstractOperationRule::rootify_disjunctions] )
+        ->simplify()
         ;
 
         $this->assertEquals( [
@@ -111,6 +113,47 @@ trait LogicalFilterTest_rules_simplification_trait
                 ['field_7', '>', 5],
                 ['field_8', '>', 3],
                 ['field_9', '>', 5],
+            ],
+            $filter->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify_cleaning_operations_complex_multilevel()
+    {
+        $filter = (new LogicalFilter(
+            ['and',
+                ['or',
+                    ['and',
+                        ['field_1', '=', 3],
+                        ['field_5', '>', 3],
+                    ],
+                    ['and',
+                        ['field_1', '=', 2],
+                        ['field_6', '>', 4],
+                    ],
+                ],
+                ['field_7', '=', 2],
+            ]
+        ))
+        // ->dump()
+        ->simplify()
+        // ->dump()
+        ;
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ['field_7', '=', 2],
+                    ['field_1', '=', 3],
+                    ['field_5', '>', 3],
+                ],
+                ['and',
+                    ['field_7', '=', 2],
+                    ['field_1', '=', 2],
+                    ['field_6', '>', 4],
+                ],
             ],
             $filter->toArray()
         );
