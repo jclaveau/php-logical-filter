@@ -127,7 +127,58 @@ class BetweenRuleTest extends \PHPUnit_Framework_TestCase
                 ->simplify()
                 ->toArray()
         );
+    }
 
+    /**
+     */
+    public function test_simplify_between_or_equal_with_equal_limits()
+    {
+        $start = new \DateTime('2018-06-11');
+        $end   = new \DateTime('2018-06-11');
+
+        $this->assertEquals(
+            ['date', '=', $start],
+            (new LogicalFilter([
+                'and',
+                ['date',  '=><', [$start, $end]],
+            ]))
+            ->simplify()
+            // ->dump()
+            ->toArray()
+        );
+
+        $this->assertEquals(
+            ['date', '=', $start],
+            (new LogicalFilter([
+                'and',
+                ['date',  '><=', [$start, $end]],
+            ]))
+            ->simplify()
+            // ->dump()
+            ->toArray()
+        );
+
+        $this->assertEquals(
+            ['date', '=', $start],
+            (new LogicalFilter([
+                'and',
+                ['date',  '=><=', [$start, $end]],
+            ]))
+            ->simplify()
+            // ->dump()
+            ->toArray()
+        );
+
+        $this->assertEquals(
+            ['and'],
+            (new LogicalFilter([
+                'and',
+                ['date',  '><', [$start, $end]],
+            ]))
+            ->simplify()
+            // ->dump()
+            ->toArray()
+        );
     }
 
     /**/
