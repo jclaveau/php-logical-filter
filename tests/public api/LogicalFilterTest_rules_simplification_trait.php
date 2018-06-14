@@ -940,5 +940,37 @@ trait LogicalFilterTest_rules_simplification_trait
         $this->assertEquals( ['and'], $filter->toArray() );
     }
 
+    /**
+     * @todo
+     * @see https://github.com/jclaveau/php-logical-filter/issues/47
+     */
+    public function test_simplify_same_operands_which_are_operations()
+    {
+        $this->markTestIncomplete("TODO not implement");
+        $filter = (new LogicalFilter([
+            'or',
+            ['and',
+                ['field_6', '>', 3],
+                ['field_7', '>', 5],
+            ],
+            ['and',
+                ['field_6', '>', 3],
+                ['field_7', '>', 5],
+            ],
+        ]))
+        ->simplify()
+        ;
+
+        $this->assertEquals( [
+                'and',
+                ['field_6', '>', 3],
+                ['field_7', '>', 5],
+            ],
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
     /**/
 }
