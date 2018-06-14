@@ -344,7 +344,7 @@ trait LogicalFilterTest_rules_manipulation_trait
         $this->assertSame(
             $filter->getRules(false)
                 ->getOperands()[1]
-                ->dump()
+                // ->dump()
                 ,
             $rules[0]
         );

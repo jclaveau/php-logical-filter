@@ -466,7 +466,6 @@ class LogicalFilter implements \JsonSerializable
             $filter,
             $this->rules,
             function($ruleTree_to_filter, $row_index, $matching_rule) use (&$out, $copy) {
-                var_dump( get_class($matching_rule) );
                 if (    !$matching_rule instanceof AndRule
                     &&  !$matching_rule instanceof OrRule
                     &&  !$matching_rule instanceof NotRule
