@@ -2,6 +2,7 @@
 namespace JClaveau\LogicalFilter\Rule;
 
 use JClaveau\VisibilityViolator\VisibilityViolator;
+use JClaveau\LogicalFilter\LogicalFilter;
 
 class BetweenRuleTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,6 +40,94 @@ class BetweenRuleTest extends \PHPUnit_Framework_TestCase
         catch (\Exception $e) {
             $this->assertTrue(true, "Exception thrown: ".$e->getMessage());
         }
+    }
+
+    /**
+     */
+    public function test_between_or_equal()
+    {
+        // between
+        $filter = (new LogicalFilter(["field_1", "><", [1, 2]]));
+
+        $this->assertEquals(
+            ["field_1", "><", [1, 2]],
+            $filter->toArray()
+        );
+
+        $this->assertEquals(
+            ['and',
+                ["field_1", ">", 1],
+                ["field_1", "<", 2],
+            ],
+            $filter
+                ->simplify()
+                ->toArray()
+        );
+
+        // between or equal lower limit
+        $filter = (new LogicalFilter(["field_1", "=><", [1, 2]]));
+
+        $this->assertEquals(
+            ["field_1", "=><", [1, 2]],
+            $filter->toArray()
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ["field_1", ">", 1],
+                    ["field_1", "<", 2],
+                ],
+                ["field_1", "=", 1],
+            ],
+            $filter
+                ->simplify()
+                ->toArray()
+        );
+
+        // between or equal upper limit
+        $filter = (new LogicalFilter(["field_1", "><=", [1, 2]]));
+
+        $this->assertEquals(
+            ["field_1", "><=", [1, 2]],
+            $filter->toArray()
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ["field_1", ">", 1],
+                    ["field_1", "<", 2],
+                ],
+                ["field_1", "=", 2],
+            ],
+            $filter
+                ->simplify()
+                ->toArray()
+        );
+
+        // between or equal both limits
+        $filter = (new LogicalFilter(["field_1", "=><=", [1, 2]]));
+
+        $this->assertEquals(
+            ["field_1", "=><=", [1, 2]],
+            $filter->toArray()
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ["field_1", ">", 1],
+                    ["field_1", "<", 2],
+                ],
+                ["field_1", "=", 1],
+                ["field_1", "=", 2],
+            ],
+            $filter
+                ->simplify()
+                ->toArray()
+        );
+
     }
 
     /**/

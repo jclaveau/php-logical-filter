@@ -5,16 +5,19 @@ abstract class AbstractRule implements \JsonSerializable
 {
     /** @var  array $ruleAliases */
     protected static $ruleAliases = [
-        '!'   => 'not',
-        '='   => 'equal',
-        '>'   => 'above',
-        '<'   => 'below',
-        '><'  => 'between',
-        '<='  => 'below_or_equal',
-        '>='  => 'above_or_equal',
-        '!='  => 'not_equal',
-        'in'  => 'in',
-        '!in' => 'not_in',
+        '!'    => 'not',
+        '='    => 'equal',
+        '>'    => 'above',
+        '<'    => 'below',
+        '><'   => 'between',
+        '=><'  => 'between_or_equal_lower',
+        '><='  => 'between_or_equal_upper',
+        '=><=' => 'between_or_equal_both',
+        '<='   => 'below_or_equal',
+        '>='   => 'above_or_equal',
+        '!='   => 'not_equal',
+        'in'   => 'in',
+        '!in'  => 'not_in',
     ];
 
     /**
