@@ -57,8 +57,6 @@ trait LogicalFilterTest_rules_simplification_trait
         ->simplify()
         ;
 
-        $this->assertTrue( $filter->getRules()->isSimplified() );
-
         $this->assertEquals( ['field_5', '>', 5], $filter->toArray() );
     }
 

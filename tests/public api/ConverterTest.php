@@ -82,7 +82,11 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             "(field_1 = 2 AND field_2 > 4 AND field_3 IS NULL AND field_4 IS NOT NULL) OR (field_1 = 2 AND field_2 < -4 AND field_3 IS NULL AND field_4 IS NOT NULL)",
-            $inline_sql
+            $inline_sql['sql']
+        );
+
+        $this->assertEmpty(
+            $inline_sql['parameters']
         );
     }
 

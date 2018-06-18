@@ -7,6 +7,10 @@
  */
 namespace JClaveau\LogicalFilter\Converter;
 use       JClaveau\LogicalFilter\LogicalFilter;
+use       JClaveau\LogicalFilter\Rule\EqualRule;
+use       JClaveau\LogicalFilter\Rule\NotEqualRule;
+use       JClaveau\LogicalFilter\Rule\AboveRule;
+use       JClaveau\LogicalFilter\Rule\BelowRule;
 
 /**
  * This class implements a converter for MySQL.
@@ -16,6 +20,9 @@ class InlineSqlMinimalConverter extends MinimalConverter
     /** @var array $output */
     protected $output = [];
 
+    /** @var array $parameters */
+    protected $parameters = [];
+
     /**
      * @param LogicalFilter $filter
      */
@@ -23,7 +30,10 @@ class InlineSqlMinimalConverter extends MinimalConverter
     {
         $this->output = [];
         parent::convert($filter);
-        return '('.implode(') OR (', $this->output).')';
+        return [
+            'sql' => '('.implode(') OR (', $this->output).')',
+            'parameters' => $this->parameters,
+        ];
     }
 
     /**
@@ -45,32 +55,55 @@ class InlineSqlMinimalConverter extends MinimalConverter
      * Pseudo-event called while for each And operand of the root Or.
      * These operands must be only atomic Rules.
      */
-    public function onAndPossibility($field, $operator, $operand, array $allOperandsByField)
+    public function onAndPossibility($field, $operator, $rule, array $allOperandsByField)
     {
-        if ($operator == '=') {
-            if ($operand->getValue() === null)
-                $new_rule = "$field IS NULL";
-            else
-                $new_rule = "$field = {$operand->getValue()}";
+        if ($rule instanceof EqualRule) {
+            $value = $rule->getValue();
         }
-        elseif ($operator == '!=') {
-            if ($operand->getValue() === null) {
-                $new_rule = "$field IS NOT NULL";
+        elseif ($rule instanceof AboveRule) {
+            $value = $rule->getMinimum();
+        }
+        elseif ($rule instanceof BelowRule) {
+            $value = $rule->getMaximum();
+        }
+        elseif ($rule instanceof NotEqualRule) {
+            $value = $rule->getValue();
+        }
+
+        if (gettype($value) == 'integer') {
+        }
+        elseif (gettype($value) == 'double') {
+            // TODO disable locale to handle separators
+        }
+        elseif ($value instanceof \DateTime) {
+            $value = $value->format('Y-m-d H:i:s');
+        }
+        elseif (gettype($value) == 'string') {
+            $id = 'param_' . count($this->parameters);
+            $this->parameters[$id] = $value;
+            $value = ':'.$id;
+        }
+        elseif ($value === null) {
+            $value = "NULL";
+            if ($rule instanceof EqualRule) {
+                $operator = 'IS';
+            }
+            elseif ($rule instanceof NotEqualRule) {
+                $operator = 'IS NOT';
             }
             else {
                 throw new \InvalidArgumentException(
-                    "This case shouldn't happend before new simplification"
-                    ." strategies support"
+                    "NULL is only handled for equality / difference"
                 );
-                // $new_rule = " $field = {$operand->getValue()} ";
             }
         }
-        elseif ($operator == '<') {
-            $new_rule = "$field < {$operand->getMaximum()}";
+        else {
+            throw new \InvalidArgumentException(
+                "Unhandled type of value: ".gettype($value). ' | ' .var_export($value, true)
+            );
         }
-        elseif ($operator == '>') {
-            $new_rule = "$field > {$operand->getMinimum()}";
-        }
+
+        $new_rule = "$field $operator $value";
 
         $this->appendToLastOrOperandKey($new_rule);
     }
