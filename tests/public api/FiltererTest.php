@@ -211,5 +211,43 @@ class FiltererTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     */
+    public function test_filterer_rule()
+    {
+        $filter_to_filter = new LogicalFilter([
+            'and',
+            ['field_1', '=', 2],
+            ['or',
+                ['field_2', '>', 4],
+                ['field_2', '<', -4],
+            ],
+            ['field_3', '=', null],
+            ['field_2', '!=', null],
+        ]);
+
+        $filtered_rules = (new RuleFilterer)
+        ->apply(
+            new LogicalFilter([
+                'and',
+                ['field',    '=',  'field_2'],
+                ['operator', '!=', '!='],
+            ]),
+            $filter_to_filter->getRules()
+        )
+        // ->dump()
+        ;
+
+        $this->assertEquals(
+            ['and',
+                ['or',
+                    ['field_2', '>', 4],
+                    ['field_2', '<', -4],
+                ],
+            ],
+            $filtered_rules->toArray()
+        );
+    }
+
     /**/
 }

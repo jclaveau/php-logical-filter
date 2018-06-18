@@ -15,15 +15,70 @@ use       JClaveau\LogicalFilter\Rule\AboveRule;
 use       JClaveau\LogicalFilter\Rule\NotEqualRule;
 
 /**
- * Parses an iterable going down to its children
+ * This filterer provides the tools and API to apply a LogicalFilter once it has
+ * been simplified.
  */
 abstract class Filterer implements FiltererInterface
 {
+    const on_row_matches    = 'on_row_matches';
+    const on_row_mismatches = 'on_row_mismatches';
+
+    /** @var array $custom_actions */
+    protected $custom_actions = [
+        self::on_row_matches    => null,
+        self::on_row_mismatches => null,
+    ];
+
     /**
+     */
+    public function setCustomActions($action_name, callable $action)
+    {
+        if (!array_key_exists($action_name, $this->custom_actions)) {
+            throw new \InvalidArgumentException(
+                "Custom action name must belong to ["
+                .implode(', ', array_keys($this->custom_actions) )
+                ."] contrary to '$action_name'."
+            );
+        }
+
+        $this->custom_actions[$action_name] = $action;
+
+        return $this;
+    }
+
+    /**
+     */
+    public function onRowMatches(&$row, $key, &$rows)
+    {
+        if (isset($this->custom_actions[ self::on_row_matches ])) {
+            call_user_func_array(
+                $this->custom_actions[ self::on_row_matches ],
+                func_get_args()
+            );
+        }
+    }
+
+    /**
+     */
+    public function onRowMismatches(&$row, $key, &$rows)
+    {
+        if (isset($this->custom_actions[ self::on_row_mismatches ])) {
+            call_user_func_array(
+                $this->custom_actions[ self::on_row_mismatches ],
+                func_get_args()
+            );
+        }
+        else {
+            unset($rows[$key]);
+        }
+    }
+
+    /**
+     * @return array
      */
     public function getChildren($row)
     {
-        return null;
+        return [];
     }
 
     /**
@@ -33,9 +88,11 @@ abstract class Filterer implements FiltererInterface
     }
 
     /**
-     * @param LogicalFilter $filter
+     * @param LogicalFilter   $filter
+     * @param Iterable|object $tree_to_filter
+     * @param array           $options
      */
-    public function apply( LogicalFilter $filter, $ruleTree_to_filter, $action_on_matches=null )
+    public function apply( LogicalFilter $filter, $tree_to_filter, $options=[] )
     {
         $root_OrRule = $filter
             ->simplify(['force_logical_core' => true])
@@ -46,127 +103,89 @@ abstract class Filterer implements FiltererInterface
         if (!$root_OrRule->hasSolution())
             return null;
 
-        $root_cases = [];
-        foreach ($root_OrRule->getOperands() as $andOperand) {
-
-            $operands_by_fields = $andOperand->groupOperandsByFieldAndOperator();
-
-            // operation rules have no fields
-            unset($operands_by_fields['']);
-
-            foreach ($operands_by_fields as $field => $operands_by_operator) {
-                foreach ($operands_by_operator as $operator => $operands_of_operator) {
-                    if (count($operands_of_operator) != 1) {
-                        throw new \RuntimeException(
-                             "Once a logical filter is simplified, there MUST be "
-                            ."no more than one operand by operator instead of for '$field' / '$operator': "
-                            .var_export($operands_of_operator, true)
-                        );
-                    }
-
-                    $operand = reset($operands_of_operator);
-
-                    if ($operand instanceof EqualRule) {
-                        $operands_by_fields[ $field ][ $operator ] = $operand->getValue();
-                    }
-                    elseif ($operand instanceof AboveRule) {
-                        $operands_by_fields[ $field ][ $operator ] = $operand->getMinimum();
-                    }
-                    elseif ($operand instanceof BelowRule) {
-                        $operands_by_fields[ $field ][ $operator ] = $operand->getMaximum();
-                    }
-                    elseif ($operand instanceof NotEqualRule) {
-                        if (null !== $operands_by_fields[ $field ][ $operator ] = $operand->getValue()) {
-                            throw new \ErrorException(
-                                "NotEqualRule is only used for null values after simplification"
-                            );
-                        }
-                    }
-                }
-            }
-
-            $root_cases[] = $operands_by_fields;
-        }
+        $root_cases = $root_OrRule->toArray();
+        unset($root_cases[0]);
 
         return $this->applyRecursion(
             $root_cases,
-            $ruleTree_to_filter,
-            $action_on_matches,
+            $tree_to_filter,
             $depth=0
-        )
-        ;
+        );
     }
 
     /**
      * @todo use array_filter
      */
-    protected function applyRecursion(array $root_cases, $ruleTree_to_filter, $action_on_matches, $depth=0)
+    protected function applyRecursion(array $root_cases, $tree_to_filter, $depth)
     {
         // Once the rules are prepared, we parse the data
-        foreach ($ruleTree_to_filter as $row_index => $row_to_filter) {
+        foreach ($tree_to_filter as $row_index => $row_to_filter) {
             $operands_validation_row_cache = [];
 
-            $root_cases_validity_count = count($root_cases);
+            $one_case_matches = false;
 
-            foreach ($root_cases as $case_index => $operands_by_fields) {
+            foreach ($root_cases as $and_case_index => $and_case_description) {
+                // The case is an AndRule so we remove the operator
+                unset($and_case_description[0]);
 
-                foreach ($operands_by_fields as $field => $operands_by_operator) {
+                foreach ($and_case_description as $i => $rule_description) {
+                    $field    = $rule_description[0];
+                    $operator = $rule_description[1];
+                    $value    = $rule_description[2];
 
-                    foreach ($operands_by_operator as $operator => $value) {
+                    $cache_key = $and_case_index.'~|~'.$field.'~|~'.$operator;
 
-                        $cache_key = $case_index.'~|~'.$field.'~|~'.$operator;
-
-                        if (!empty($operands_validation_row_cache[ $cache_key ]))
-                            return $operands_validation_row_cache[ $cache_key ];
-
+                    if (!empty($operands_validation_row_cache[ $cache_key ])) {
+                        $is_valid = $operands_validation_row_cache[ $cache_key ];
+                    }
+                    else {
                         $is_valid = $this->validateRule(
                             $field,
                             $operator,
                             $value,
                             $row_to_filter,
                             $depth,
-                            $operands_by_fields
+                            $root_cases
                         );
-
-                        if (!$is_valid) {
-                            $root_cases_validity_count--;
-                            continue 3;
-                        }
 
                         $operands_validation_row_cache[ $cache_key ] = $is_valid;
                     }
+
+                    // var_dump("$field $operator " . var_export($value, true) ." => ". var_export($is_valid, true));
+                    if (!$is_valid) {
+                        // one of the rules of the and_case do not validate
+                        // so all the and_case is invalid
+                        continue 2;
+                    }
                 }
+
+                $one_case_matches = true;
+                // at least one and_case works so we can stop here
+                break;
             }
 
+            if ($one_case_matches) {
+                // at least 1 case matches the
+                if ($children = $this->getChildren($row_to_filter)) {
+                    $filtered_children = $this->applyRecursion(
+                        $root_cases,
+                        $children,
+                        $depth++
+                    );
+                    $this->setChildren($row_to_filter, $filtered_children);
+                }
 
-            if ( ! $root_cases_validity_count && !$action_on_matches) {
-                unset($ruleTree_to_filter[$row_index]);
-                continue;
+                $this->onRowMatches($row_to_filter, $row_index, $tree_to_filter);
             }
-
-            if ($children = $this->getChildren($row_to_filter)) {
-                $filtered_children = $this->applyRecursion( $root_cases, $children, $action_on_matches, $depth++ );
-                // $this->setChildren($ruleTree_to_filter[$row_index], $filtered_children);
-                $this->setChildren($row_to_filter, $filtered_children);
-            }
-
-            $ruleTree_to_filter[$row_index] = $row_to_filter;
-
-            if ($root_cases_validity_count > 0 && $action_on_matches) {
-                $argumentes = [
-                    &$ruleTree_to_filter,
-                    $row_index,
-                    &$row_to_filter
-                ];
-
-                call_user_func_array(
-                    $action_on_matches,
-                    $argumentes
-                );
+            else {
+                // No case match the rule
+                // $row_to_filter->dump(!true);
+                // var_dump($tree_to_filter);
+                $this->onRowMismatches($row_to_filter, $row_index, $tree_to_filter);
             }
         }
 
-        return $ruleTree_to_filter;
+        return $tree_to_filter;
     }
 
     /**/

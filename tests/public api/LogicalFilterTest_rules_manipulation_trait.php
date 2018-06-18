@@ -1,5 +1,6 @@
 <?php
 namespace JClaveau\LogicalFilter;
+use       JClaveau\LogicalFilter\Filterer\RuleFilterer;
 
 
 trait LogicalFilterTest_rules_manipulation_trait
@@ -311,11 +312,13 @@ trait LogicalFilterTest_rules_manipulation_trait
         ));
 
         $rules = $filter->listRulesMatching([
-            ['field', '=', 'field_5'],
-            'and',
-            ['operator', '=', '>'],
-        ])
-        ;
+            ['operator', 'in', ['or', 'and']],
+            'or',
+            ['and',
+                ['field', '=', 'field_5'],
+                ['operator', '=', '>'],
+            ],
+        ]);
 
         $this->assertEquals( 1, count($rules) );
 
@@ -329,7 +332,10 @@ trait LogicalFilterTest_rules_manipulation_trait
             $filter->getRules(false)
                 ->getOperands()[1]
                 // ->dump()
-                ,
+            ,
+            // [
+                // [$rules[0], $key, $parent]
+            // ]
             $rules[0]
         );
 
@@ -337,7 +343,7 @@ trait LogicalFilterTest_rules_manipulation_trait
         $rules = $filter->listRulesMatching([
             ['field', '=', 'field_5'],
             'and',
-            ['operator', '=', '>'],
+            ['operator', 'in', ['>', 'or', 'and']],
         ], false)
         ;
 
@@ -347,6 +353,96 @@ trait LogicalFilterTest_rules_manipulation_trait
                 // ->dump()
                 ,
             $rules[0]
+        );
+    }
+
+    /**
+     */
+    public function test_applyOn_another_filter()
+    {
+        $filter_to_filter = new LogicalFilter([
+            'and',
+            ['field_1', '=', 2],
+            ['or',
+                ['field_2', '>', 4],
+                ['field_2', '<', -4],
+            ],
+            ['field_3', '=', null],
+            ['field_2', '!=', null],
+        ]);
+
+        $filtered_filter = (new LogicalFilter([
+                'and',
+                ['field',    '=',  'field_2'],
+                ['operator', '!=', '!='],
+            ], new RuleFilterer)
+        )
+        ->applyOn(
+            $filter_to_filter
+            // no action => remove every non matching rule
+        )
+        // ->dump()
+        ;
+
+        $this->assertEquals(
+            ['and',
+                ['or',
+                    ['field_2', '>', 4],
+                    ['field_2', '<', -4],
+                ],
+            ],
+            $filtered_filter->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_applyOn_another_filter_with_custom_action()
+    {
+        $filter_to_filter = new LogicalFilter([
+            'and',
+            ['field_1', '=', 2],
+            ['or',
+                ['field_2', '>', 4],
+                ['field_2', '<', -4],
+            ],
+            ['field_3', '=', null],
+            ['field_2', '!=', null],
+        ]);
+
+        $filtered_filter = (new LogicalFilter(
+            ['and',
+                ['field',    '=',  'field_2'],
+                ['operator', '!=', '!='],
+            ],
+            new RuleFilterer
+        ))
+        ->applyOn( $filter_to_filter, function(AbstractRule $matching_rule, $key, array $siblings) {
+            // replace > and < by >= and <=
+            if ($matching_rule instanceof AboveRule)
+                $value = $matching_rule->getMinimum();
+            elseif ($matching_rule instanceof BelowRule)
+                $value = $matching_rule->getMaximum();
+
+            $siblings[$key] = new OrRule([
+                $matching_rule,
+                new EqualRule(
+                    $matching_rule->getField(),
+                    $value
+                )
+            ]);
+        })
+        // ->dump()
+        ;
+
+        $this->assertEquals(
+            ['and',
+                ['or',
+                    ['field_2', '>', 4],
+                    ['field_2', '<', -4],
+                ],
+            ],
+            $filtered_filter->toArray()
         );
     }
 

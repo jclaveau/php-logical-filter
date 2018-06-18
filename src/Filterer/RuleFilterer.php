@@ -55,6 +55,9 @@ class RuleFilterer extends Filterer
      */
     public function validateRule ($field, $operator, $value, $rule, $depth, $all_operands)
     {
+        // var_dump("$field, $operator, " . var_export($value, true));
+        // $rule->dump();
+
         if ($field === self::field) {
             if (!method_exists($rule, 'getField'))
                 return true;
@@ -148,7 +151,7 @@ class RuleFilterer extends Filterer
     /**
      * @param LogicalFilter $filter
      */
-    public function apply( LogicalFilter $filter, $ruleTree_to_filter, $action_on_matches=null )
+    public function apply( LogicalFilter $filter, $ruleTree_to_filter, $options=[] )
     {
         if ($ruleTree_to_filter instanceof AbstractRule)
             $ruleTree_to_filter = [$ruleTree_to_filter];
@@ -160,8 +163,9 @@ class RuleFilterer extends Filterer
             );
         }
 
-        //Produces "Only variables should be passed by reference" on Travis
-        $result = parent::apply($filter, $ruleTree_to_filter, $action_on_matches);
+        // Produces "Only variables should be passed by reference" on Travis
+        $result = parent::apply($filter, $ruleTree_to_filter, $options);
+
         return reset( $result );
     }
 

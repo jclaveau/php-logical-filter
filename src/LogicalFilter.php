@@ -33,18 +33,24 @@ class LogicalFilter implements \JsonSerializable
     /** @var  AndRule $rules */
     protected $rules;
 
+    /** @var  Filterer $default_filterer */
+    protected $default_filterer;
+
     /**
      * Creates a filter. You can provide a description of rules as in
      * addRules() as paramater.
      *
-     * @param  array $rules
+     * @param  array    $rules
+     * @param  Filterer $default_filterer
      *
      * @see self::addRules
      */
-    public function __construct(array $rules=[])
+    public function __construct(array $rules=[], Filterer $default_filterer=null)
     {
         if ($rules)
             $this->and_( $rules );
+
+        $this->default_filterer = $default_filterer ? : new PhpFilterer();
     }
 
     /**
@@ -457,23 +463,30 @@ class LogicalFilter implements \JsonSerializable
      */
     public function listRulesMatching($filter, $copy=true)
     {
-        $filter = (new LogicalFilter($filter))
+        $filter = (new LogicalFilter($filter, new RuleFilterer))
         // ->dump()
         ;
 
         $out = [];
-        (new RuleFilterer)->apply(
-            $filter,
-            $this->rules,
-            function($ruleTree_to_filter, $row_index, $matching_rule) use (&$out, $copy) {
-                if (    !$matching_rule instanceof AndRule
-                    &&  !$matching_rule instanceof OrRule
-                    &&  !$matching_rule instanceof NotRule
-                ) {
-                    $out[] = $copy ? $matching_rule->copy() : $matching_rule;
+        (new RuleFilterer)
+            ->setCustomActions(
+                Filterer::on_row_matches,
+                function(AbstractRule $matching_rule, $key, array $siblings) use (&$out, $copy) {
+
+                    if (    !$matching_rule instanceof AndRule
+                        &&  !$matching_rule instanceof OrRule
+                        &&  !$matching_rule instanceof NotRule
+                    ) {
+                        // $matching_rule->dump(true)
+                        // ;
+                        $out[] = $copy ? $matching_rule->copy() : $matching_rule;
+                    }
                 }
-            }
-        );
+            )
+            ->apply(
+                $filter,
+                $this->rules
+            );
 
         return $out;
     }
@@ -513,22 +526,28 @@ class LogicalFilter implements \JsonSerializable
      *
      * @return mixed The filtered data
      */
-    public function applyOn($data_to_filter, $filterer=null)
+    public function applyOn($data_to_filter, $action_on_matches=null, $filterer=null)
     {
         if ($filterer === null) {
-            $filterer = new PhpFilterer();
+            $filterer = $this->default_filterer;
         }
         elseif (is_callable($filterer)) {
             $filterer = new CustomizableFilterer($filterer);
         }
         elseif (!$filterer instanceof Filterer) {
             throw new \InvalidArgumentException(
-                 "The given $filterer must be null or a callable or a instance "
+                 "The given \$filterer must be null or a callable or a instance "
                 ."of Filterer instead of: ".var_export($filterer, true)
             );
         }
 
-        return $filterer->apply( $this, $data_to_filter );
+        if ($data_to_filter instanceof LogicalFilter) {
+            $filtered_rules = $filterer->apply( $this, $data_to_filter->getRules() );
+            return $data_to_filter->flushRules()->addRule( $filtered_rules );
+        }
+        else {
+            return $filterer->apply( $this, $data_to_filter );
+        }
     }
 
     /**/

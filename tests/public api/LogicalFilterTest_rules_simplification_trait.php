@@ -946,7 +946,7 @@ trait LogicalFilterTest_rules_simplification_trait
      */
     public function test_simplify_same_operands_which_are_operations()
     {
-        $this->markTestIncomplete("TODO not implement");
+        $this->markTestIncomplete("TODO not implemented");
         $filter = (new LogicalFilter([
             'or',
             ['and',

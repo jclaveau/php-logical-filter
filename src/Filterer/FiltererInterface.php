@@ -16,8 +16,7 @@ interface FiltererInterface
      * @param LogicalFilter $filter
      * @param Iterable      $data_to_filter
      */
-    // public function apply( LogicalFilter $filter, Iterable $dataToFilter )
-    public function apply( LogicalFilter $filter, $data_to_filter );
+    public function apply( LogicalFilter $filter, $tree_to_filter, $options=[] );
 
     public function validateRule ($field, $operator, $value, $row, $depth, $all_operands);
     /**/
