@@ -100,11 +100,16 @@ abstract class Filterer implements FiltererInterface
             // ->dump(true)
             ;
 
-        if (!$root_OrRule->hasSolution())
-            return null;
+        if ($root_OrRule !== null) {
+            if (!$root_OrRule->hasSolution())
+                return null;
 
-        $root_cases = $root_OrRule->toArray();
-        unset($root_cases[0]);
+            $root_cases = $root_OrRule->toArray();
+            unset($root_cases[0]);
+        }
+        else {
+            $root_cases = [];
+        }
 
         return $this->applyRecursion(
             $root_cases,
@@ -122,46 +127,51 @@ abstract class Filterer implements FiltererInterface
         foreach ($tree_to_filter as $row_index => $row_to_filter) {
             $operands_validation_row_cache = [];
 
-            $one_case_matches = false;
-
-            foreach ($root_cases as $and_case_index => $and_case_description) {
-                // The case is an AndRule so we remove the operator
-                unset($and_case_description[0]);
-
-                foreach ($and_case_description as $i => $rule_description) {
-                    $field    = $rule_description[0];
-                    $operator = $rule_description[1];
-                    $value    = $rule_description[2];
-
-                    $cache_key = $and_case_index.'~|~'.$field.'~|~'.$operator;
-
-                    if (!empty($operands_validation_row_cache[ $cache_key ])) {
-                        $is_valid = $operands_validation_row_cache[ $cache_key ];
-                    }
-                    else {
-                        $is_valid = $this->validateRule(
-                            $field,
-                            $operator,
-                            $value,
-                            $row_to_filter,
-                            $depth,
-                            $root_cases
-                        );
-
-                        $operands_validation_row_cache[ $cache_key ] = $is_valid;
-                    }
-
-                    // var_dump("$field $operator " . var_export($value, true) ." => ". var_export($is_valid, true));
-                    if (!$is_valid) {
-                        // one of the rules of the and_case do not validate
-                        // so all the and_case is invalid
-                        continue 2;
-                    }
-                }
-
+            if (!$root_cases) {
                 $one_case_matches = true;
-                // at least one and_case works so we can stop here
-                break;
+            }
+            else {
+                $one_case_matches = false;
+
+                foreach ($root_cases as $and_case_index => $and_case_description) {
+                    // The case is an AndRule so we remove the operator
+                    unset($and_case_description[0]);
+
+                    foreach ($and_case_description as $i => $rule_description) {
+                        $field    = $rule_description[0];
+                        $operator = $rule_description[1];
+                        $value    = $rule_description[2];
+
+                        $cache_key = $and_case_index.'~|~'.$field.'~|~'.$operator;
+
+                        if (!empty($operands_validation_row_cache[ $cache_key ])) {
+                            $is_valid = $operands_validation_row_cache[ $cache_key ];
+                        }
+                        else {
+                            $is_valid = $this->validateRule(
+                                $field,
+                                $operator,
+                                $value,
+                                $row_to_filter,
+                                $depth,
+                                $root_cases
+                            );
+
+                            $operands_validation_row_cache[ $cache_key ] = $is_valid;
+                        }
+
+                        // var_dump("$field $operator " . var_export($value, true) ." => ". var_export($is_valid, true));
+                        if (!$is_valid) {
+                            // one of the rules of the and_case do not validate
+                            // so all the and_case is invalid
+                            continue 2;
+                        }
+                    }
+
+                    $one_case_matches = true;
+                    // at least one and_case works so we can stop here
+                    break;
+                }
             }
 
             if ($one_case_matches) {

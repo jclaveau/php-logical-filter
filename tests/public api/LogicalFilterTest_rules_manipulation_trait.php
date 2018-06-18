@@ -299,7 +299,7 @@ trait LogicalFilterTest_rules_manipulation_trait
 
     /**
      */
-    public function test_filterRules_multiple()
+    public function test_listLeafRulesMatching_empty()
     {
         $filter = (new LogicalFilter(
             ['and',
@@ -311,13 +311,40 @@ trait LogicalFilterTest_rules_manipulation_trait
             ]
         ));
 
-        $rules = $filter->listRulesMatching([
-            ['operator', 'in', ['or', 'and']],
-            'or',
+        $rules = $filter->listLeafRulesMatching();
+
+        $this->assertEquals(
+            [
+                ['field_3', '<', 'a'],
+                ['field_5', '=', 12],
+                ['field_5', '>', 11],
+            ],
+            [
+                $rules[0]->toArray(),
+                $rules[1]->toArray(),
+                $rules[2]->toArray(),
+            ]
+        );
+    }
+
+    /**
+     */
+    public function test_listLeafRulesMatching_multiple()
+    {
+        $filter = (new LogicalFilter(
             ['and',
+                ['or',
+                    ['field_3', '<', 'a'],
+                    ['field_5', '=', 12],
+                ],
+                ['field_5', '>', 11],
+            ]
+        ));
+
+        $rules = $filter->listLeafRulesMatching([
+            'and',
                 ['field', '=', 'field_5'],
                 ['operator', '=', '>'],
-            ],
         ]);
 
         $this->assertEquals( 1, count($rules) );
@@ -340,7 +367,7 @@ trait LogicalFilterTest_rules_manipulation_trait
         );
 
         // copying rules
-        $rules = $filter->listRulesMatching([
+        $rules = $filter->listLeafRulesMatching([
             ['field', '=', 'field_5'],
             'and',
             ['operator', 'in', ['>', 'or', 'and']],

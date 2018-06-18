@@ -321,11 +321,13 @@ class LogicalFilter implements \JsonSerializable
      * @param  mixed The descriptions of the rules to add
      * @return $this
      *
+     * @todo
      * @todo remove the _ for PHP 7
      */
     public function or_()
     {
-        $this->addRules( OrRule::operator, func_get_args());
+        if ($this->rules !== null)
+            $this->addRules( OrRule::operator, func_get_args());
         return $this;
     }
 
@@ -461,11 +463,14 @@ class LogicalFilter implements \JsonSerializable
      *
      * @todo Merge with rules
      */
-    public function listRulesMatching($filter, $copy=true)
+    public function listLeafRulesMatching($filter=[], $copy=true)
     {
         $filter = (new LogicalFilter($filter, new RuleFilterer))
         // ->dump()
         ;
+
+        // Allow recursions into every operation rule
+        $filter->or_(['operator', 'in', ['or', 'and', 'not']]);
 
         $out = [];
         (new RuleFilterer)
