@@ -24,6 +24,23 @@ abstract class AbstractAtomicRule extends AbstractRule
     }
 
     /**
+     * @return string $field
+     */
+    public final function setField( $field )
+    {
+        if (!is_scalar($field)) {
+            throw new \InvalidArgumentEXception(
+                "\$field property of a logical rule must be a scalar contrary to: "
+                .var_export($field, true)
+            );
+        }
+
+        $this->field = $field;
+
+        return $this;
+    }
+
+    /**
      * @param  array|callable Associative array of renamings or callable
      *                        that would rename the fields.
      *
@@ -46,16 +63,6 @@ abstract class AbstractAtomicRule extends AbstractRule
         }
 
         return $this;
-    }
-
-    /**
-     * Atomic rules are always simplified
-     *
-     * @return bool
-     */
-    public function isSimplified()
-    {
-        return true;
     }
 
     /**/

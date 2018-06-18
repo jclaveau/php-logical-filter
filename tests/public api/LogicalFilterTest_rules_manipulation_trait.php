@@ -370,7 +370,7 @@ trait LogicalFilterTest_rules_manipulation_trait
         $rules = $filter->listLeafRulesMatching([
             ['field', '=', 'field_5'],
             'and',
-            ['operator', 'in', ['>', 'or', 'and']],
+            ['operator', 'in', ['>']],
         ], false)
         ;
 
