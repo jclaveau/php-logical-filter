@@ -484,12 +484,17 @@ abstract class AbstractOperationRule extends AbstractRule
      *
      * @return OperationRule A copy of the current instance with copied operands.
      */
-    public function copy()
+    public final function copy($token=null)
     {
+        // copying the instance first avoids the copy_cache array to be copied
         $copied_rule = clone $this;
+
+        if ($copy = $this->registerCopy($token))
+            return $copy;
+
         $copied_operands = [];
         foreach ($this->operands as $operand) {
-            $copied_operands[] = $operand->copy();
+            $copied_operands[] = $operand->copy($token);
         }
 
         VisibilityViolator::setHiddenProperty(
@@ -498,7 +503,37 @@ abstract class AbstractOperationRule extends AbstractRule
             $copied_operands
         );
 
+        $this->copy_cache = [];
+        // Emptying the gc once the explicitly required copy() has ended
+        if (!array_filter(func_get_args()))
+            gc_collect_cycles();
+
         return $copied_rule;
+    }
+
+
+    /** @var array $copy_cache */
+    private $copy_cache = [];
+
+    /**
+     */
+    protected final function registerCopy( &$token )
+    {
+        if ($token === null)
+            $token = $this->getInstanceId().'-'.uniqid();
+
+        if (!isset($this->copy_cache[ $token ]))
+            $this->copy_cache[$token] = [];
+
+        if (isset($this->copy_cache[$token][ $this->getInstanceId() ])) {
+            throw new \Exception(
+                 "Copying multiple times the same object during the copy recursion "
+                ."identified by $token: {$this->getInstanceId()} => " . $this
+            );
+            // return $this->copy_cache[$token][ $this->getInstanceId() ];
+        }
+
+        $this->copy_cache[$token][ $this->getInstanceId() ] = $this;
     }
 
     /**/
