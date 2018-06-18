@@ -469,14 +469,14 @@ class LogicalFilter implements \JsonSerializable
         // ->dump()
         ;
 
-        // Allow recursions into every operation rule
-        $filter->or_(['operator', 'in', ['or', 'and', 'not']]);
-
         $out = [];
         (new RuleFilterer)
-            ->setCustomActions(
-                Filterer::on_row_matches,
-                function(AbstractRule $matching_rule, $key, array $siblings) use (&$out, $copy) {
+            ->setCustomActions([
+                Filterer::on_row_matches => function(
+                    AbstractRule $matching_rule,
+                    $key,
+                    array $siblings
+                ) use (&$out, $copy) {
 
                     if (    !$matching_rule instanceof AndRule
                         &&  !$matching_rule instanceof OrRule
@@ -487,7 +487,7 @@ class LogicalFilter implements \JsonSerializable
                         $out[] = $copy ? $matching_rule->copy() : $matching_rule;
                     }
                 }
-            )
+            ])
             ->apply(
                 $filter,
                 $this->rules

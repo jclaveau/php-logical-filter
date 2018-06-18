@@ -25,24 +25,15 @@ abstract class Filterer implements FiltererInterface
 
     /** @var array $custom_actions */
     protected $custom_actions = [
-        self::on_row_matches    => null,
-        self::on_row_mismatches => null,
+        // self::on_row_matches    => null,
+        // self::on_row_mismatches => null,
     ];
 
     /**
      */
-    public function setCustomActions($action_name, callable $action)
+    public function setCustomActions(array $custom_actions)
     {
-        if (!array_key_exists($action_name, $this->custom_actions)) {
-            throw new \InvalidArgumentException(
-                "Custom action name must belong to ["
-                .implode(', ', array_keys($this->custom_actions) )
-                ."] contrary to '$action_name'."
-            );
-        }
-
-        $this->custom_actions[$action_name] = $action;
-
+        $this->custom_actions = $custom_actions;
         return $this;
     }
 
@@ -68,6 +59,12 @@ abstract class Filterer implements FiltererInterface
      */
     public function onRowMismatches(&$row, $key, &$rows)
     {
+        if (!$this->custom_actions) {
+            // Unset by default ONLY if NO custom action defined
+            unset($rows[$key]);
+            return;
+        }
+
         if (isset($this->custom_actions[ self::on_row_mismatches ])) {
             $args = [
                 &$row,
@@ -78,9 +75,6 @@ abstract class Filterer implements FiltererInterface
                 $this->custom_actions[ self::on_row_mismatches ],
                 $args
             );
-        }
-        else {
-            unset($rows[$key]);
         }
     }
 
@@ -137,11 +131,6 @@ abstract class Filterer implements FiltererInterface
         foreach ($tree_to_filter as $row_index => $row_to_filter) {
             $operands_validation_row_cache = [];
 
-            if (!$root_cases) {
-                $one_case_matches = true;
-                break;
-            }
-
             if ($children = $this->getChildren($row_to_filter)) {
                 $filtered_children = $this->applyRecursion(
                     $root_cases,
@@ -152,56 +141,61 @@ abstract class Filterer implements FiltererInterface
                 $this->setChildren($row_to_filter, $filtered_children);
             }
 
-            $matching_case = null;
-            foreach ($root_cases as $and_case_index => $and_case_description) {
+            if (!$root_cases) {
+                $matching_case = true;
+            }
+            else {
+                $matching_case = null;
+                foreach ($root_cases as $and_case_index => $and_case_description) {
 
-                $case_is_good = true;
-                foreach ($and_case_description->getOperands() as $i => $rule) {
+                    $case_is_good = true;
+                    foreach ($and_case_description->getOperands() as $i => $rule) {
 
-                    $field = method_exists($rule, 'getField')
-                           ? $rule->getField()
-                           : null;
+                        $field = method_exists($rule, 'getField')
+                               ? $rule->getField()
+                               : null;
 
-                    if ($rule instanceof AbstractOperationRule) {
-                        $value = $rule->getOperands();
+                        if ($rule instanceof AbstractOperationRule) {
+                            $value = $rule->getOperands();
+                        }
+                        else {
+                            // TODO set a getValue foir every leaf rule
+                            $value = $rule->toArray()[2];
+                        }
+
+                        $operator = $rule::operator;
+
+                        $cache_key = $and_case_index.'~|~'.$field.'~|~'.$operator;
+
+                        if (!empty($operands_validation_row_cache[ $cache_key ])) {
+                            $is_valid = $operands_validation_row_cache[ $cache_key ];
+                        }
+                        else {
+                            $is_valid = $this->validateRule(
+                                $field,
+                                $operator,
+                                $value,
+                                $row_to_filter,
+                                $depth,
+                                $root_cases
+                            );
+
+                            $operands_validation_row_cache[ $cache_key ] = $is_valid;
+                        }
+
+                        if (!$is_valid) {
+                            // one of the rules of the and_case do not validate
+                            // so all the and_case is invalid
+                            $case_is_good = false;
+                            break;
+                        }
                     }
-                    else {
-                        // TODO set a getValue foir every leaf rule
-                        $value = $rule->toArray()[2];
-                    }
 
-                    $operator = $rule::operator;
-
-                    $cache_key = $and_case_index.'~|~'.$field.'~|~'.$operator;
-
-                    if (!empty($operands_validation_row_cache[ $cache_key ])) {
-                        $is_valid = $operands_validation_row_cache[ $cache_key ];
-                    }
-                    else {
-                        $is_valid = $this->validateRule(
-                            $field,
-                            $operator,
-                            $value,
-                            $row_to_filter,
-                            $depth,
-                            $root_cases
-                        );
-
-                        $operands_validation_row_cache[ $cache_key ] = $is_valid;
-                    }
-
-                    if (!$is_valid) {
-                        // one of the rules of the and_case do not validate
-                        // so all the and_case is invalid
-                        $case_is_good = false;
+                    if ($case_is_good) {
+                        // at least one and_case works so we can stop here
+                        $matching_case = $and_case_description;
                         break;
                     }
-                }
-
-                if ($case_is_good) {
-                    // at least one and_case works so we can stop here
-                    $matching_case = $and_case_description;
-                    break;
                 }
             }
 
