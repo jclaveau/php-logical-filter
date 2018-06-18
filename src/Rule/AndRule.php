@@ -62,6 +62,11 @@ class AndRule extends AbstractOperationRule
                     );
                 }
             }
+            elseif ($operand instanceof InRule) {
+                // we disable the disjunctions rootification here to avoid
+                // explosion of ram consumption
+                $upLiftedOr = $this;
+            }
             elseif ($operand instanceof OrRule) {
                 // If an operand is an Or, me transform the current
                 // (A' || A") && (B')       <=> (A' && B') || (A" && B');
