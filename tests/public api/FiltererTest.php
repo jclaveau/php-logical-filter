@@ -19,6 +19,7 @@ class FiltererTest extends \PHPUnit_Framework_TestCase
             ],
             ['field_3', '=', null],
             ['field_4', '!=', null],
+            ['non_existing_field', '=', 8],
         ]);
 
         $data_to_filter = [
@@ -28,6 +29,7 @@ class FiltererTest extends \PHPUnit_Framework_TestCase
                 'field_2' => 12,
                 // no filed 3 <=> null
                 'field_4' => 12,
+                'non_existing_field' => 8,
             ],
             [
                 'name'    => '2: field_1 invalid',
@@ -47,6 +49,7 @@ class FiltererTest extends \PHPUnit_Framework_TestCase
                 'field_2' => -12,
                 'field_3' => null,
                 'field_4' => 0,
+                'non_existing_field' => 8,
             ],
             [
                 'name'    => '5: field_2 invalid',
@@ -81,6 +84,7 @@ class FiltererTest extends \PHPUnit_Framework_TestCase
                     'field_1' => 2,
                     'field_2' => 12,
                     'field_4' => 12,
+                    'non_existing_field' => 8,
                 ],
                 3 => [
                 'name'    => '4: valid row',
@@ -88,6 +92,7 @@ class FiltererTest extends \PHPUnit_Framework_TestCase
                     'field_2' => -12,
                     'field_3' => null,
                     'field_4' => 0,
+                    'non_existing_field' => 8,
                 ],
             ],
             $filtered_data

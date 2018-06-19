@@ -24,16 +24,29 @@ class PhpFilterer extends Filterer
             if ($value === null) {
                 $result = !isset($row[$field]);
             }
+            elseif (!isset($row[$field])) {
+                $result = false;
+            }
             else {
                 // TODO support strict comparisons
                 $result = $row[$field] == $value;
             }
         }
         elseif ($operator === BelowRule::operator) {
-            $result = $row[$field] < $value;
+            if (!isset($row[$field])) {
+                $result = false;
+            }
+            else {
+                $result = $row[$field] < $value;
+            }
         }
         elseif ($operator === AboveRule::operator) {
-            $result = $row[$field] > $value;
+            if (!isset($row[$field])) {
+                $result = false;
+            }
+            else {
+                $result = $row[$field] > $value;
+            }
         }
         elseif ($operator === NotEqualRule::operator) {
             if ($value === null) {
