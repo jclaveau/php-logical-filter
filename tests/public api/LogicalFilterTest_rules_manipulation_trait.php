@@ -1,6 +1,8 @@
 <?php
 namespace JClaveau\LogicalFilter;
 use       JClaveau\LogicalFilter\Filterer\RuleFilterer;
+use       JClaveau\LogicalFilter\Rule\InRule;
+use       JClaveau\LogicalFilter\Rule\AbstractRule;
 
 
 trait LogicalFilterTest_rules_manipulation_trait
@@ -396,9 +398,6 @@ trait LogicalFilterTest_rules_manipulation_trait
                 ->getOperands()[1]
                 // ->dump()
             ,
-            // [
-                // [$rules[0], $key, $parent]
-            // ]
             $rules[0]
         );
 
@@ -416,6 +415,42 @@ trait LogicalFilterTest_rules_manipulation_trait
                 // ->dump()
                 ,
             $rules[0]
+        );
+    }
+
+    /**
+     */
+    public function test_onEachRule()
+    {
+        $filter = (new LogicalFilter(
+            ['and',
+                ['or',
+                    ['field_3', '<', 'a'],
+                    ['field_5', '=', 12],
+                    ['field_6', '>', 11],
+                ],
+                ['field_5', '>', 8],
+            ]
+        ))
+        ->onEachRule(
+            ['operator', '=', '>'],
+            function (AbstractRule $rule, $key, array &$siblings) {
+                $siblings[ $key ] = new InRule(
+                    $rule->getField(), [13, 15, $rule->getMinimum() + 10]
+                );
+            }
+        );
+
+        $this->assertEquals(
+            ['and',
+                ['or',
+                    ['field_3', '<', 'a'],
+                    ['field_5', '=', 12],
+                    ['field_6', 'in', [13, 15, 21]],
+                ],
+                ['field_5', 'in', [13, 15, 18]],
+            ],
+            $filter->toArray()
         );
     }
 

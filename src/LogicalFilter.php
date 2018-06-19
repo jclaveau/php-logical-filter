@@ -515,7 +515,7 @@ class LogicalFilter implements \JsonSerializable
      *
      * @todo Merge with rules
      */
-    public function listLeafRulesMatching($filter=[], $copy=true)
+    public function listLeafRulesMatching($filter=[])
     {
         $filter = (new LogicalFilter($filter, new RuleFilterer))
         // ->dump()
@@ -525,30 +525,60 @@ class LogicalFilter implements \JsonSerializable
             return [];
 
         $out = [];
-        (new RuleFilterer)
-            ->setCustomActions([
+        (new RuleFilterer)->apply(
+            $filter,
+            $this->rules,
+            [
                 Filterer::on_row_matches => function(
                     AbstractRule $matching_rule,
                     $key,
                     array $siblings
-                ) use (&$out, $copy) {
+                ) use (&$out) {
 
                     if (    !$matching_rule instanceof AndRule
                         &&  !$matching_rule instanceof OrRule
                         &&  !$matching_rule instanceof NotRule
                     ) {
-                        // $matching_rule->dump(true)
-                        // ;
-                        $out[] = $copy ? $matching_rule->copy() : $matching_rule;
+                        $out[] = $matching_rule;
                     }
                 }
-            ])
-            ->apply(
-                $filter,
-                $this->rules
-            );
+            ]
+        );
 
         return $out;
+    }
+
+    /**
+     * @param  array|callable Associative array of renamings or callable
+     *                        that would rename the fields.
+     *
+     * @return array The rules matching the filter
+     *
+     *
+     * @todo Merge with rules
+     */
+    public function onEachRule($filter=[], $options)
+    {
+        $filter = (new LogicalFilter($filter, new RuleFilterer))
+        // ->dump()
+        ;
+
+        if (!$this->rules)
+            return [];
+
+        if (is_callable($options)) {
+            $options = [
+                Filterer::on_row_matches => $options,
+            ];
+        }
+
+        (new RuleFilterer)->apply(
+            $filter,
+            $this->rules,
+            $options
+        );
+
+        return $this;
     }
 
     /**
