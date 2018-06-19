@@ -16,7 +16,7 @@ class InRule extends OrRule
     const operator = 'in';
 
     /** @var integer simplification_threshold */
-    const simplification_threshold = 50;
+    const simplification_threshold = 20;
 
     /** @var string $field */
     protected $field;

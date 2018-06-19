@@ -508,8 +508,9 @@ abstract class AbstractOperationRule extends AbstractRule
 
         $this->copy_cache = [];
         // Emptying the gc once the explicitly required copy() has ended
-        if (!array_filter(func_get_args()))
-            gc_collect_cycles();
+        // too slow
+        // if (!array_filter(func_get_args()))
+            // gc_collect_cycles();
 
         return $copied_rule;
     }
