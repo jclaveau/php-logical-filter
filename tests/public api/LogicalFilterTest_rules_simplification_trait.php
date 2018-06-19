@@ -970,5 +970,61 @@ trait LogicalFilterTest_rules_simplification_trait
         );
     }
 
+    /**
+     */
+    public function test_do_not_simplify_if_possibilities_count_above_threshold()
+    {
+        // The constant InRule::simplification_threshold forbids the simplification
+        // of the InRule to avoid combinations explosion (and fatal error
+        // due to more than allowed ram used)
+        $filter = new LogicalFilter(['field', 'in', [
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+            4, 5, 6,
+        ]]);
+
+        $this->assertEquals(
+            ['field', 'in', [
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+                4, 5, 6,
+            ]],
+            $filter
+                ->simplify()
+                // ->dump()
+                ->toArray()
+        );
+    }
+
     /**/
 }

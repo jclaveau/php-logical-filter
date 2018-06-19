@@ -24,6 +24,9 @@ class OrRule extends AbstractOperationRule
     {
         $this->moveSimplificationStepForward( self::rootify_disjunctions );
 
+        if (!$this->isSimplificationAllowed())
+            return $this->copy();
+
         $upLiftedOperands = [];
         foreach ($this->getOperands() as $operand) {
             $operand = $operand->copy();

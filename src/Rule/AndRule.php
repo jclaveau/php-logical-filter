@@ -67,7 +67,8 @@ class AndRule extends AbstractOperationRule
                 // explosion of ram consumption
                 $upLiftedOr = $this;
             }
-            elseif ($operand instanceof OrRule) {
+            elseif ($operand instanceof OrRule && $operand->isSimplificationAllowed()) {
+
                 // If an operand is an Or, me transform the current
                 // (A' || A") && (B')       <=> (A' && B') || (A" && B');
                 // (A' || A") && (B' || B") <=> (A' && B') || (A' && B") || (A" && B') || (A" && B");

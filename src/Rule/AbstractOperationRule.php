@@ -127,7 +127,7 @@ abstract class AbstractOperationRule extends AbstractRule
             );
         }
 
-        if (!$force && $this->current_simplification_step != null) {
+        if ($this->isSimplificationAllowed() && !$force && $this->current_simplification_step != null) {
             $steps_indices = array_flip(self::simplification_steps);
 
             $current_index = $steps_indices[ $this->current_simplification_step ];
@@ -293,6 +293,9 @@ abstract class AbstractOperationRule extends AbstractRule
         $this->moveSimplificationStepForward( self::unify_atomic_operands );
 
         // $this->dump(true);
+
+        if (!$this->isSimplificationAllowed())
+            return $this;
 
         foreach ($this->operands as $operand) {
             if ($operand instanceof AbstractOperationRule) {
@@ -534,6 +537,13 @@ abstract class AbstractOperationRule extends AbstractRule
         }
 
         $this->copy_cache[$token][ $this->getInstanceId() ] = $this;
+    }
+
+    /**
+     */
+    public function isSimplificationAllowed()
+    {
+        return true;
     }
 
     /**/

@@ -15,8 +15,14 @@ class InRule extends OrRule
     /** @var string operator */
     const operator = 'in';
 
+    /** @var integer simplification_threshold */
+    const simplification_threshold = 50;
+
     /** @var string $field */
     protected $field;
+
+    /** @var string $field */
+    public $simplification_allowed = true;
 
     /**
      * @param string $field         The field to apply the rule on.
@@ -112,6 +118,8 @@ class InRule extends OrRule
             $this->operands[] = new EqualRule($this->getField(), $possibility);
         }
 
+        $this->simplification_allowed = count($this->operands) < self::simplification_threshold;
+
         return $this;
     }
 
@@ -127,6 +135,13 @@ class InRule extends OrRule
         ];
 
         return $description;
+    }
+
+    /**
+     */
+    public function isSimplificationAllowed()
+    {
+        return $this->simplification_allowed;
     }
 
     /**/
