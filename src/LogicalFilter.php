@@ -445,10 +445,62 @@ class LogicalFilter implements \JsonSerializable
      */
     public function removeRules($filter)
     {
-        $filter = new LogicalFilter(['not', $filter]);
+        $this->rules = (new RuleFilterer)->apply(
+            new LogicalFilter($filter),
+            $this->rules,
+            [
+                Filterer::on_row_matches => function($rule, $key, &$rows, $matching_case) {
+                    // $rule->dump();
+                    // $matching_case->dump(true);
+                    unset( $rows[$key] );
+                },
+                Filterer::on_row_mismatches => function($rule, $key, &$rows, $matching_case) {
+                    // $rule->dump();
+                    // $matching_case && $matching_case->dump(true);
+                }
+            ]
+        );
 
-        if ($this->rules) {
-            $this->rules = (new RuleFilterer)->apply($filter, $this->rules);
+        return $this;
+    }
+
+    /**
+     * @param  array|callable Associative array of renamings or callable
+     *                        that would rename the fields.
+     *
+     * @return array The rules matching the filter
+     *
+     *
+     * @todo Merge with rules
+     */
+    public function keepLeafRulesMatching($filter=[], array $options=[])
+    {
+        $clean_empty_branches = !isset($options['clean_empty_branches']) || $options['clean_empty_branches'];
+
+        $filter = (new LogicalFilter($filter, new RuleFilterer))
+        // ->dump()
+        ;
+
+        $this->rules = (new RuleFilterer)->apply($filter, $this->rules);
+        // $this->rules->dump();
+
+
+        // clean the remaining branches
+        if ($clean_empty_branches) {
+            $this->rules = (new RuleFilterer)->apply(
+                new LogicalFilter(['and',
+                    ['operator', 'in', ['or', 'and', 'not']],
+                    ['children', '=', 0],
+                ]),
+                $this->rules,
+                [
+                    Filterer::on_row_matches => function($rule, $key, &$rows) {
+                        unset( $rows[$key] );
+                    },
+                    Filterer::on_row_mismatches => function($rule, $key, &$rows) {
+                    }
+                ]
+            );
         }
 
         return $this;
@@ -468,6 +520,9 @@ class LogicalFilter implements \JsonSerializable
         $filter = (new LogicalFilter($filter, new RuleFilterer))
         // ->dump()
         ;
+
+        if (!$this->rules)
+            return [];
 
         $out = [];
         (new RuleFilterer)
@@ -516,10 +571,22 @@ class LogicalFilter implements \JsonSerializable
 
     /**
      */
-    public function dump($exit=false, $debug=false)
+    public function dump($exit=false, $debug=false, $callstack_depth = 2)
     {
-        if ($this->rules)
+        if ($this->rules) {
             $this->rules->dump($exit, $debug, 3);
+        }
+        else {
+            $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $callstack_depth);
+            $caller = $bt[ $callstack_depth - 2 ];
+
+            echo "\n" . $caller['file'] . ':' . $caller['line'] . "\n";
+            var_export($this->toArray($debug));
+            echo "\n\n";
+            if ($exit)
+                exit;
+        }
+
         return $this;
     }
 

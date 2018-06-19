@@ -18,26 +18,26 @@ class PhpFilterer extends Filterer
 {
     /**
      */
-    public function validateRule ($field, $operator, $value, $row, $depth, $all_operands)
+    public function validateRule ($field, $operator, $value, $row, $depth, $all_operands, $options)
     {
         if ($operator === EqualRule::operator) {
             if ($value === null) {
-                return !isset($row[$field]);
+                $result = !isset($row[$field]);
             }
             else {
                 // TODO support strict comparisons
-                return $row[$field] == $value;
+                $result = $row[$field] == $value;
             }
         }
         elseif ($operator === BelowRule::operator) {
-            return $row[$field] < $value;
+            $result = $row[$field] < $value;
         }
         elseif ($operator === AboveRule::operator) {
-            return $row[$field] > $value;
+            $result = $row[$field] > $value;
         }
         elseif ($operator === NotEqualRule::operator) {
             if ($value === null) {
-                return isset($row[$field]);
+                $result = isset($row[$field]);
             }
             else {
                 throw new \InvalidArgumentException(
@@ -51,6 +51,12 @@ class PhpFilterer extends Filterer
                 "Unhandled operator: " . $operator
             );
         }
+
+        // var_dump(
+            // "$field, $operator, " . var_export($value, true)
+             // . ' vs ' . var_export($row, true) . ' => ' . var_export($result, true)
+        // );
+        return $result;
     }
 
     /**/

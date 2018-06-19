@@ -52,15 +52,17 @@ class RuleFilterer extends Filterer
     }
 
     /**
+     *
+     * @return true | false | null
      */
-    public function validateRule ($field, $operator, $value, $rule, $depth, $all_operands)
+    public function validateRule ($field, $operator, $value, $rule, $depth, $all_operands, $options)
     {
         // var_dump("$field, $operator, " . var_export($value, true));
         // $rule->dump();
 
         if ($field === self::field) {
             if (!method_exists($rule, 'getField'))
-                return true;
+                return null; // The filter cannot be applied to this rule
 
             $value_to_compare = $rule->getField();
         }
@@ -76,7 +78,7 @@ class RuleFilterer extends Filterer
                 $value_to_compare = $description[2];
             }
             else {
-                return true;
+                return null; // The filter cannot be applied to this rule
             }
         }
         elseif ($field === self::description) {
@@ -84,7 +86,7 @@ class RuleFilterer extends Filterer
         }
         elseif ($field === self::depth) {
             // original $depth is lost once the filter is simplified
-            throw new \InvalidArgumentException('Path rule uppport not implemented');
+            throw new \InvalidArgumentException('Depth rule uppport not implemented');
             // $value_to_compare = $depth;
         }
         elseif ($field === self::path) {
@@ -93,7 +95,7 @@ class RuleFilterer extends Filterer
         }
         elseif ($field === self::children) {
             if (!method_exists($rule, 'getOperands'))
-                return true;
+                return null; // The filter cannot be applied to this rule
             $value_to_compare = count( $rule->getOperands() );
         }
         else {
@@ -111,7 +113,6 @@ class RuleFilterer extends Filterer
                 ."] contrary to : ".var_export($field, true)
             );
         }
-
 
         if ($operator === EqualRule::operator) {
             if ($value === null) {
@@ -144,6 +145,12 @@ class RuleFilterer extends Filterer
                 "Unhandled operator: " . $operator
             );
         }
+
+        // var_dump(
+            // "$field, $operator, " . var_export($value, true)
+             // . ' vs ' . $value_to_compare . ' => ' . var_export($out, true)
+        // );
+        // $rule->dump();
 
         return $out;
     }

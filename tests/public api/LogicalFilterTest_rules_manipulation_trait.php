@@ -7,10 +7,8 @@ trait LogicalFilterTest_rules_manipulation_trait
 {
     /**
      */
-    public function test_removeRules_simple()
+    public function test_removeRules_simple_field()
     {
-        /**/
-        // field
         $this->assertEquals(
             ['and',
                 ['or',
@@ -29,8 +27,12 @@ trait LogicalFilterTest_rules_manipulation_trait
             // ->dump(true)
             ->toArray()
         );
+    }
 
-        // operator
+    /**
+     */
+    public function test_removeRules_simple_operator()
+    {
         $this->assertEquals(
             ['and',
                 ['or',
@@ -51,8 +53,12 @@ trait LogicalFilterTest_rules_manipulation_trait
             // ->dump(true)
             ->toArray()
         );
+    }
 
-        // value
+    /**
+     */
+    public function test_removeRules_simple_value()
+    {
         $this->assertEquals(
             ['and',
                 ['or',
@@ -73,8 +79,12 @@ trait LogicalFilterTest_rules_manipulation_trait
             // ->dump(true)
             ->toArray()
         );
+    }
 
-        // children
+    /**
+     */
+    public function test_removeRules_simple_children()
+    {
         $this->assertEquals(
             ['and'],
             (new LogicalFilter(
@@ -87,14 +97,20 @@ trait LogicalFilterTest_rules_manipulation_trait
                     ],
                 ]
             ))
+            // ->dump(!true)
             ->removeRules(
                 ['children', '=', 4]
             )
             // ->dump(true)
             ->toArray()
         );
-        /**/
+    }
 
+
+    /**
+     */
+    public function test_removeRules_simple_description()
+    {
         // TODO description
         // $this->assertEquals(
             // ['and',
@@ -109,8 +125,12 @@ trait LogicalFilterTest_rules_manipulation_trait
                 // ->dump(true)
                 // ->toArray()
         // );
+    }
 
-
+    /**
+     */
+    public function test_removeRules_simple_depth()
+    {
         // TODO depth
         try {
             (new LogicalFilter(
@@ -136,8 +156,13 @@ trait LogicalFilterTest_rules_manipulation_trait
         catch (\InvalidArgumentException $e) {
            $this->assertTrue(true, "Exception thrown: ". $e->getMessage());
         }
+    }
 
-        // TODO path
+
+    /**
+     */
+    public function test_removeRules_simple_path()
+    {
         try {
             (new LogicalFilter(
                 ['and',
@@ -329,6 +354,17 @@ trait LogicalFilterTest_rules_manipulation_trait
 
     /**
      */
+    public function test_listLeafRulesMatching_of_an_empty_filter()
+    {
+        $filter = new LogicalFilter();
+
+        $rules = $filter->listLeafRulesMatching();
+
+        $this->assertEquals( [], $rules );
+    }
+
+    /**
+     */
     public function test_listLeafRulesMatching_multiple()
     {
         $filter = (new LogicalFilter(
@@ -473,5 +509,32 @@ trait LogicalFilterTest_rules_manipulation_trait
         );
     }
 
+    /**
+     */
+    public function test_keepLeafRulesMatching()
+    {
+        $filtered_filter = (new LogicalFilter([
+            'and',
+            ['field_1', '=', 2],
+            ['or',
+                ['field_2', '>', 4],
+                ['field_2', '<', -4],
+            ],
+            ['field_3', '=', null],
+            ['field_2', '!=', null],
+        ]))
+        ->keepLeafRulesMatching(
+            ['field', '=', 'field_1']
+        )
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            ['and',
+                ['field_1', '=', 2],
+            ],
+            $filtered_filter->toArray()
+        );
+    }
     /**/
 }

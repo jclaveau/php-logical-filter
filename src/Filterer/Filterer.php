@@ -39,43 +39,63 @@ abstract class Filterer implements FiltererInterface
 
     /**
      */
-    public function onRowMatches(&$row, $key, &$rows)
+    public function onRowMatches(&$row, $key, &$rows, $matching_case, $options)
     {
-        if (isset($this->custom_actions[ self::on_row_matches ])) {
-            $args = [
-                &$row,
-                $key,
-                &$rows,
-            ];
-
-            call_user_func_array(
-                $this->custom_actions[ self::on_row_matches ],
-                $args
-            );
+        if (isset($options[ self::on_row_matches ])) {
+            $callback = $options[ self::on_row_matches ];
         }
+        elseif (isset($this->custom_actions[ self::on_row_matches ])) {
+            $callback = $this->custom_actions[ self::on_row_matches ];
+        }
+        else {
+            return;
+        }
+
+        $args = [
+            // &$row,
+            $row,
+            $key,
+            &$rows,
+            $matching_case,
+            $options,
+        ];
+
+        call_user_func_array($callback, $args);
     }
 
     /**
      */
-    public function onRowMismatches(&$row, $key, &$rows)
+    public function onRowMismatches(&$row, $key, &$rows, $matching_case, $options)
     {
-        if (!$this->custom_actions) {
+        if (    ! $this->custom_actions
+            &&  ! isset($options[self::on_row_mismatches])
+            &&  ! isset($options[self::on_row_matches])
+        ) {
             // Unset by default ONLY if NO custom action defined
             unset($rows[$key]);
             return;
         }
 
-        if (isset($this->custom_actions[ self::on_row_mismatches ])) {
-            $args = [
-                &$row,
-                $key,
-                &$rows,
-            ];
-            call_user_func_array(
-                $this->custom_actions[ self::on_row_mismatches ],
-                $args
-            );
+        if (isset($options[ self::on_row_mismatches ])) {
+            $callback = $options[ self::on_row_mismatches ];
         }
+        elseif (isset($this->custom_actions[ self::on_row_mismatches ])) {
+            $callback = $this->custom_actions[ self::on_row_mismatches ];
+        }
+        else {
+            return;
+        }
+
+        $args = [
+            // &$row,
+            $row,
+            $key,
+            &$rows,
+            $matching_case,
+            $options,
+        ];
+
+        call_user_func_array($callback, $args);
     }
 
     /**
@@ -118,14 +138,15 @@ abstract class Filterer implements FiltererInterface
         return $this->applyRecursion(
             $root_cases,
             $tree_to_filter,
-            $depth=0
+            $depth=0,
+            $options
         );
     }
 
     /**
      * @todo use array_filter
      */
-    protected function applyRecursion(array $root_cases, $tree_to_filter, $depth)
+    protected function applyRecursion(array $root_cases, $tree_to_filter, $depth, $options=[])
     {
         // Once the rules are prepared, we parse the data
         foreach ($tree_to_filter as $row_index => $row_to_filter) {
@@ -135,7 +156,8 @@ abstract class Filterer implements FiltererInterface
                 $filtered_children = $this->applyRecursion(
                     $root_cases,
                     $children,
-                    $depth++
+                    $depth++,
+                    $options
                 );
 
                 $this->setChildren($row_to_filter, $filtered_children);
@@ -146,10 +168,10 @@ abstract class Filterer implements FiltererInterface
             }
             else {
                 $matching_case = null;
-                foreach ($root_cases as $and_case_index => $and_case_description) {
+                foreach ($root_cases as $and_case_index => $and_case) {
 
-                    $case_is_good = true;
-                    foreach ($and_case_description->getOperands() as $i => $rule) {
+                    $case_is_good = null;
+                    foreach ($and_case->getOperands() as $i => $rule) {
 
                         $field = method_exists($rule, 'getField')
                                ? $rule->getField()
@@ -159,7 +181,7 @@ abstract class Filterer implements FiltererInterface
                             $value = $rule->getOperands();
                         }
                         else {
-                            // TODO set a getValue foir every leaf rule
+                            // TODO set a getValue for every leaf rule
                             $value = $rule->toArray()[2];
                         }
 
@@ -177,34 +199,50 @@ abstract class Filterer implements FiltererInterface
                                 $value,
                                 $row_to_filter,
                                 $depth,
-                                $root_cases
+                                $root_cases,
+                                $options
                             );
 
                             $operands_validation_row_cache[ $cache_key ] = $is_valid;
                         }
 
-                        if (!$is_valid) {
+                        if ($is_valid === false) {
                             // one of the rules of the and_case do not validate
                             // so all the and_case is invalid
                             $case_is_good = false;
                             break;
                         }
+                        elseif ($is_valid === true) {
+                            // one of the rules of the and_case do not validate
+                            // so all the and_case is invalid
+                            $case_is_good = true;
+                        }
                     }
 
-                    if ($case_is_good) {
+                    if ($case_is_good === true) {
                         // at least one and_case works so we can stop here
-                        $matching_case = $and_case_description;
+                        $matching_case = $and_case;
                         break;
+                    }
+                    elseif ($case_is_good === false) {
+                        $matching_case = false;
+                    }
+                    elseif ($case_is_good === null) {
+                        // row out of scope
                     }
                 }
             }
 
             if ($matching_case) {
-                $this->onRowMatches($row_to_filter, $row_index, $tree_to_filter);
+                $this->onRowMatches($row_to_filter, $row_index, $tree_to_filter, $matching_case, $options);
             }
-            else {
+            elseif ($matching_case === false) {
                 // No case match the rule
-                $this->onRowMismatches($row_to_filter, $row_index, $tree_to_filter);
+                $this->onRowMismatches($row_to_filter, $row_index, $tree_to_filter, $matching_case, $options);
+            }
+            elseif ($matching_case === null) {
+                // We simply avoid rules
+                // row out of scope
             }
         }
 
