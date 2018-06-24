@@ -65,5 +65,18 @@ abstract class AbstractAtomicRule extends AbstractRule
         return $this;
     }
 
+    /**
+     */
+    public function toArray($debug=false)
+    {
+        $class = get_class($this);
+
+        return [
+            $this->getField(),
+            $debug ? $this->getInstanceId() : $class::operator,
+            $this->getValues(),
+        ];
+    }
+
     /**/
 }

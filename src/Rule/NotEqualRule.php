@@ -60,6 +60,13 @@ class NotEqualRule extends NotRule
 
     /**
      */
+    public function getValues()
+    {
+        return $this->getValue();
+    }
+
+    /**
+     */
     public function toArray($debug=false)
     {
         return [

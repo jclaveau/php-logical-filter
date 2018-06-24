@@ -30,14 +30,11 @@ class EqualRule extends AbstractAtomicRule
     }
 
     /**
+     * @return array
      */
-    public function toArray($debug=false)
+    public function getValues()
     {
-        return [
-            $this->field,
-            $debug ? $this->getInstanceId() : self::operator,
-            $this->value,
-        ];
+        return $this->getValue();
     }
 
     /**

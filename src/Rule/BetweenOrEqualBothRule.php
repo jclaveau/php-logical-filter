@@ -21,20 +21,13 @@ class BetweenOrEqualBothRule extends BetweenRule
     }
 
     /**
-     * @param bool $debug=false
      */
-    public function toArray($debug=false)
+    public function getValues()
     {
-        $description = [
-            $this->getField(),
-            $debug ? $this->getInstanceId() : self::operator,
-            [
-                $this->getMinimum(),
-                $this->getMaximum(),
-            ]
+        return [
+            $this->getMinimum(),
+            $this->getMaximum(),
         ];
-
-        return $description;
     }
 
     /**/

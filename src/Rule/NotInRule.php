@@ -35,6 +35,13 @@ class NotInRule extends NotRule
 
     /**
      */
+    public function getValues()
+    {
+        return $this->getPossibilities();
+    }
+
+    /**
+     */
     public function toArray($debug=false)
     {
         return [

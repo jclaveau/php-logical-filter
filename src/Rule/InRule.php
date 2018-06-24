@@ -124,17 +124,24 @@ class InRule extends OrRule
     }
 
     /**
-     * @param bool $debug=false
+     * @return array
+     */
+    public function getValues()
+    {
+        return $this->getPossibilities();
+    }
+
+    /**
      */
     public function toArray($debug=false)
     {
-        $description = [
-            $this->getField(),
-            $debug ? $this->getInstanceId() : self::operator,
-            $this->getPossibilities()
-        ];
+        $class = get_class($this);
 
-        return $description;
+        return [
+            $this->getField(),
+            $debug ? $this->getInstanceId() : $class::operator,
+            $this->getValues(),
+        ];
     }
 
     /**

@@ -61,13 +61,9 @@ class BelowRule extends AbstractAtomicRule
 
     /**
      */
-    public function toArray($debug=false)
+    public function getValues()
     {
-        return [
-            $this->field,
-            $debug ? $this->getInstanceId() : self::operator,
-            $this->maximum,
-        ];
+        return $this->getMaximum();
     }
 
     /**/

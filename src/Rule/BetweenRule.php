@@ -37,6 +37,17 @@ class BetweenRule extends AndRule
     }
 
     /**
+     * @return array
+     */
+    public function getValues()
+    {
+        return [
+            $this->getMinimum(),
+            $this->getMaximum(),
+        ];
+    }
+
+    /**
      */
     public function getField()
     {
@@ -67,20 +78,16 @@ class BetweenRule extends AndRule
     }
 
     /**
-     * @param bool $debug=false
      */
     public function toArray($debug=false)
     {
-        $description = [
-            $this->getField(),
-            $debug ? $this->getInstanceId() : self::operator,
-            [
-                $this->getMinimum(),
-                $this->getMaximum(),
-            ]
-        ];
+        $class = get_class($this);
 
-        return $description;
+        return [
+            $this->getField(),
+            $debug ? $this->getInstanceId() : $class::operator,
+            $this->getValues(),
+        ];
     }
 
     /**/

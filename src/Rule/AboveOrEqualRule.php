@@ -58,6 +58,14 @@ class AboveOrEqualRule extends OrRule
     }
 
     /**
+     * @return array
+     */
+    public function getValues()
+    {
+        return $this->getMinimum();
+    }
+
+    /**
      */
     public function toArray($debug=false)
     {
@@ -66,7 +74,7 @@ class AboveOrEqualRule extends OrRule
             return [
                 $this->getField(),
                 $debug ? $this->getInstanceId() : self::operator,
-                $this->getMinimum(),
+                $this->getValues(),
             ];
         }
         catch (\RuntimeException $e) {

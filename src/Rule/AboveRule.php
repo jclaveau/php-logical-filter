@@ -41,6 +41,14 @@ class AboveRule extends AbstractAtomicRule
     }
 
     /**
+     * @return array
+     */
+    public function getValues()
+    {
+        return $this->getMinimum();
+    }
+
+    /**
      * Checks if the rule do not expect the value to be above infinity.
      *
      * @return bool
@@ -57,17 +65,6 @@ class AboveRule extends AbstractAtomicRule
         }
 
         return true;
-    }
-
-    /**
-     */
-    public function toArray($debug=false)
-    {
-        return [
-            $this->field,
-            $debug ? $this->getInstanceId() : self::operator,
-            $this->minimum,
-        ];
     }
 
     /**/
