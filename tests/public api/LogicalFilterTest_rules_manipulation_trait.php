@@ -589,5 +589,25 @@ trait LogicalFilterTest_rules_manipulation_trait
         );
     }
 
+    /**
+     */
+    public function test_keepLeafRulesMatching_on_negation()
+    {
+        $filtered_filter = (new LogicalFilter(
+            ["id", "!in", [299,298]]
+        ))
+        ->keepLeafRulesMatching([
+            'and',
+            ['field', '=', 'other_field_name'],
+        ])
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            null, // TODO this would become TrueRule
+            $filtered_filter->toArray()
+        );
+    }
+
     /**/
 }

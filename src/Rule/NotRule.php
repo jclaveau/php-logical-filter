@@ -155,7 +155,7 @@ class NotRule extends AbstractOperationRule
     {
         return [
             $debug ? $this->getInstanceId() : self::operator,
-            $this->operands[0]->toArray($debug)
+            isset($this->operands[0]) ? $this->operands[0]->toArray($debug) : false
         ];
     }
 

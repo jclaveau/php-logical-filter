@@ -22,6 +22,14 @@ class NotInRule extends NotRule
      */
     public function getField()
     {
+        if (!isset($this->operands[0])) {
+            // TODO a NotRule with no operand should be simplified as
+            //      a TrueRule
+            throw new \LogicException(
+                "Trying to get the field of a negation missing its operand"
+            );
+        }
+
         return $this->operands[0]->getField();
     }
 
@@ -44,11 +52,16 @@ class NotInRule extends NotRule
      */
     public function toArray($debug=false)
     {
-        return [
-            $this->getField(),
-            $debug ? $this->getInstanceId() : self::operator,
-            $this->getPossibilities(),
-        ];
+        try {
+            return [
+                $this->getField(),
+                $debug ? $this->getInstanceId() : self::operator,
+                $this->getPossibilities(),
+            ];
+        }
+        catch (\LogicException $e) {
+            return parent::toArray();
+        }
     }
 
     /**/

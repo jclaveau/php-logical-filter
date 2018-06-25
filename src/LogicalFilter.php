@@ -489,7 +489,7 @@ class LogicalFilter implements \JsonSerializable
         if ($clean_empty_branches) {
             $this->rules = (new RuleFilterer)->apply(
                 new LogicalFilter(['and',
-                    ['operator', 'in', ['or', 'and', 'not']],
+                    ['operator', 'in', ['or', 'and', 'not', '!in']],
                     ['children', '=', 0],
                 ]),
                 $this->rules,

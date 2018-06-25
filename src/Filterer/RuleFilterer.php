@@ -26,6 +26,7 @@ use       JClaveau\LogicalFilter\Rule\AbstractRule;
  */
 class RuleFilterer extends Filterer
 {
+    const this       = 'instance';
     const field       = 'field';
     const operator    = 'operator';
     const value       = 'value';
@@ -64,7 +65,14 @@ class RuleFilterer extends Filterer
             if (!method_exists($rule, 'getField'))
                 return null; // The filter cannot be applied to this rule
 
-            $value_to_compare = $rule->getField();
+            try {
+                $value_to_compare = $rule->getField();
+            }
+            catch (\LogicException $e) {
+                // This is due to NotInRule.
+                // TODO replace it by a TrueRule in this case
+                return  null;
+            }
         }
         elseif ($field === self::operator) {
             $value_to_compare = $rule::operator;
