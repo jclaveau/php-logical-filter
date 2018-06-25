@@ -571,5 +571,23 @@ trait LogicalFilterTest_rules_manipulation_trait
             $filtered_filter->toArray()
         );
     }
+
+    /**
+     */
+    public function test_keepLeafRulesMatching_on_an_empty_filter()
+    {
+        $filtered_filter = (new LogicalFilter)
+        ->keepLeafRulesMatching(
+            ['field', '=', 'field_1']
+        )
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            null, // TODO this would become TrueRule
+            $filtered_filter->toArray()
+        );
+    }
+
     /**/
 }

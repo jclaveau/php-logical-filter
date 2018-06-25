@@ -160,6 +160,9 @@ class RuleFilterer extends Filterer
      */
     public function apply( LogicalFilter $filter, $ruleTree_to_filter, $options=[] )
     {
+        if (!$ruleTree_to_filter)
+            return $ruleTree_to_filter;
+
         if ($ruleTree_to_filter instanceof AbstractRule)
             $ruleTree_to_filter = [$ruleTree_to_filter];
 
