@@ -591,6 +591,30 @@ trait LogicalFilterTest_rules_manipulation_trait
 
     /**
      */
+    public function test_keepLeafRulesMatching_filtering_on_in_operator()
+    {
+        $filtered_filter = (new LogicalFilter(
+            ["and",
+                ["types", "in", ["my_type_1", "my_type_2"]],
+            ]
+        ))
+        ->keepLeafRulesMatching([
+            'and',
+            ['field',    '=',  'types'],
+            ['operator', 'in', ['=', 'in']],
+        ])
+        ;
+
+        $this->assertEquals(
+            ["and",
+                ["types", "in", ["my_type_1", "my_type_2"]],
+            ],
+            $filtered_filter->toArray()
+        );
+    }
+
+    /**
+     */
     public function test_keepLeafRulesMatching_on_negation()
     {
         $filtered_filter = (new LogicalFilter(

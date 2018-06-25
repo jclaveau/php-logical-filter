@@ -10,6 +10,9 @@ use       JClaveau\LogicalFilter\LogicalFilter;
 use       JClaveau\LogicalFilter\Rule\EqualRule;
 use       JClaveau\LogicalFilter\Rule\BelowRule;
 use       JClaveau\LogicalFilter\Rule\AboveRule;
+use       JClaveau\LogicalFilter\Rule\OrRule;
+use       JClaveau\LogicalFilter\Rule\AndRule;
+use       JClaveau\LogicalFilter\Rule\NotRule;
 use       JClaveau\LogicalFilter\Rule\NotEqualRule;
 use       JClaveau\LogicalFilter\Rule\AbstractOperationRule;
 use       JClaveau\LogicalFilter\Rule\AbstractRule;
@@ -58,8 +61,11 @@ class RuleFilterer extends Filterer
      */
     public function validateRule ($field, $operator, $value, $rule, $depth, $all_operands, $options)
     {
-        // var_dump("$field, $operator, " . var_export($value, true));
-        // $rule->dump();
+        if (    !empty($options['leafs_only'])
+            && in_array( get_class($rule), [OrRule::class, AndRule::class, NotRule::class] )
+        ) {
+            return true;
+        }
 
         if ($field === self::field) {
             if (!method_exists($rule, 'getField'))
@@ -154,17 +160,23 @@ class RuleFilterer extends Filterer
             );
         }
 
-        // var_dump(
-            // "$field, $operator, " . var_export($value, true)
-             // . ' vs ' . $value_to_compare . ' => ' . var_export($out, true)
-        // );
-        // $rule->dump();
+        if (!empty($options['debug'])) {
+            var_dump(
+                "$field, $operator, " . var_export($value, true)
+                 . ' ||  '. $value_to_compare . ' => ' . var_export($out, true)
+                 . "\n" . get_class($rule)
+                 . "\n" . var_export($options, true)
+            );
+            // $rule->dump();
+        }
 
         return $out;
     }
 
     /**
-     * @param LogicalFilter $filter
+     * @param LogicalFilter      $filter
+     * @param array|AbstractRule $ruleTree_to_filter
+     * @param array              $options leafs_only | debug
      */
     public function apply( LogicalFilter $filter, $ruleTree_to_filter, $options=[] )
     {

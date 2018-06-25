@@ -170,6 +170,9 @@ abstract class Filterer implements FiltererInterface
                 $matching_case = null;
                 foreach ($root_cases as $and_case_index => $and_case) {
 
+                    if (!empty($options['debug']))
+                        var_dump("Case $and_case_index: ".$and_case);
+
                     $case_is_good = null;
                     foreach ($and_case->getOperands() as $i => $rule) {
 
