@@ -1026,5 +1026,27 @@ trait LogicalFilterTest_rules_simplification_trait
         );
     }
 
+    /**
+     */
+    public function test_simplify_same_operands_with_same_casted_values()
+    {
+        $filter = (new LogicalFilter([
+            'or',
+            ['and',
+                ['field_6', '=', 3],
+                ['field_6', '=', '3'],
+            ],
+        ]))
+        ->simplify()
+        ;
+
+        $this->assertEquals(
+            ['field_6', '=', 3],
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
     /**/
 }

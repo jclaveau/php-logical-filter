@@ -320,15 +320,15 @@ abstract class AbstractOperationRule extends AbstractRule
                     $operands = [reset($operands)];
                 }
                 elseif ($operator == EqualRule::operator) {
-                    $operandsTmp = array_map(function($operand) {
-                        return serialize($operand);
-                    }, $operands);
+                    // TODO add an option for the support strict comparison
+                    foreach ($operands as $i => $operand) {
+                        if (isset($previous_operand) && $previous_operand == $operand) {
+                            unset($operands[$i]);
+                            continue;
+                        }
 
-                    $operandsTmp = array_unique($operandsTmp);
-
-                    $operands = array_map(function($operand) {
-                        return unserialize($operand);
-                    }, $operandsTmp);
+                        $previous_operand = $operand;
+                    }
                 }
 
                 $operandsByFields[ $field ][ $operator ] = $operands;
