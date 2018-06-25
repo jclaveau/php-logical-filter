@@ -182,6 +182,9 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function removeNegations()
     {
+        if (!$this->isSimplificationAllowed())
+            return $this;
+
         $this->moveSimplificationStepForward(self::remove_negations);
 
         foreach ($this->operands as $i => $operand) {
@@ -290,6 +293,9 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function unifyAtomicOperands($unifyDifferentOperands = true)
     {
+        if (!$this->isSimplificationAllowed())
+            return $this;
+
         $this->moveSimplificationStepForward( self::unify_atomic_operands );
 
         // $this->dump(true);

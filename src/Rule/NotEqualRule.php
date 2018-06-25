@@ -36,6 +36,9 @@ class NotEqualRule extends NotRule
      */
     public function rootifyDisjunctions()
     {
+        if (!$this->isSimplificationAllowed())
+            return $this;
+
         $this->moveSimplificationStepForward( self::rootify_disjunctions );
         return $this;
     }

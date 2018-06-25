@@ -22,7 +22,7 @@ class InRule extends OrRule
     protected $field;
 
     /** @var string $field */
-    public $simplification_allowed = true;
+    protected $simplification_allowed = true;
 
     /**
      * @param string $field         The field to apply the rule on.

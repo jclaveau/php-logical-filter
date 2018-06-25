@@ -20,6 +20,9 @@ class AndRule extends AbstractOperationRule
      */
     public function rootifyDisjunctions()
     {
+        if (!$this->isSimplificationAllowed())
+            return $this;
+
         $this->moveSimplificationStepForward( self::rootify_disjunctions );
 
         $upLiftedOperands = [];
@@ -61,11 +64,6 @@ class AndRule extends AbstractOperationRule
                         'UpLifting disjunctions MUST be done after negations removal'
                     );
                 }
-            }
-            elseif ($operand instanceof InRule) {
-                // we disable the disjunctions rootification here to avoid
-                // explosion of ram consumption
-                $upLiftedOr = $this;
             }
             elseif ($operand instanceof OrRule && $operand->isSimplificationAllowed()) {
 
@@ -125,6 +123,9 @@ class AndRule extends AbstractOperationRule
      */
     public function removeInvalidBranches()
     {
+        if (!$this->isSimplificationAllowed())
+            return $this;
+
         $this->moveSimplificationStepForward(self::remove_invalid_branches);
 
         foreach ($this->operands as $i => $operand) {

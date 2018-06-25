@@ -22,10 +22,10 @@ class OrRule extends AbstractOperationRule
      */
     public function rootifyDisjunctions()
     {
-        $this->moveSimplificationStepForward( self::rootify_disjunctions );
-
         if (!$this->isSimplificationAllowed())
             return $this->copy();
+
+        $this->moveSimplificationStepForward( self::rootify_disjunctions );
 
         $upLiftedOperands = [];
         foreach ($this->getOperands() as $operand) {
@@ -117,6 +117,9 @@ class OrRule extends AbstractOperationRule
      */
     public function removeInvalidBranches()
     {
+        if (!$this->isSimplificationAllowed())
+            return $this;
+
         $this->moveSimplificationStepForward(self::remove_invalid_branches);
 
         foreach ($this->operands as $i => $operand) {
@@ -145,6 +148,9 @@ class OrRule extends AbstractOperationRule
      */
     public function hasSolution()
     {
+        if (!$this->isSimplificationAllowed())
+            return true;
+
         if (!$this->simplicationStepReached(self::simplified)) {
             throw new \LogicException(
                 "hasSolution has no sens if the rule is not simplified instead of being at: "
