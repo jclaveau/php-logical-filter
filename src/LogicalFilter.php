@@ -385,7 +385,7 @@ class LogicalFilter implements \JsonSerializable
             return $this->rules->hasSolution();
         }
 
-        return $this->rules->copy()->simplify()->hasSolution();
+        return $this->copy()->simplify()->rules->hasSolution();
     }
 
     /**

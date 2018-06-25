@@ -1083,5 +1083,13 @@ trait LogicalFilterTest_rules_simplification_trait
         );
     }
 
+    /**
+     */
+    public function test_simplify_on_atomic_rule_without_saving()
+    {
+        $filter = new LogicalFilter(["field", "=", true]);
+        $this->assertTrue( $filter->hasSolution(false) );
+    }
+
     /**/
 }
