@@ -405,6 +405,8 @@ abstract class AbstractOperationRule extends AbstractRule
             );
         }
 
+        $this->cleanOperations();
+
         if ($step_to_stop_before == self::remove_negations)
             return $this;
 

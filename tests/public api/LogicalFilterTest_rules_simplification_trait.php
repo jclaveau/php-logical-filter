@@ -1112,40 +1112,6 @@ trait LogicalFilterTest_rules_simplification_trait
 
     /**
      * /
-    public function test_simplify_same_complex_operands()
-    {
-        $filter = (new LogicalFilter(
-            ["and",
-                ["or",
-                    ["field", '=', 'a'],
-                    ["field2", '>', 12],
-                ],
-            ]
-        ))
-        ->simplify()
-        // ->dump(true)
-        ;
-
-        $this->assertEquals(
-            ["and",
-                [
-                    "adserver_type",
-                    "in",
-                    [
-                        "INTERNE",
-                        "PROD",
-                        "MEDIABONG"
-                    ]
-                ],
-            ],
-            $filter
-                ->dump(true)
-                ->toArray()
-        );
-    }
-
-    /**
-     * /
     public function test_simplify_buggy()
     {
         // return;
