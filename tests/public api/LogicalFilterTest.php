@@ -20,10 +20,6 @@ class LogicalFilterTest extends \AbstractTest
     use LogicalFilterTest_rules_manipulation_trait;
     use LogicalFilterTest_rules_simplification_trait;
 
-    public static function setUpBeforeClass()
-    {
-    }
-
     /**
      */
     public function test_construct()

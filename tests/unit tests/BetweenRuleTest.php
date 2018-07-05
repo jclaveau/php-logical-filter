@@ -181,9 +181,5 @@ class BetweenRuleTest extends \AbstractTest
         );
     }
 
-    public function setUp() {
-        var_dump($this->getName());
-    }
-
     /**/
 }

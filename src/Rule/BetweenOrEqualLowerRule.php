@@ -44,6 +44,9 @@ class BetweenOrEqualLowerRule extends BetweenRule
      */
     public function getMaximum()
     {
+        if (!isset($this->operands[1]))
+            return $this->operands[0]->getValue();
+
         if ($this->operands[1] instanceof EqualRule)
             return $this->operands[1]->getValue();
 

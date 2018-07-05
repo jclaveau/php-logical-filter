@@ -5,8 +5,13 @@
 
 class AbstractTest extends \PHPUnit_Framework_TestCase
 {
-    public function setUp() {
-        var_dump($this->getName());
+    public static function setUpBeforeClass()
+    {
+    }
+
+    public function setUp()
+    {
+        echo( get_called_class() . '::' . $this->getName() ."\n" );
     }
 
     /**/

@@ -211,19 +211,31 @@ abstract class AbstractOperationRule extends AbstractRule
      *
      * @return $this;
      */
-    public function cleanOperations()
+    public function cleanOperations($recurse=true)
     {
-        foreach ($this->operands as $i => $operand) {
+        if ($recurse) foreach ($this->operands as $i => $operand) {
             if ($operand instanceof AbstractOperationRule) {
                 $this->operands[$i] = $operand->cleanOperations();
             }
         }
 
-        $this->removeSameOperationOperands();
-        $this->removeMonooperandOperationsOperands();
+        $is_modified = true;
+        while ($is_modified) {
+            $is_modified = false;
+
+            if ($this->removeSameOperands())
+                $is_modified = true;
+
+            if ($this->removeMonooperandOperationsOperands())
+                $is_modified = true;
+
+            if ($this->removeSameOperationOperands())
+                $is_modified = true;
+        }
 
         return $this;
     }
+
 
     /**
      * If a child is an OrRule or an AndRule and has only one child,
@@ -231,7 +243,7 @@ abstract class AbstractOperationRule extends AbstractRule
      *
      * @used-by removeSameOperationOperands() Ping-pong recursion
      *
-     * @return $thi_s;
+     * @return bool If something has been simplified or not
      */
     public function removeMonooperandOperationsOperands()
     {
@@ -245,26 +257,22 @@ abstract class AbstractOperationRule extends AbstractRule
                 &&  count($sub_operands) == 1
             ) {
                 $this->operands[$i] = reset($sub_operands);
-                $possible_same_operations_operands = true;
+                $has_been_changed = true;
             }
         }
 
-        if (isset($possible_same_operations_operands)) {
-            $this->removeSameOperationOperands();
-        }
-
-        return $this;
+        return !empty($has_been_changed);
     }
 
     /**
-     * @used-by removeMonooperandOperationsOperands() Ping-pong recursion
+     * Remove AndRules operands of AndRules and OrRules of OrRules.
      */
     public function removeSameOperationOperands()
     {
         $this->is_clean = true;
 
         if ($this instanceof NotRule)
-            return $this;
+            return false;
 
         foreach ($this->operands as $i => $operand) {
             if (get_class($operand) == get_class($this)) {
@@ -274,16 +282,31 @@ abstract class AbstractOperationRule extends AbstractRule
                 }
                 unset($this->operands[$i]);
 
-                // possibility of mono-operand
-                $possible_monooperands = true;
+                // possibility of mono-operand or dupicates
+                $has_been_changed = true;
             }
         }
 
-        if (isset($possible_monooperands)) {
-            $this->removeMonooperandOperationsOperands();
+        return !empty($has_been_changed);
+    }
+
+    /**
+     * Removes same operands even if they are not leaves.
+     *
+     * @return bool
+     */
+    public function removeSameOperands()
+    {
+        $operands_count = count($this->operands);
+
+        $cleaned_operands = [];
+        foreach ($this->operands as $operand) {
+            $cleaned_operands[ $operand->__toString() ] = $operand;
         }
 
-        return $this;
+        $this->operands = array_values($cleaned_operands);
+
+        return $operands_count != count( $this->operands );
     }
 
     /**
@@ -440,8 +463,7 @@ abstract class AbstractOperationRule extends AbstractRule
                 return $instance;
 
             $operands = (new AndRule([$instance]))
-                ->removeSameOperationOperands()
-                ->removeMonooperandOperationsOperands()
+                ->cleanOperations(false)
                 // ->dump(true)
                 ->getOperands();
 

@@ -52,6 +52,10 @@ class BetweenRule extends AndRule
     public function getField()
     {
         $field1 = $this->operands[0]->getField();
+
+        if (!isset($this->operands[1]))
+            return $field1;
+
         $field2 = $this->operands[1]->getField();
 
         if ($field1 != $field2) {
@@ -83,11 +87,16 @@ class BetweenRule extends AndRule
     {
         $class = get_class($this);
 
-        return [
-            $this->getField(),
-            $debug ? $this->getInstanceId() : $class::operator,
-            $this->getValues(),
-        ];
+        try {
+            return [
+                $this->getField(),
+                $debug ? $this->getInstanceId() : $class::operator,
+                $this->getValues(),
+            ];
+        }
+        catch (\RuntimeException $e) {
+            return parent::toArray();
+        }
     }
 
     /**/
