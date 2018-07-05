@@ -338,26 +338,39 @@ abstract class AbstractOperationRule extends AbstractRule
         // unifying same operands
         foreach ($operandsByFields as $field => $operandsByOperator) {
 
+            unset($previous_operand);
             foreach ($operandsByOperator as $operator => $operands) {
 
-                if ($operator == AboveRule::operator) {
-                    usort($operands, [$this, 'aboveRuleUnifySorter']);
-                    $operands = [reset($operands)];
-                }
-                elseif ($operator == BelowRule::operator) {
-                    usort($operands, [$this, 'belowRuleUnifySorter']);
-                    $operands = [reset($operands)];
-                }
-                elseif ($operator == EqualRule::operator) {
-                    // TODO add an option for the support strict comparison
-                    foreach ($operands as $i => $operand) {
-                        if (isset($previous_operand) && $previous_operand == $operand) {
-                            unset($operands[$i]);
-                            continue;
-                        }
-
-                        $previous_operand = $operand;
+                try {
+                    if ($operator == AboveRule::operator) {
+                        usort($operands, [$this, 'aboveRuleUnifySorter']);
+                        $operands = [reset($operands)];
                     }
+                    elseif ($operator == BelowRule::operator) {
+                        usort($operands, [$this, 'belowRuleUnifySorter']);
+                        $operands = [reset($operands)];
+                    }
+                    elseif ($operator == EqualRule::operator) {
+                        // TODO add an option for the support strict comparison
+                        foreach ($operands as $i => $operand) {
+                            if (isset($previous_operand) && $previous_operand == $operand) {
+                                unset($operands[$i]);
+                                continue;
+                            }
+
+                            $previous_operand = $operand;
+                        }
+                    }
+                }
+                catch (\Exception $e) {
+                    VisibilityViolator::setHiddenProperty($e, 'message', $e->getMessage() . "\n" . var_export([
+                            'previous_operand' => $previous_operand,
+                            'operand'          => $operand,
+                        ], true)
+                    );
+
+                    // \Debug::dumpJson($this->toArray(), true);
+                    throw $e;
                 }
 
                 $operandsByFields[ $field ][ $operator ] = $operands;

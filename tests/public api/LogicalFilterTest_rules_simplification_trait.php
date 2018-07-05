@@ -1210,5 +1210,75 @@ trait LogicalFilterTest_rules_simplification_trait
         );
     }
 
+    /**
+     */
+    public function test_simplify_equal_rules_with_fields_having_different_types()
+    {
+        // This produced a bug due to comparisons between different fields
+        // and missing unset
+        $filter = (new LogicalFilter(
+            ["and",
+                [
+                    "adserver_type",
+                    "=",
+                    "INTERNE"
+                ],
+                [
+                    "adserver_id",
+                    ">",
+                    0
+                ],
+                [
+                    "adserver_id",
+                    ">",
+                    12
+                ],
+                [
+                    "adserver_id",
+                    ">=",
+                    100
+                ],
+                [
+                    "adserver_id",
+                    "<",
+                    2000
+                ],
+                [
+                    "adserver_id",
+                    "=",
+                    100
+                ],
+                [
+                    "date",
+                    "=",
+                    new \DateTime('2018-07-04')
+                ],
+                [
+                    "event",
+                    "=",
+                    "impression"
+                ],
+            ]
+        ))
+        ->simplify([
+        ])
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ['adserver_type', '=', 'INTERNE'],
+                    ['adserver_id', '=', 100],
+                    ['date', '=', new \DateTime('2018-07-04')],
+                    ['event', '=', 'impression'],
+                ],
+            ],
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
     /**/
 }
