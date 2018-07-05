@@ -15,7 +15,7 @@ use JClaveau\LogicalFilter\Rule\BelowRule;
 require  __DIR__ . "/LogicalFilterTest_rules_manipulation_trait.php";
 require  __DIR__ . "/LogicalFilterTest_rules_simplification_trait.php";
 
-class LogicalFilterTest extends \PHPUnit_Framework_TestCase
+class LogicalFilterTest extends \AbstractTest
 {
     use LogicalFilterTest_rules_manipulation_trait;
     use LogicalFilterTest_rules_simplification_trait;

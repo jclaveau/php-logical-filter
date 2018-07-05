@@ -4,7 +4,7 @@ namespace JClaveau\LogicalFilter\Rule;
 use JClaveau\VisibilityViolator\VisibilityViolator;
 use JClaveau\LogicalFilter\LogicalFilter;
 
-class BetweenRuleTest extends \PHPUnit_Framework_TestCase
+class BetweenRuleTest extends \AbstractTest
 {
     /**
      */
@@ -179,6 +179,10 @@ class BetweenRuleTest extends \PHPUnit_Framework_TestCase
             // ->dump()
             ->toArray()
         );
+    }
+
+    public function setUp() {
+        var_dump($this->getName());
     }
 
     /**/

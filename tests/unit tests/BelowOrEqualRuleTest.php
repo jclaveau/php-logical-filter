@@ -3,7 +3,7 @@ namespace JClaveau\LogicalFilter\Rule;
 
 use JClaveau\VisibilityViolator\VisibilityViolator;
 
-class BelowOrEqualRuleTest extends \PHPUnit_Framework_TestCase
+class BelowOrEqualRuleTest extends \AbstractTest
 {
     /**
      */

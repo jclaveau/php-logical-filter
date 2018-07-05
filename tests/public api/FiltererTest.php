@@ -4,7 +4,7 @@ namespace JClaveau\LogicalFilter\Filterer;
 use JClaveau\VisibilityViolator\VisibilityViolator;
 use JClaveau\LogicalFilter\LogicalFilter;
 
-class FiltererTest extends \PHPUnit_Framework_TestCase
+class FiltererTest extends \AbstractTest
 {
     /**
      */
