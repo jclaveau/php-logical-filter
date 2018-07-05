@@ -38,6 +38,11 @@ class NotInRule extends NotRule
      */
     public function getPossibilities()
     {
+        if ($this->operands[0] instanceof EqualRule) {
+            // In can be simplified in =
+            return [$this->operands[0]->getValue()];
+        }
+
         return $this->operands[0]->getPossibilities();
     }
 
