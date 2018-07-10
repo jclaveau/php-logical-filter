@@ -1,4 +1,4 @@
-JClaveau\LogicalFilter\Rule\BetweenRule
+JClaveau\LogicalFilter\Rule\BetweenOrEqualBothRule
 ===============
 
 Logical conjunction:
@@ -6,9 +6,9 @@ Logical conjunction:
 
 
 
-* Class name: BetweenRule
+* Class name: BetweenOrEqualBothRule
 * Namespace: JClaveau\LogicalFilter\Rule
-* Parent class: [JClaveau\LogicalFilter\Rule\AndRule](JClaveau-LogicalFilter-Rule-AndRule.md)
+* Parent class: [JClaveau\LogicalFilter\Rule\BetweenRule](JClaveau-LogicalFilter-Rule-BetweenRule.md)
 
 
 
@@ -39,11 +39,26 @@ Methods
 
 
 * Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\BetweenRule](JClaveau-LogicalFilter-Rule-BetweenRule.md)
 
 
 #### Arguments
 * $field **mixed**
 * $limits **array**
+
+
+
+### getValues
+
+    array JClaveau\LogicalFilter\Rule\BetweenRule::getValues()
+
+
+
+
+
+* Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\BetweenRule](JClaveau-LogicalFilter-Rule-BetweenRule.md)
+
 
 
 
@@ -56,6 +71,7 @@ Methods
 
 
 * Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\BetweenRule](JClaveau-LogicalFilter-Rule-BetweenRule.md)
 
 
 
@@ -69,19 +85,7 @@ Methods
 
 
 * Visibility: **public**
-
-
-
-
-### getValues
-
-    array JClaveau\LogicalFilter\Rule\BetweenRule::getValues()
-
-
-
-
-
-* Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\BetweenRule](JClaveau-LogicalFilter-Rule-BetweenRule.md)
 
 
 
@@ -95,6 +99,7 @@ Methods
 
 
 * Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\BetweenRule](JClaveau-LogicalFilter-Rule-BetweenRule.md)
 
 
 

@@ -1,4 +1,4 @@
-JClaveau\LogicalFilter\Rule\BetweenRule
+JClaveau\LogicalFilter\Rule\BetweenOrEqualUpperRule
 ===============
 
 Logical conjunction:
@@ -6,9 +6,9 @@ Logical conjunction:
 
 
 
-* Class name: BetweenRule
+* Class name: BetweenOrEqualUpperRule
 * Namespace: JClaveau\LogicalFilter\Rule
-* Parent class: [JClaveau\LogicalFilter\Rule\AndRule](JClaveau-LogicalFilter-Rule-AndRule.md)
+* Parent class: [JClaveau\LogicalFilter\Rule\BetweenRule](JClaveau-LogicalFilter-Rule-BetweenRule.md)
 
 
 
@@ -39,6 +39,7 @@ Methods
 
 
 * Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\BetweenRule](JClaveau-LogicalFilter-Rule-BetweenRule.md)
 
 
 #### Arguments
@@ -56,6 +57,7 @@ Methods
 
 
 * Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\BetweenRule](JClaveau-LogicalFilter-Rule-BetweenRule.md)
 
 
 
@@ -69,6 +71,7 @@ Methods
 
 
 * Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\BetweenRule](JClaveau-LogicalFilter-Rule-BetweenRule.md)
 
 
 
@@ -82,6 +85,7 @@ Methods
 
 
 * Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\BetweenRule](JClaveau-LogicalFilter-Rule-BetweenRule.md)
 
 
 
@@ -95,6 +99,7 @@ Methods
 
 
 * Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\BetweenRule](JClaveau-LogicalFilter-Rule-BetweenRule.md)
 
 
 

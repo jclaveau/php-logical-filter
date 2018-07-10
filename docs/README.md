@@ -18,6 +18,15 @@ API Index
             * [AbstractAtomicRule](JClaveau-LogicalFilter-Rule-AbstractAtomicRule.md)
             * [AndRule](JClaveau-LogicalFilter-Rule-AndRule.md)
             * [BelowRule](JClaveau-LogicalFilter-Rule-BelowRule.md)
+            * [BetweenOrEqualUpperRule](JClaveau-LogicalFilter-Rule-BetweenOrEqualUpperRule.md)
+            * [BetweenOrEqualBothRule](JClaveau-LogicalFilter-Rule-BetweenOrEqualBothRule.md)
+            * [BetweenOrEqualLowerRule](JClaveau-LogicalFilter-Rule-BetweenOrEqualLowerRule.md)
+        * JClaveau\LogicalFilter\Filterer
+            * [CustomizableFilterer](JClaveau-LogicalFilter-Filterer-CustomizableFilterer.md)
+            * [FiltererInterface](JClaveau-LogicalFilter-Filterer-FiltererInterface.md)
+            * [Filterer](JClaveau-LogicalFilter-Filterer-Filterer.md)
+            * [PhpFilterer](JClaveau-LogicalFilter-Filterer-PhpFilterer.md)
+            * [RuleFilterer](JClaveau-LogicalFilter-Filterer-RuleFilterer.md)
         * [LogicalFilter](JClaveau-LogicalFilter-LogicalFilter.md)
         * JClaveau\LogicalFilter\Converter
             * [CustomizableMinimalConverter](JClaveau-LogicalFilter-Converter-CustomizableMinimalConverter.md)
@@ -25,9 +34,4 @@ API Index
             * [ConverterInterface](JClaveau-LogicalFilter-Converter-ConverterInterface.md)
             * [MinimalConverter](JClaveau-LogicalFilter-Converter-MinimalConverter.md)
             * [ElasticSearchMinimalConverter](JClaveau-LogicalFilter-Converter-ElasticSearchMinimalConverter.md)
-        * JClaveau\LogicalFilter\Filterer
-            * [Filterer](JClaveau-LogicalFilter-Filterer-Filterer.md)
-            * [PhpFilterer](JClaveau-LogicalFilter-Filterer-PhpFilterer.md)
-            * [FiltererInterface](JClaveau-LogicalFilter-Filterer-FiltererInterface.md)
-            * [CustomizableFilterer](JClaveau-LogicalFilter-Filterer-CustomizableFilterer.md)
 

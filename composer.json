@@ -10,7 +10,7 @@
             "role": "Developer"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4" : {
             "JClaveau\\LogicalFilter\\" : "src"
@@ -32,6 +32,11 @@
         },
         {
             "type": "vcs",
+            "url": "https://github.com/jclaveau/phpunit-testlistener-xhprof",
+            "no-api": true
+        },
+        {
+            "type": "vcs",
             "url": "https://github.com/webD97/phpdoc-md",
             "no-api": true
         }
@@ -40,7 +45,7 @@
         "phpunit/phpunit": "5.*",
         "webD97/phpdoc-md": "~0.2.0",
         "phpdocumentor/phpdocumentor": "~2.8.0",
-        "lightair/phpunit-testlistener-xhprof": "^1.0@dev",
+        "jclaveau/phpunit-testlistener-xhprof": "dev-master",
         "jclaveau/xhprof": "dev-master"
     },
     "require": {

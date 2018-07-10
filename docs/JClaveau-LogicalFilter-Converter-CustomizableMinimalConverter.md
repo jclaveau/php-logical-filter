@@ -10,7 +10,7 @@ related to the rules parsing.
 * Class name: CustomizableMinimalConverter
 * Namespace: JClaveau\LogicalFilter\Converter
 * Parent class: [JClaveau\LogicalFilter\Converter\MinimalConverter](JClaveau-LogicalFilter-Converter-MinimalConverter.md)
-* This class implements: [JClaveau\LogicalFilter\Converter\ConverterInterface](JClaveau-LogicalFilter-Converter-ConverterInterface.md)
+
 
 
 

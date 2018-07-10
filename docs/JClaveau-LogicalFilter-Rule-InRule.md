@@ -25,6 +25,14 @@ Constants
 
 
 
+### simplification_threshold
+
+    const simplification_threshold = 20
+
+
+
+
+
 Properties
 ----------
 
@@ -32,6 +40,17 @@ Properties
 ### $field
 
     protected string $field
+
+
+
+
+
+* Visibility: **protected**
+
+
+### $simplification_allowed
+
+    protected string $simplification_allowed = true
 
 
 
@@ -74,6 +93,22 @@ Methods
 
 
 
+### renameFields
+
+    \JClaveau\LogicalFilter\Rule\AbstractAtomicRule JClaveau\LogicalFilter\Rule\InRule::renameFields($renamings)
+
+
+
+
+
+* Visibility: **public**
+
+
+#### Arguments
+* $renamings **mixed**
+
+
+
 ### getPossibilities
 
     array JClaveau\LogicalFilter\Rule\InRule::getPossibilities()
@@ -103,6 +138,35 @@ Methods
 
 
 
+### setPossibilities
+
+    \JClaveau\LogicalFilter\Rule\InRule JClaveau\LogicalFilter\Rule\InRule::setPossibilities($possibilities)
+
+
+
+
+
+* Visibility: **public**
+
+
+#### Arguments
+* $possibilities **mixed**
+
+
+
+### getValues
+
+    array JClaveau\LogicalFilter\Rule\InRule::getValues()
+
+
+
+
+
+* Visibility: **public**
+
+
+
+
 ### toArray
 
     mixed JClaveau\LogicalFilter\Rule\OrRule::toArray($debug)
@@ -117,6 +181,19 @@ Methods
 
 #### Arguments
 * $debug **mixed**
+
+
+
+### isSimplificationAllowed
+
+    mixed JClaveau\LogicalFilter\Rule\InRule::isSimplificationAllowed()
+
+
+
+
+
+* Visibility: **public**
+
 
 
 
@@ -141,7 +218,10 @@ Replace all the OrRules of the RuleTree by one OrRule at its root.
 This is called by the unifyAtomicOperands() method to choose which AboveRule
 to keep for a given field.
 
-It's used as a usort() parameter.
+It's used as a usort() parameter:
++ return -1 that moves the $b variable down the array
++ return  1 moves $b up the array
++ return  0 keeps $b in the same place.
 
 * Visibility: **protected**
 * This method is defined by [JClaveau\LogicalFilter\Rule\OrRule](JClaveau-LogicalFilter-Rule-OrRule.md)
@@ -160,7 +240,10 @@ It's used as a usort() parameter.
 This is called by the unifyAtomicOperands() method to choose which BelowRule
 to keep for a given field.
 
-It's used as a usort() parameter.
+It's used as a usort() parameter:
++ return -1 that moves the $b variable down the array
++ return  1 moves $b up the array
++ return  0 keeps $b in the same place.
 
 * Visibility: **protected**
 * This method is defined by [JClaveau\LogicalFilter\Rule\OrRule](JClaveau-LogicalFilter-Rule-OrRule.md)

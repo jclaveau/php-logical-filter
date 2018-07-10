@@ -52,7 +52,7 @@ Properties
 
 ### $ruleAliases
 
-    protected array $ruleAliases = array('!' => 'not', '=' => 'equal', '>' => 'above', '<' => 'below', '><' => 'between', '<=' => 'below_or_equal', '>=' => 'above_or_equal', '!=' => 'not_equal', 'in' => 'in', '!in' => 'not_in')
+    protected array $ruleAliases = array('!' => 'not', '=' => 'equal', '>' => 'above', '<' => 'below', '><' => 'between', '=><' => 'between_or_equal_lower', '><=' => 'between_or_equal_upper', '=><=' => 'between_or_equal_both', '<=' => 'below_or_equal', '>=' => 'above_or_equal', '!=' => 'not_equal', 'in' => 'in', '!in' => 'not_in')
 
 
 
@@ -109,9 +109,9 @@ Checks if the rule do not expect the value to be above infinity.
 
 
 
-### toArray
+### getValues
 
-    mixed JClaveau\LogicalFilter\Rule\BelowRule::toArray($debug)
+    mixed JClaveau\LogicalFilter\Rule\BelowRule::getValues()
 
 
 
@@ -119,9 +119,6 @@ Checks if the rule do not expect the value to be above infinity.
 
 * Visibility: **public**
 
-
-#### Arguments
-* $debug **mixed**
 
 
 
@@ -139,17 +136,54 @@ Checks if the rule do not expect the value to be above infinity.
 
 
 
-### isSimplified
+### setField
 
-    boolean JClaveau\LogicalFilter\Rule\AbstractAtomicRule::isSimplified()
+    string JClaveau\LogicalFilter\Rule\AbstractAtomicRule::setField($field)
 
-Atomic rules are always simplified
+
 
 
 
 * Visibility: **public**
 * This method is defined by [JClaveau\LogicalFilter\Rule\AbstractAtomicRule](JClaveau-LogicalFilter-Rule-AbstractAtomicRule.md)
 
+
+#### Arguments
+* $field **mixed**
+
+
+
+### renameField
+
+    \JClaveau\LogicalFilter\Rule\AbstractAtomicRule JClaveau\LogicalFilter\Rule\AbstractAtomicRule::renameField($renamings)
+
+
+
+
+
+* Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\AbstractAtomicRule](JClaveau-LogicalFilter-Rule-AbstractAtomicRule.md)
+
+
+#### Arguments
+* $renamings **mixed**
+
+
+
+### toArray
+
+    mixed JClaveau\LogicalFilter\Rule\AbstractAtomicRule::toArray($debug)
+
+
+
+
+
+* Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\AbstractAtomicRule](JClaveau-LogicalFilter-Rule-AbstractAtomicRule.md)
+
+
+#### Arguments
+* $debug **mixed**
 
 
 
@@ -293,6 +327,20 @@ For implementing JsonSerializable interface.
     string JClaveau\LogicalFilter\Rule\AbstractRule::getInstanceId()
 
 Returns an id describing the instance internally for debug purpose.
+
+
+
+* Visibility: **public**
+* This method is defined by [JClaveau\LogicalFilter\Rule\AbstractRule](JClaveau-LogicalFilter-Rule-AbstractRule.md)
+
+
+
+
+### getSemanticId
+
+    string JClaveau\LogicalFilter\Rule\AbstractRule::getSemanticId()
+
+Returns an id corresponding to the meaning of the rule.
 
 
 

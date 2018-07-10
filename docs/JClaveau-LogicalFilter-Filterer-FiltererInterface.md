@@ -21,7 +21,7 @@ Methods
 
 ### apply
 
-    mixed JClaveau\LogicalFilter\Filterer\FiltererInterface::apply(\JClaveau\LogicalFilter\LogicalFilter $filter, $data_to_filter)
+    mixed JClaveau\LogicalFilter\Filterer\FiltererInterface::apply(\JClaveau\LogicalFilter\LogicalFilter $filter, $tree_to_filter, $options)
 
 
 
@@ -32,13 +32,14 @@ Methods
 
 #### Arguments
 * $filter **[JClaveau\LogicalFilter\LogicalFilter](JClaveau-LogicalFilter-LogicalFilter.md)**
-* $data_to_filter **mixed**
+* $tree_to_filter **mixed**
+* $options **mixed**
 
 
 
 ### validateRule
 
-    mixed JClaveau\LogicalFilter\Filterer\FiltererInterface::validateRule($field, $operator, $value, $row, $all_operands)
+    mixed JClaveau\LogicalFilter\Filterer\FiltererInterface::validateRule($field, $operator, $value, $rule, $depth, $all_operands, $options)
 
 
 
@@ -51,7 +52,9 @@ Methods
 * $field **mixed**
 * $operator **mixed**
 * $value **mixed**
-* $row **mixed**
+* $rule **mixed**
+* $depth **mixed**
 * $all_operands **mixed**
+* $options **mixed**
 
 

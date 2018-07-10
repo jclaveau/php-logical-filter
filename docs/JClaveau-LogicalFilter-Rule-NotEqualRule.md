@@ -99,6 +99,19 @@ Replace all the OrRules of the RuleTree by one OrRule at its root.
 
 
 
+### getValues
+
+    mixed JClaveau\LogicalFilter\Rule\NotEqualRule::getValues()
+
+
+
+
+
+* Visibility: **public**
+
+
+
+
 ### toArray
 
     mixed JClaveau\LogicalFilter\Rule\NotRule::toArray($debug)

@@ -113,7 +113,10 @@ Checks if a simplified AndRule has incompatible operands like:
 This is called by the unifyAtomicOperands() method to choose which AboveRule
 to keep for a given field.
 
-It's used as a usort() parameter.
+It's used as a usort() parameter:
++ return -1 that moves the $b variable down the array
++ return  1 moves $b up the array
++ return  0 keeps $b in the same place.
 
 * Visibility: **protected**
 
@@ -131,7 +134,10 @@ It's used as a usort() parameter.
 This is called by the unifyAtomicOperands() method to choose which BelowRule
 to keep for a given field.
 
-It's used as a usort() parameter.
+It's used as a usort() parameter:
++ return -1 that moves the $b variable down the array
++ return  1 moves $b up the array
++ return  0 keeps $b in the same place.
 
 * Visibility: **protected**
 

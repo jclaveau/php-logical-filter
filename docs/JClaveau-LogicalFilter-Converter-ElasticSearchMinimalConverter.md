@@ -9,7 +9,7 @@ This class implements a converter for ElasticSearch.
 * Class name: ElasticSearchMinimalConverter
 * Namespace: JClaveau\LogicalFilter\Converter
 * Parent class: [JClaveau\LogicalFilter\Converter\MinimalConverter](JClaveau-LogicalFilter-Converter-MinimalConverter.md)
-* This class implements: [JClaveau\LogicalFilter\Converter\ConverterInterface](JClaveau-LogicalFilter-Converter-ConverterInterface.md)
+
 
 
 

@@ -73,6 +73,19 @@ Methods
 
 
 
+### getValues
+
+    mixed JClaveau\LogicalFilter\Rule\NotInRule::getValues()
+
+
+
+
+
+* Visibility: **public**
+
+
+
+
 ### toArray
 
     mixed JClaveau\LogicalFilter\Rule\NotRule::toArray($debug)

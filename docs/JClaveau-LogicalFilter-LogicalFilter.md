@@ -31,13 +31,24 @@ Properties
 * Visibility: **protected**
 
 
+### $default_filterer
+
+    protected \JClaveau\LogicalFilter\Filterer\Filterer $default_filterer
+
+
+
+
+
+* Visibility: **protected**
+
+
 Methods
 -------
 
 
 ### __construct
 
-    mixed JClaveau\LogicalFilter\LogicalFilter::__construct(array $rules)
+    mixed JClaveau\LogicalFilter\LogicalFilter::__construct(array $rules, \JClaveau\LogicalFilter\Filterer\Filterer $default_filterer)
 
 Creates a filter. You can provide a description of rules as in
 addRules() as paramater.
@@ -49,6 +60,7 @@ addRules() as paramater.
 
 #### Arguments
 * $rules **array**
+* $default_filterer **[JClaveau\LogicalFilter\Filterer\Filterer](JClaveau-LogicalFilter-Filterer-Filterer.md)**
 
 
 
@@ -261,6 +273,88 @@ Removes all the defined rules.
 
 
 
+### renameFields
+
+    string JClaveau\LogicalFilter\LogicalFilter::renameFields($renamings)
+
+
+
+
+
+* Visibility: **public**
+
+
+#### Arguments
+* $renamings **mixed**
+
+
+
+### removeRules
+
+    string JClaveau\LogicalFilter\LogicalFilter::removeRules($filter)
+
+
+
+
+
+* Visibility: **public**
+
+
+#### Arguments
+* $filter **mixed**
+
+
+
+### keepLeafRulesMatching
+
+    array JClaveau\LogicalFilter\LogicalFilter::keepLeafRulesMatching($filter, array $options)
+
+
+
+
+
+* Visibility: **public**
+
+
+#### Arguments
+* $filter **mixed**
+* $options **array**
+
+
+
+### listLeafRulesMatching
+
+    array JClaveau\LogicalFilter\LogicalFilter::listLeafRulesMatching($filter)
+
+
+
+
+
+* Visibility: **public**
+
+
+#### Arguments
+* $filter **mixed**
+
+
+
+### onEachRule
+
+    array JClaveau\LogicalFilter\LogicalFilter::onEachRule($filter, $options)
+
+
+
+
+
+* Visibility: **public**
+
+
+#### Arguments
+* $filter **mixed**
+* $options **mixed**
+
+
+
 ### copy
 
     \JClaveau\LogicalFilter\LogicalFilter JClaveau\LogicalFilter\LogicalFilter::copy()
@@ -276,7 +370,7 @@ Clone the current object and its rules.
 
 ### dump
 
-    mixed JClaveau\LogicalFilter\LogicalFilter::dump($exit, $debug)
+    mixed JClaveau\LogicalFilter\LogicalFilter::dump($exit, $debug, $callstack_depth)
 
 
 
@@ -288,5 +382,24 @@ Clone the current object and its rules.
 #### Arguments
 * $exit **mixed**
 * $debug **mixed**
+* $callstack_depth **mixed**
+
+
+
+### applyOn
+
+    mixed JClaveau\LogicalFilter\LogicalFilter::applyOn(mixed $data_to_filter, $action_on_matches, \JClaveau\LogicalFilter\Filterer\Filterer|callable|null $filterer)
+
+Applies the current instance to a set of data.
+
+
+
+* Visibility: **public**
+
+
+#### Arguments
+* $data_to_filter **mixed**
+* $action_on_matches **mixed**
+* $filterer **[JClaveau\LogicalFilter\Filterer\Filterer](JClaveau-LogicalFilter-Filterer-Filterer.md)|callable|null**
 
 

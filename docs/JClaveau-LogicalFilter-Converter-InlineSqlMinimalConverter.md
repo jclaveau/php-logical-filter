@@ -9,7 +9,7 @@ This class implements a converter for MySQL.
 * Class name: InlineSqlMinimalConverter
 * Namespace: JClaveau\LogicalFilter\Converter
 * Parent class: [JClaveau\LogicalFilter\Converter\MinimalConverter](JClaveau-LogicalFilter-Converter-MinimalConverter.md)
-* This class implements: [JClaveau\LogicalFilter\Converter\ConverterInterface](JClaveau-LogicalFilter-Converter-ConverterInterface.md)
+
 
 
 
@@ -21,6 +21,17 @@ Properties
 ### $output
 
     protected array $output = array()
+
+
+
+
+
+* Visibility: **protected**
+
+
+### $parameters
+
+    protected array $parameters = array()
 
 
 
