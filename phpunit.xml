@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <phpunit backupGlobals="false"
          defaultTestSuite="all_tests"
-         backupStaticAttributes="true"
+         backupStaticAttributes="false"
          colors="true"
          syntaxCheck="true"
          bootstrap="./tests/bootstrap_phpunit.php"
          >
 
     <testsuites>
+        <!-- TODO defaultTestSuite will work with phpunit 6.1 -->
         <testsuite name="all_tests">
-            <directory>./tests/unit tests</directory>
+            <directory>./tests/unit</directory>
             <!-- /!\ keep the public API after unit tests to ease debug -->
-            <directory>./tests/public api</directory>
+            <directory>./tests/functionnal</directory>
+        </testsuite>
+        <testsuite name="profiling">
+            <directory>./tests/profiling</directory>
         </testsuite>
     </testsuites>
 
@@ -25,6 +29,33 @@
 -->
         </whitelist>
     </filter>
+
+    <listeners>
+        <listener class="PHPUnit\XHProfTestListener\XHProfTestListener">
+            <arguments>
+                <array>
+                    <element key="xhprofLibFile">
+                        <string>./vendor/jclaveau/xhprof/xhprof_lib/utils/xhprof_lib.php</string>
+                    </element>
+                    <element key="xhprofRunsFile">
+                        <string>./vendor/jclaveau/xhprof/xhprof_lib/utils/xhprof_runs.php</string>
+                    </element>
+                    <element key="xhprofWeb">
+                        <string>http://xhprof.loc/index.php</string>
+                    </element>
+                    <element key="appNamespace">
+                        <string>php-logical-filter</string>
+                    </element>
+                    <element key="xhprofFlags">
+                        <string>XHPROF_FLAGS_CPU,XHPROF_FLAGS_MEMORY</string>
+                    </element>
+                    <element key="xhprofIgnore">
+                        <string>call_user_func,call_user_func_array</string>
+                    </element>
+                </array>
+            </arguments>
+        </listener>
+    </listeners>
 
     <logging>
         <log type="coverage-clover" target="clover.xml"/>
