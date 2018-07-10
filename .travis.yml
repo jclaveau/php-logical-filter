@@ -19,7 +19,7 @@ before_script:
  - ./cc-test-reporter before-build
 
 # Commands you want to run that will verify your build.
-script: ./phpunit --coverage-clover=coverage.xml
+script: ./phpunit --coverage-clover=coverage.xml --testsuite=all_tests
 
 after_script:
  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
