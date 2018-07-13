@@ -1,5 +1,7 @@
 # phpdoc command
-vendor/bin/phpdoc  -d src -t docs/phpdoc --template="xml"
+#vendor/bin/phpdoc  -d src -t docs/phpdoc --template="xml"
+
+./vendor/bin/phpdoc --directory=src/ --target=docs --template="vendor/cvuorinen/phpdoc-markdown-public/data/templates/markdown-public" --title="My Project Documentation"
 
 # Next, run phpdocmd:
-vendor/bin/phpdocmd docs/phpdoc/structure.xml --index README.md docs
+#vendor/bin/phpdocmd docs/phpdoc/structure.xml --index README.md docs
