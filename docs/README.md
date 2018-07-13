@@ -1,4 +1,4 @@
-# My Project Documentation
+# PHP Logical Filter
 
 ## Table of Contents
 
