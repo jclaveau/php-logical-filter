@@ -1112,6 +1112,115 @@ trait LogicalFilterTest_rules_simplification_trait
 
     /**
      */
+    public function test_simplify_with_in_rules()
+    {
+        $filter = (new LogicalFilter(
+            [
+                "and",
+                [
+                    "field",
+                    "in",
+                    [
+                        "PLOP",
+                        "PROUT",
+                    ]
+                ],
+                [
+                    "field",
+                    "in",
+                    [
+                        "PLOUF",
+                        "PROUT",
+                    ]
+                ],
+                [
+                    "field",
+                    "in",
+                    [
+                        "PROUT",
+                        "PLOUF",
+                        "POUET",
+                    ]
+                ],
+            ]
+        ))
+        ->simplify()
+        ;
+
+        $this->assertEquals(
+            ['field', '=', 'PROUT'],
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify_with_not_in_rules()
+    {
+        $filter = (new LogicalFilter(
+            ["and",
+                [
+                    "field",
+                    "!in",
+                    [
+                        "PLOP",
+                        "PROUT",
+                    ]
+                ],
+                [
+                    "field",
+                    "!in",
+                    [
+                        "PLOUF",
+                        "PROUT",
+                    ]
+                ],
+                [
+                    "field",
+                    "!in",
+                    [
+                        "PROUT",
+                        "PLOUF",
+                        "POUET",
+                    ]
+                ],
+            ]
+        ))
+        ->simplify()
+        ;
+
+        // reversed alphabetical order:
+        // + PROUT
+        // + POUET
+        // + PLOUF
+        // + PLOP
+        $this->assertEquals(
+            ["or",
+                ["field", ">", "PROUT"],
+                ["and",
+                    ["field", ">", "POUET"],
+                    ["field", "<", "PROUT"],
+                ],
+                ["and",
+                    ["field", ">", "PLOUF"],
+                    ["field", "<", "POUET"],
+                ],
+                ["and",
+                    ["field", ">", "PLOP"],
+                    ["field", "<", "PLOUF"],
+                ],
+                ["field", "<", "PLOP"],
+            ],
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
     public function test_simplify_with_big_combinations()
     {
         $filter = (new LogicalFilter(

@@ -126,6 +126,8 @@ abstract class AbstractRule implements \JsonSerializable
         return var_export($this->toArray(), true);
     }
 
+    protected $instance_id;
+
     /**
      * Returns an id describing the instance internally for debug purpose.
      *
@@ -135,7 +137,20 @@ abstract class AbstractRule implements \JsonSerializable
      */
     public function getInstanceId()
     {
-        return get_class($this).':'.spl_object_id($this);
+        if ($this->instance_id)
+            return $this->instance_id;
+
+        return $this->instance_id = get_class($this).':'.spl_object_id($this);
+    }
+
+    /**
+     * Returns an id corresponding to the meaning of the rule.
+     *
+     * @return string
+     */
+    public function getSemanticId()
+    {
+        return hash('crc32b', var_export($this->toArray(), true));
     }
 
     /**

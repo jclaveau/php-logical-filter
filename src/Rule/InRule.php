@@ -124,6 +124,19 @@ class InRule extends OrRule
     }
 
     /**
+     * @param  mixed possibilities
+     *
+     * @return InRule $this
+     */
+    public function setPossibilities($possibilities)
+    {
+        $this->operands = [];
+        $this->addPossibilities($possibilities);
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getValues()

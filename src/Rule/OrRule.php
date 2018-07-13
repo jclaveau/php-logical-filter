@@ -1,5 +1,6 @@
 <?php
 namespace JClaveau\LogicalFilter\Rule;
+use       JClaveau\VisibilityViolator\VisibilityViolator;
 
 /**
  * Logical inclusive disjunction
@@ -60,53 +61,80 @@ class OrRule extends AbstractOperationRule
     }
 
     /**
-     * This is called by the unifyAtomicOperands() method to choose which AboveRule
-     * to keep for a given field.
-     *
-     * It's used as a usort() parameter:
-     * + return -1 that moves the $b variable down the array
-     * + return  1 moves $b up the array
-     * + return  0 keeps $b in the same place.
-     *
-     * @return int -1|0|1
+     * + if A > 2 && A > 1 <=> A > 2
+     * + if A < 2 && A < 1 <=> A < 1
      */
-    protected function aboveRuleUnifySorter( AboveRule $a, AboveRule $b)
+    protected function simplifySameOperands(array $operandsByFields)
     {
-        if ($a->getMinimum() === null)
-            return 1;
+        // unifying same operands
+        foreach ($operandsByFields as $field => $operandsByOperator) {
 
-        if ($b->getMinimum() === null)
-            return -1;
+            unset($previous_operand);
+            foreach ($operandsByOperator as $operator => $operands) {
 
-        if ($a->getMinimum() < $b->getMinimum())
-            return -1;
+                try {
+                    if ($operator == AboveRule::operator) {
+                        usort($operands, function( AboveRule $a, AboveRule $b ) {
+                            if ($a->getMinimum() === null)
+                                return 1;
 
-        return 1;
-    }
+                            if ($b->getMinimum() === null)
+                                return -1;
 
-    /**
-     * This is called by the unifyAtomicOperands() method to choose which BelowRule
-     * to keep for a given field.
-     *
-     * It's used as a usort() parameter:
-     * + return -1 that moves the $b variable down the array
-     * + return  1 moves $b up the array
-     * + return  0 keeps $b in the same place.
-     *
-     * @return int -1|0|1
-     */
-    protected function belowRuleUnifySorter( BelowRule $a, BelowRule $b)
-    {
-        if ($a->getMaximum() === null)
-            return 1;
+                            if ($a->getMinimum() < $b->getMinimum())
+                                return -1;
 
-        if ($b->getMaximum() === null)
-            return -1;
+                            return 1;
+                        });
+                        $operands = [reset($operands)];
+                    }
+                    elseif ($operator == BelowRule::operator) {
+                        usort($operands, function( BelowRule $a, BelowRule $b ) {
+                            if ($a->getMaximum() === null)
+                                return 1;
 
-        if ($a->getMaximum() > $b->getMaximum())
-            return -1;
+                            if ($b->getMaximum() === null)
+                                return -1;
 
-        return 1;
+                            if ($a->getMaximum() > $b->getMaximum())
+                                return -1;
+
+                            return 1;
+                        });
+                        $operands = [reset($operands)];
+                    }
+                    elseif ($operator == InRule::operator || $operator == NotInRule::operator) {
+                        foreach ($operands as $i => $operand) {
+                            if (isset($previous_operand)) {
+                                $previous_operand->setPossibilities( array_merge(
+                                    $previous_operand->getPossibilities(),
+                                    $operand->getPossibilities()
+                                ) );
+
+                                unset($operands[$i]);
+                                continue;
+                            }
+
+                            $previous_operand = $operand;
+                        }
+                    }
+                }
+                catch (\Exception $e) {
+                    VisibilityViolator::setHiddenProperty($e, 'message', $e->getMessage() . "\n" . var_export([
+                            'previous_operand' => $previous_operand,
+                            'operand'          => $operand,
+                        ], true)
+                    );
+
+                    // \Debug::dumpJson($this->toArray(), true);
+                    throw $e;
+                }
+
+                $operandsByFields[ $field ][ $operator ] = $operands;
+            }
+        }
+
+        return $operandsByFields;
     }
 
     /**

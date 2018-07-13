@@ -301,7 +301,7 @@ abstract class AbstractOperationRule extends AbstractRule
 
         $cleaned_operands = [];
         foreach ($this->operands as $operand) {
-            $cleaned_operands[ $operand->__toString() ] = $operand;
+            $cleaned_operands[ $operand->getSemanticId() ] = $operand;
         }
 
         $this->operands = array_values($cleaned_operands);
@@ -314,12 +314,13 @@ abstract class AbstractOperationRule extends AbstractRule
      *
      * @return AbstractOperationRule the simplified rule
      */
-    public function unifyAtomicOperands($unifyDifferentOperands = true)
+    public function unifyAtomicOperands($simplification_strategy_step = false)
     {
-        if (!$this->isSimplificationAllowed())
-            return $this;
+        // if (!$this->isSimplificationAllowed())
+            // return $this;
 
-        $this->moveSimplificationStepForward( self::unify_atomic_operands );
+        if ($simplification_strategy_step)
+            $this->moveSimplificationStepForward( self::unify_atomic_operands );
 
         // $this->dump(true);
 
@@ -335,49 +336,9 @@ abstract class AbstractOperationRule extends AbstractRule
         $operandsByFields = $this->groupOperandsByFieldAndOperator();
         // var_dump($operandsByFields);
 
-        // unifying same operands
-        foreach ($operandsByFields as $field => $operandsByOperator) {
+        $operandsByFields = $this->simplifySameOperands($operandsByFields);
 
-            unset($previous_operand);
-            foreach ($operandsByOperator as $operator => $operands) {
-
-                try {
-                    if ($operator == AboveRule::operator) {
-                        usort($operands, [$this, 'aboveRuleUnifySorter']);
-                        $operands = [reset($operands)];
-                    }
-                    elseif ($operator == BelowRule::operator) {
-                        usort($operands, [$this, 'belowRuleUnifySorter']);
-                        $operands = [reset($operands)];
-                    }
-                    elseif ($operator == EqualRule::operator) {
-                        // TODO add an option for the support strict comparison
-                        foreach ($operands as $i => $operand) {
-                            if (isset($previous_operand) && $previous_operand == $operand) {
-                                unset($operands[$i]);
-                                continue;
-                            }
-
-                            $previous_operand = $operand;
-                        }
-                    }
-                }
-                catch (\Exception $e) {
-                    VisibilityViolator::setHiddenProperty($e, 'message', $e->getMessage() . "\n" . var_export([
-                            'previous_operand' => $previous_operand,
-                            'operand'          => $operand,
-                        ], true)
-                    );
-
-                    // \Debug::dumpJson($this->toArray(), true);
-                    throw $e;
-                }
-
-                $operandsByFields[ $field ][ $operator ] = $operands;
-            }
-        }
-
-        if ($unifyDifferentOperands && $this instanceof AndRule) {
+        if ($this instanceof AndRule) {
             // unifiying operands of different types
             $operandsByFields = $this->simplifyDifferentOperands($operandsByFields);
         }
@@ -419,6 +380,7 @@ abstract class AbstractOperationRule extends AbstractRule
         }
 
         $this->cleanOperations();
+        $this->unifyAtomicOperands();
 
         if ($step_to_stop_before == self::remove_negations)
             return $this;
@@ -451,7 +413,7 @@ abstract class AbstractOperationRule extends AbstractRule
         if (!$instance instanceof AbstractAtomicRule) {
 
             $instance->cleanOperations();
-            $instance->unifyAtomicOperands();
+            $instance->unifyAtomicOperands(true);
 
             // $instance->dump(true);
 
@@ -535,8 +497,9 @@ abstract class AbstractOperationRule extends AbstractRule
         // copying the instance first avoids the copy_cache array to be copied
         $copied_rule = clone $this;
 
-        if ($copy = $this->registerCopy($token))
-            return $copy;
+        // TODO enable copy registration only in debug mode
+        // if ($copy = $this->registerCopy($token))
+            // return $copy;
 
         $copied_operands = [];
         foreach ($this->operands as $operand) {

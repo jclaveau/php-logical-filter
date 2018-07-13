@@ -15,6 +15,9 @@ abstract class AbstractAtomicRule extends AbstractRule
     /** @var string $field The field to apply the rule on */
     protected $field;
 
+    /** @var bool $changed */
+    protected $changed = true;
+
     /**
      * @return string $field
      */
@@ -35,7 +38,10 @@ abstract class AbstractAtomicRule extends AbstractRule
             );
         }
 
-        $this->field = $field;
+        if ($this->field != $field) {
+            $this->field   = $field;
+            $this->changed = true;
+        }
 
         return $this;
     }
@@ -49,11 +55,11 @@ abstract class AbstractAtomicRule extends AbstractRule
     public final function renameField($renamings)
     {
         if (is_callable($renamings)) {
-            $this->field = call_user_func($renamings, $this->field);
+            $this->setField( call_user_func($renamings, $this->field) );
         }
         elseif (is_array($renamings)) {
             if (isset($renamings[$this->field]))
-                $this->field = $renamings[$this->field];
+                $this->setField( $renamings[$this->field] );
         }
         else {
             throw new \InvalidArgumentException(
@@ -65,13 +71,20 @@ abstract class AbstractAtomicRule extends AbstractRule
         return $this;
     }
 
+    protected $cache;
+
     /**
      */
     public function toArray($debug=false)
     {
+        if (!$this->changed)
+            return $this->cache;
+
+        $this->changed = false;
+
         $class = get_class($this);
 
-        return [
+        return $this->cache = [
             $this->getField(),
             $debug ? $this->getInstanceId() : $class::operator,
             $this->getValues(),

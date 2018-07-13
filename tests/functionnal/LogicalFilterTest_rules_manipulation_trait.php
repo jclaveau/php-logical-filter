@@ -19,8 +19,15 @@ trait LogicalFilterTest_rules_manipulation_trait
             ],
             (new LogicalFilter(
                 ['and',
-                    ['or',
+                    [
                         ['field_3', '<', 'a'],
+                        'or',
+                        ['field_5', '=', 12],
+                        'or',
+                        ['field_5', '=', 12],
+                        'or',
+                        ['field_5', '=', 12],
+                        'or',
                         ['field_5', '=', 12],
                     ],
                 ]

@@ -47,6 +47,27 @@ class NotInRule extends NotRule
     }
 
     /**
+     * @return $this
+     */
+    public function setPossibilities(array $possibilities)
+    {
+        if ($this->operands[0] instanceof EqualRule) {
+            // TODO this case should occure anympore while a NotInRule
+            // may not have the same class once simplified
+            $possibilities[] = $this->operands[0]->getValue();
+
+            $this->operands[0] = new InRule(
+                $this->operands[0]->getField(),
+                array_unique($possibilities)
+            );
+        }
+        elseif ($this->operands[0] instanceof InRule) {
+            return $this->operands[0]->setPossibilities($possibilities);
+        }
+
+    }
+
+    /**
      */
     public function getValues()
     {
