@@ -305,6 +305,8 @@ class AndRule extends AbstractOperationRule
                                 $operand->getPossibilities()
                             ) );
                         }
+
+                        unset($operands[$i]);
                     }
                     elseif ($operator == NotInRule::operator) {
                         foreach ($operands as $i => $operand) {

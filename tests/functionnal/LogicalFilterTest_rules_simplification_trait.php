@@ -1535,5 +1535,27 @@ trait LogicalFilterTest_rules_simplification_trait
         );
     }
 
+    /**
+     */
+    public function test_simplify_simplifySameperands_multiple_in()
+    {
+        $filter = (new LogicalFilter(
+            ["and",
+                ["type", "in", ["a", "b", "c", "d"]],
+                ["type", "in", ["b", "c", "d"]],
+                ["type", "=",  "c"],
+            ]
+        ))
+        ->simplify()
+        ;
+
+        $this->assertEquals(
+            ["type", "=",  "c"],
+            $filter
+                // ->dump(!true)
+                ->toArray()
+        );
+    }
+
     /**/
 }
