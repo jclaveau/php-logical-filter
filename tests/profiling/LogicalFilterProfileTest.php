@@ -36,7 +36,7 @@ class LogicalFilterProfileTest extends \AbstractTest
         $this->assertMemoryUsageBelow('1.1M');
 
         // var_dump($this->getExecutionTime());
-        $this->assertExecutionTimeBelow(0.2);
+        $this->assertExecutionTimeBelow(0.4);
     }
 
     /**
@@ -62,7 +62,7 @@ class LogicalFilterProfileTest extends \AbstractTest
         $this->assertMemoryUsageBelow('1');
 
         // var_dump($this->getExecutionTime());
-        $this->assertExecutionTimeBelow(0.02);
+        $this->assertExecutionTimeBelow(0.1);
     }
 
     /**
@@ -87,7 +87,7 @@ class LogicalFilterProfileTest extends \AbstractTest
         ;
 
         // var_dump($this->getMemoryUsage());
-        $this->assertMemoryUsageBelow('7M');
+        $this->assertMemoryUsageBelow('1.3M');
 
         // var_dump($this->getExecutionTime());
         $this->assertExecutionTimeBelow(1.5);

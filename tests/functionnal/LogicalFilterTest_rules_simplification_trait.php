@@ -1403,12 +1403,23 @@ trait LogicalFilterTest_rules_simplification_trait
         ;
 
         $this->assertEquals(
-            ["or",
-                ["type", "=",  "a"],
-                ["type", "=",  "b"],
-                ["type", "=",  "c"],
-                ["type", "=",  "d"],
-            ],
+            ["type", "=",  "a"],
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+
+        $filter = (new LogicalFilter(
+            ["and",
+                ["type", "=",  "z"],
+                ["type", "in", ["a", "b", "c", "d"]],
+            ]
+        ))
+        ->simplify()
+        ;
+
+        $this->assertEquals(
+            ["or"],
             $filter
                 // ->dump(true)
                 ->toArray()

@@ -391,12 +391,12 @@ class AndRule extends AbstractOperationRule
                     $possibilities = reset($operandsByOperator[ InRule::operator ])->getPossibilities();
 
                     if (in_array($equalRule->getValue(), $possibilities)) {
-                        unset($operandsByFields[ $field ][ EqualRule::operator ]);
+                        unset($operandsByFields[ $field ][ InRule::operator ]);
                     }
                     else {
                         // We flush possibilities of the InRule
                         // TODO Replace it by a FalseRule
-                        $operandsByFields[ $field ][ InRule::operator ]->setPossibilities([]);
+                        $operandsByFields[ $field ][ InRule::operator ][0]->setPossibilities([]);
                         // and also remove the equal rule to shorten the reste of the simplification process
                         unset($operandsByFields[ $field ][ EqualRule::operator ]);
                     }
