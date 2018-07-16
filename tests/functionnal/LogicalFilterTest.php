@@ -591,12 +591,12 @@ class LogicalFilterTest extends \AbstractTest
             [
                 'or',
                 ['field_1', '>', 3],
+                ['field_1', '<', 2],
                 [
                     'and',
                     ['field_1', '>', 2],
                     ['field_1', '<', 3],
                 ],
-                ['field_1', '<', 2],
             ],
             $filter->simplify()
                 // ->dump(true)

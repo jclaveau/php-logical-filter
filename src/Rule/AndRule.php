@@ -79,7 +79,8 @@ class AndRule extends AbstractOperationRule
                     foreach ($upLiftedOr->getOperands() as $upLiftedOrSubOperand) {
                         $newUpLiftedOrSubOperand = $upLiftedOrSubOperand->copy();
                         $newUpLiftedOrSubOperand->addOperand( $subOperand->copy() );
-                        $newUpLiftedOr->addOperand( $newUpLiftedOrSubOperand );
+                        if ($newUpLiftedOrSubOperand->simplify()->hasSolution())
+                            $newUpLiftedOr->addOperand( $newUpLiftedOrSubOperand );
                     }
                 }
 
@@ -246,8 +247,8 @@ class AndRule extends AbstractOperationRule
         // unifying same operands
         foreach ($operandsByFields as $field => $operandsByOperator) {
 
-            unset($previous_operand);
             foreach ($operandsByOperator as $operator => $operands) {
+                unset($previous_operand);
 
                 try {
                     if ($operator == AboveRule::operator) {
@@ -283,49 +284,48 @@ class AndRule extends AbstractOperationRule
                     elseif ($operator == EqualRule::operator) {
                         // TODO add an option for the support strict comparison
                         foreach ($operands as $i => $operand) {
-                            if (isset($previous_operand) && $previous_operand == $operand) {
-                                unset($operands[$i]);
+                            if (!isset($previous_operand)) {
+                                $previous_operand = $operand;
                                 continue;
                             }
 
-                            $previous_operand = $operand;
+                            if ($previous_operand == $operand)
+                                unset($operands[$i]);
                         }
                     }
                     elseif ($operator == InRule::operator) {
                         foreach ($operands as $i => $operand) {
-                            if (isset($previous_operand)) {
-                                $previous_operand->setPossibilities( array_intersect(
-                                    $previous_operand->getPossibilities(),
-                                    $operand->getPossibilities()
-                                ) );
-
-                                unset($operands[$i]);
+                            if (!isset($previous_operand)) {
+                                $previous_operand = $operand;
                                 continue;
                             }
 
-                            $previous_operand = $operand;
+                            $previous_operand->setPossibilities( array_intersect(
+                                $previous_operand->getPossibilities(),
+                                $operand->getPossibilities()
+                            ) );
                         }
                     }
                     elseif ($operator == NotInRule::operator) {
                         foreach ($operands as $i => $operand) {
-                            if (isset($previous_operand)) {
-                                $previous_operand->setPossibilities( array_merge(
-                                    $previous_operand->getPossibilities(),
-                                    $operand->getPossibilities()
-                                ) );
-
-                                unset($operands[$i]);
+                            if (!isset($previous_operand)) {
+                                $previous_operand = $operand;
                                 continue;
                             }
 
-                            $previous_operand = $operand;
+                            $previous_operand->setPossibilities( array_merge(
+                                $previous_operand->getPossibilities(),
+                                $operand->getPossibilities()
+                            ) );
+
+                            unset($operands[$i]);
                         }
                     }
                 }
                 catch (\Exception $e) {
                     VisibilityViolator::setHiddenProperty($e, 'message', $e->getMessage() . "\n" . var_export([
-                            'previous_operand' => $previous_operand,
-                            'operand'          => $operand,
+                            'operand' => $operand,
+                            'this'    => $this,
                         ], true)
                     );
 
@@ -388,14 +388,17 @@ class AndRule extends AbstractOperationRule
                         );
                     }
 
-                    $inRule = reset($operandsByOperator[ InRule::operator ]);
-                    if (in_array($equalRule->getValue(), $inRule->getPossibilities())) {
-                        unset($operandsByFields[ $field ][ InRule::operator ]);
+                    $possibilities = reset($operandsByOperator[ InRule::operator ])->getPossibilities();
+
+                    if (in_array($equalRule->getValue(), $possibilities)) {
+                        unset($operandsByFields[ $field ][ EqualRule::operator ]);
                     }
                     else {
                         // We flush possibilities of the InRule
                         // TODO Replace it by a FalseRule
                         $operandsByFields[ $field ][ InRule::operator ]->setPossibilities([]);
+                        // and also remove the equal rule to shorten the reste of the simplification process
+                        unset($operandsByFields[ $field ][ EqualRule::operator ]);
                     }
                 }
 

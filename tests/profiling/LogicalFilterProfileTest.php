@@ -18,46 +18,14 @@ class LogicalFilterProfileTest extends \AbstractTest
         // and missing unset
         $filter = (new LogicalFilter(
             ["and",
-                [
-                    "adserver_type",
-                    "=",
-                    "INTERNE"
-                ],
-                [
-                    "adserver_id",
-                    ">",
-                    0
-                ],
-                [
-                    "adserver_id",
-                    ">",
-                    12
-                ],
-                [
-                    "adserver_id",
-                    ">=",
-                    100
-                ],
-                [
-                    "adserver_id",
-                    "<",
-                    2000
-                ],
-                [
-                    "adserver_id",
-                    "=",
-                    100
-                ],
-                [
-                    "date",
-                    "=",
-                    new \DateTime('2018-07-04')
-                ],
-                [
-                    "event",
-                    "=",
-                    "impression"
-                ],
+                ["type", "=", "my_type"],
+                ["id", ">", 0],
+                ["id", ">", 12],
+                ["id", ">=", 100],
+                ["id", "<", 2000],
+                ["id", "=", 100],
+                ["date", "=", new \DateTime('2018-07-04') ],
+                ["event", "=", "somethiong happened"],
             ]
         ))
         ->simplify()
@@ -68,7 +36,7 @@ class LogicalFilterProfileTest extends \AbstractTest
         $this->assertMemoryUsageBelow('1.1M');
 
         // var_dump($this->getExecutionTime());
-        $this->assertExecutionTimeBelow(0.05);
+        $this->assertExecutionTimeBelow(0.2);
     }
 
     /**

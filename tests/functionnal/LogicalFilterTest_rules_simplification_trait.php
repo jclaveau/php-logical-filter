@@ -143,14 +143,14 @@ trait LogicalFilterTest_rules_simplification_trait
         $this->assertEquals(
             ['or',
                 ['and',
-                    ['field_7', '=', 2],
                     ['field_1', '=', 3],
                     ['field_5', '>', 3],
+                    ['field_7', '=', 2],
                 ],
                 ['and',
-                    ['field_7', '=', 2],
                     ['field_1', '=', 2],
                     ['field_6', '>', 4],
+                    ['field_7', '=', 2],
                 ],
             ],
             $filter->toArray()
@@ -1199,6 +1199,7 @@ trait LogicalFilterTest_rules_simplification_trait
         $this->assertEquals(
             ["or",
                 ["field", ">", "PROUT"],
+                ["field", "<", "PLOP"],
                 ["and",
                     ["field", ">", "POUET"],
                     ["field", "<", "PROUT"],
@@ -1211,7 +1212,6 @@ trait LogicalFilterTest_rules_simplification_trait
                     ["field", ">", "PLOP"],
                     ["field", "<", "PLOUF"],
                 ],
-                ["field", "<", "PLOP"],
             ],
             $filter
                 // ->dump(true)
@@ -1382,6 +1382,32 @@ trait LogicalFilterTest_rules_simplification_trait
                     ['date', '=', new \DateTime('2018-07-04')],
                     ['event', '=', 'impression'],
                 ],
+            ],
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify_simplifyDifferentOperands_equal_and_in()
+    {
+        $filter = (new LogicalFilter(
+            ["and",
+                ["type", "=",  "a"],
+                ["type", "in", ["a", "b", "c", "d"]],
+            ]
+        ))
+        ->simplify()
+        ;
+
+        $this->assertEquals(
+            ["or",
+                ["type", "=",  "a"],
+                ["type", "=",  "b"],
+                ["type", "=",  "c"],
+                ["type", "=",  "d"],
             ],
             $filter
                 // ->dump(true)

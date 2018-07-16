@@ -329,7 +329,7 @@ abstract class AbstractOperationRule extends AbstractRule
 
         foreach ($this->operands as $operand) {
             if ($operand instanceof AbstractOperationRule) {
-                $operand->unifyAtomicOperands();
+                $operand->unifyAtomicOperands($simplification_strategy_step);
             }
         }
 
