@@ -411,7 +411,7 @@ class AndRule extends AbstractOperationRule
 
                     $notInRule = reset($operandsByOperator[ NotInRule::operator ]);
 
-                    $operandsByFields[ $field ][ NotInRule::operator ]->setPossibilities(
+                    $operandsByFields[ $field ][ NotInRule::operator ][0]->setPossibilities(
                         array_diff($notInRule->getPossibilities(), [$equalRule->getValue()])
                     );
                 }
@@ -464,14 +464,14 @@ class AndRule extends AbstractOperationRule
                     }
 
                     $notInRule = reset($operandsByOperator[ NotInRule::operator ]);
-                    if (in_array($notEqualRule->getValue(), $notInRule->getPossibilities())) {
-                        unset($operandsByFields[ $field ][ NotInRule::operator ]);
-                    }
-                    else {
-                        // We flush possibilities of the NotInRule
+                    if (!in_array($notEqualRule->getValue(), $notInRule->getPossibilities())) {
                         // TODO Replace it by a FalseRule
-                        $operandsByFields[ $field ][ NotInRule::operator ]->setPossibilities([]);
+                        $operandsByFields[ $field ][ NotInRule::operator ][0]->setPossibilities(
+                            array_merge($notInRule->getPossibilities(), [$notEqualRule->getValue()])
+                        );
                     }
+
+                    unset($operandsByFields[ $field ][ NotEqualRule::operator ]);
                 }
 
                 if (!empty($operandsByOperator[ InRule::operator ])) {

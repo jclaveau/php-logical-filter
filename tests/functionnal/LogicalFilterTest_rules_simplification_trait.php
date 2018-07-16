@@ -1426,5 +1426,114 @@ trait LogicalFilterTest_rules_simplification_trait
         );
     }
 
+    /**
+     */
+    public function test_simplify_simplifyDifferentOperands_equal_and_not_in()
+    {
+        $filter = (new LogicalFilter(
+            ["and",
+                ["type", "=",  "a"],
+                ["type", "!in", ["a", "b", "c", "d"]],
+            ]
+        ))
+        ->simplify()
+        ;
+
+        $this->assertEquals(
+            ["type", "=",  "a"],
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+
+        $filter = (new LogicalFilter(
+            ["and",
+                ["type", "=",  "z"],
+                ["type", "!in", ["a", "b", "c", "d"]],
+            ]
+        ))
+        ->simplify()
+        ;
+
+        $this->assertEquals(
+            ["type", "=",  "z"],
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify_simplifyDifferentOperands_different_and_not_in()
+    {
+        $filter = (new LogicalFilter(
+            ["and",
+                ["type", "!=",  "a"],
+                ["type", "!in", ["a", "b", "c", "d"]],
+            ]
+        ))
+        ->simplify()
+        ;
+
+        $this->assertEquals(
+            ["or",
+                ["type", ">",  "d"],
+                ["type", "<",  "a"],
+                ["and",
+                    ["type", ">",  "c"],
+                    ["type", "<",  "d"],
+                ],
+                ["and",
+                    ["type", ">",  "b"],
+                    ["type", "<",  "c"],
+                ],
+                ["and",
+                    ["type", ">",  "a"],
+                    ["type", "<",  "b"],
+                ],
+            ],
+            $filter
+                // ->dump(!true)
+                ->toArray()
+        );
+
+        $filter = (new LogicalFilter(
+            ["and",
+                ["type", "!=",  "z"],
+                ["type", "!in", ["a", "b", "c", "d"]],
+            ]
+        ))
+        ->simplify()
+        ;
+
+        $this->assertEquals(
+            ["or",
+                ["type", ">",  "z"],
+                // ["type", ">",  "d"],
+                ["type", "<",  "a"],
+                ["and",
+                    ["type", ">",  "d"],
+                    ["type", "<",  "z"],
+                ],
+                ["and",
+                    ["type", ">",  "c"],
+                    ["type", "<",  "d"],
+                ],
+                ["and",
+                    ["type", ">",  "b"],
+                    ["type", "<",  "c"],
+                ],
+                ["and",
+                    ["type", ">",  "a"],
+                    ["type", "<",  "b"],
+                ],
+            ],
+            $filter
+                // ->dump(!true)
+                ->toArray()
+        );
+    }
+
     /**/
 }
