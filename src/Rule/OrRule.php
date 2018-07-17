@@ -69,8 +69,8 @@ class OrRule extends AbstractOperationRule
         // unifying same operands
         foreach ($operandsByFields as $field => $operandsByOperator) {
 
-            unset($previous_operand);
             foreach ($operandsByOperator as $operator => $operands) {
+                unset($previous_operand);
 
                 try {
                     if ($operator == AboveRule::operator) {
@@ -103,19 +103,19 @@ class OrRule extends AbstractOperationRule
                         });
                         $operands = [reset($operands)];
                     }
-                    elseif ($operator == InRule::operator || $operator == NotInRule::operator) {
-                        foreach ($operands as $i => $operand) {
-                            if (isset($previous_operand)) {
-                                $previous_operand->setPossibilities( array_merge(
-                                    $previous_operand->getPossibilities(),
-                                    $operand->getPossibilities()
-                                ) );
+                    elseif ($operator == InRule::operator) {
+                        $first_in = reset($operands);
 
-                                unset($operands[$i]);
+                        foreach ($operands as $i => $next_in) {
+                            if ($first_in === $next_in)
                                 continue;
-                            }
 
-                            $previous_operand = $operand;
+                            $first_in->setPossibilities( array_merge(
+                                $first_in->getPossibilities(),
+                                $next_in->getPossibilities()
+                            ) );
+
+                            unset($operands[$i]);
                         }
                     }
                 }

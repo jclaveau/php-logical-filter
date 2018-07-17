@@ -497,7 +497,17 @@ class LogicalFilterTest extends \AbstractTest
                 ['field_1', '=', 'd'],
                 ['field_1', '=', 'e'],
             ],
-            $filter->simplify()->toArray()
+            $filter
+                // ->dump(!true)
+                ->simplify([
+                    // 'stop_after' =>
+                    // AbstractOperationRule::remove_negations,
+                    // AbstractOperationRule::rootify_disjunctions,
+                    // AbstractOperationRule::unify_atomic_operands,
+                    // AbstractOperationRule::remove_invalid_branches,
+                ])
+                // ->dump(true)
+                ->toArray()
         );
     }
 

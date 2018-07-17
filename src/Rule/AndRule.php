@@ -289,35 +289,39 @@ class AndRule extends AbstractOperationRule
                                 continue;
                             }
 
-                            if ($previous_operand == $operand)
+                            if ($previous_operand == $operand) {
                                 unset($operands[$i]);
+                                continue;
+                            }
+
+                            $previous_operand = $operand;
                         }
                     }
                     elseif ($operator == InRule::operator) {
-                        foreach ($operands as $i => $operand) {
-                            if (!isset($previous_operand)) {
-                                $previous_operand = $operand;
+                        $first_in = reset($operands);
+
+                        foreach ($operands as $i => $next_in) {
+                            if ($first_in === $next_in)
                                 continue;
-                            }
 
-                            $previous_operand->setPossibilities( array_intersect(
-                                $previous_operand->getPossibilities(),
-                                $operand->getPossibilities()
+                            $first_in->setPossibilities( array_intersect(
+                                $first_in->getPossibilities(),
+                                $next_in->getPossibilities()
                             ) );
-                        }
 
-                        unset($operands[$i]);
+                            unset($operands[$i]);
+                        }
                     }
                     elseif ($operator == NotInRule::operator) {
-                        foreach ($operands as $i => $operand) {
-                            if (!isset($previous_operand)) {
-                                $previous_operand = $operand;
-                                continue;
-                            }
+                        $first_not_in = reset($operands);
 
-                            $previous_operand->setPossibilities( array_merge(
-                                $previous_operand->getPossibilities(),
-                                $operand->getPossibilities()
+                        foreach ($operands as $i => $next_not_in) {
+                            if ($first_not_in === $next_not_in)
+                                continue;
+
+                            $first_not_in->setPossibilities( array_merge(
+                                $first_not_in->getPossibilities(),
+                                $next_not_in->getPossibilities()
                             ) );
 
                             unset($operands[$i]);
@@ -326,8 +330,8 @@ class AndRule extends AbstractOperationRule
                 }
                 catch (\Exception $e) {
                     VisibilityViolator::setHiddenProperty($e, 'message', $e->getMessage() . "\n" . var_export([
-                            'operand' => $operand,
-                            'this'    => $this,
+                            'operands' => $operands,
+                            'this'     => $this,
                         ], true)
                     );
 

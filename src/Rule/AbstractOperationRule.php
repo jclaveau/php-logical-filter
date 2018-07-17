@@ -30,10 +30,10 @@ abstract class AbstractOperationRule extends AbstractRule
      * @var array $simplification_steps
      */
     const simplification_steps = [
-        self::remove_negations,
-        self::rootify_disjunctions,
-        self::unify_atomic_operands,
-        self::remove_invalid_branches,
+        AbstractOperationRule::remove_negations,
+        AbstractOperationRule::rootify_disjunctions,
+        AbstractOperationRule::unify_atomic_operands,
+        AbstractOperationRule::remove_invalid_branches,
     ];
 
     /**
@@ -337,6 +337,7 @@ abstract class AbstractOperationRule extends AbstractRule
         // var_dump($operandsByFields);
 
         $operandsByFields = $this->simplifySameOperands($operandsByFields);
+        // var_dump($operandsByFields);
 
         if ($this instanceof AndRule) {
             // unifiying operands of different types
@@ -381,6 +382,7 @@ abstract class AbstractOperationRule extends AbstractRule
 
         $this->cleanOperations();
         $this->unifyAtomicOperands();
+        // $this->dump(true);
 
         if ($step_to_stop_before == self::remove_negations)
             return $this;
