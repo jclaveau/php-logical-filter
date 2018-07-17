@@ -504,6 +504,10 @@ class LogicalFilter implements \JsonSerializable
                     }
                 ]
             );
+
+            // TODO replace it by a FalseRule
+            if ($this->rules === false)
+                $this->rules = new AndRule;
         }
 
         return $this;

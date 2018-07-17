@@ -622,20 +622,29 @@ trait LogicalFilterTest_rules_manipulation_trait
 
     /**
      */
-    public function test_keepLeafRulesMatching_on_negation()
+    public function test_keepLeafRulesMatching_with_no_result()
     {
         $filtered_filter = (new LogicalFilter(
-            ["id", "!in", [299,298]]
+            ["and",
+                ['field_1', '=', 2],
+                ['or',
+                    ['field_2', '>', 4],
+                    ['field_2', '<', -4],
+                ],
+                ['field_3', '=', null],
+                ['field_2', '!=', null],
+            ]
         ))
+        // ->dump(true)
         ->keepLeafRulesMatching([
             'and',
-            ['field', '=', 'other_field_name'],
+            ['field', '=', 'field that does not exist'],
         ])
         // ->dump(true)
         ;
 
         $this->assertEquals(
-            null, // TODO this would become TrueRule
+            ["and"],    // TODO replace it by a FalseRule
             $filtered_filter->toArray()
         );
     }
