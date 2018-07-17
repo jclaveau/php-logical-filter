@@ -74,6 +74,7 @@ class ConverterTest extends \AbstractTest
             ],
             ['field_3', '=', null],
             ['field_4', '!=', null],
+            ['field_5', 'regexp', "/^(ab)+/i"],
         ]))
         // ->dump()
         ;
@@ -81,11 +82,15 @@ class ConverterTest extends \AbstractTest
         $inline_sql = (new InlineSqlMinimalConverter())->convert( $filter );
 
         $this->assertEquals(
-            "(field_1 = 2 AND field_2 > 4 AND field_3 IS NULL AND field_4 IS NOT NULL) OR (field_1 = 2 AND field_2 < -4 AND field_3 IS NULL AND field_4 IS NOT NULL)",
+            "(field_1 = 2 AND field_2 > 4 AND field_3 IS NULL AND field_4 IS NOT NULL AND field_5 REGEXP :param_0) OR (field_1 = 2 AND field_2 < -4 AND field_3 IS NULL AND field_4 IS NOT NULL AND field_5 REGEXP :param_1)",
             $inline_sql['sql']
         );
 
-        $this->assertEmpty(
+        $this->assertEquals(
+            [
+                'param_0' => '(?i)^(ab)+',
+                'param_1' => '(?i)^(ab)+',
+            ],
             $inline_sql['parameters']
         );
     }
@@ -104,6 +109,7 @@ class ConverterTest extends \AbstractTest
             ],
             ['field_3', '=', null],
             ['field_4', '!=', null],
+            ['field_5', 'regexp', "/^(ab)+/i"],
         ]))
         // ->dump(true)
         ;
@@ -140,6 +146,13 @@ class ConverterTest extends \AbstractTest
                                             "field" => 'field_4',
                                         ],
                                     ],
+                                    [
+                                        "regexp" => [
+                                            "field_5" => [
+                                                "value" => "/^(ab)+/i",
+                                            ],
+                                        ],
+                                    ],
                                 ],
                             ],
                         ],
@@ -166,6 +179,13 @@ class ConverterTest extends \AbstractTest
                                     [
                                         "exists" => [
                                             "field" => 'field_4',
+                                        ],
+                                    ],
+                                    [
+                                        "regexp" => [
+                                            "field_5" => [
+                                                "value" => "/^(ab)+/i",
+                                            ],
                                         ],
                                     ],
                                 ],

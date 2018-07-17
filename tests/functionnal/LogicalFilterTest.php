@@ -1100,5 +1100,20 @@ class LogicalFilterTest extends \AbstractTest
 
     }
 
+    /**
+     */
+    public function test_add_RegexpRule()
+    {
+        $filter = new LogicalFilter(
+            ['field_1', 'regexp', "/^prefix-[^-]+-suffix$/"]
+        );
+
+        // toArray must be iso to the provided descrition
+        $this->assertEquals(
+            ['field_1', 'regexp', "/^prefix-[^-]+-suffix$/"],
+            $filter->toArray()
+        );
+    }
+
     /**/
 }

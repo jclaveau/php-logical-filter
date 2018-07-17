@@ -102,6 +102,18 @@ class ElasticSearchMinimalConverter extends MinimalConverter
                 ],
             ];
         }
+        elseif ($operator == 'regexp') {
+            // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html
+            $new_rule = [
+                'regexp' => [
+                     $field => [
+                        'value' => $operand->getPattern()
+                        // 'flags' => 'INTERSECTION|COMPLEMENT|EMPTY',
+                        // 'max_determinized_states' => 2000
+                    ],
+                ],
+            ];
+        }
         else {
             throw new \InvalidArgumentException(
                 "Unhandled operator '$operator' during ES query generation"

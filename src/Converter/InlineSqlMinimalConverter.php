@@ -11,6 +11,7 @@ use       JClaveau\LogicalFilter\Rule\EqualRule;
 use       JClaveau\LogicalFilter\Rule\NotEqualRule;
 use       JClaveau\LogicalFilter\Rule\AboveRule;
 use       JClaveau\LogicalFilter\Rule\BelowRule;
+use       JClaveau\LogicalFilter\Rule\RegexpRule;
 
 /**
  * This class implements a converter for MySQL.
@@ -68,6 +69,10 @@ class InlineSqlMinimalConverter extends MinimalConverter
         }
         elseif ($rule instanceof NotEqualRule) {
             $value = $rule->getValue();
+        }
+        elseif ($rule instanceof RegexpRule) {
+            $value = RegexpRule::php2mariadbPCRE( $rule->getPattern() );
+            $operator = 'REGEXP';
         }
 
         if (gettype($value) == 'integer') {
