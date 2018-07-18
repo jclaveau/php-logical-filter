@@ -508,7 +508,7 @@ class AndRule extends AbstractOperationRule
                     }
 
                     $notInRule = reset($operandsByOperator[ NotInRule::operator ]);
-                    $operandsByFields[ $field ][ NotInRule::operator ][0]->setPossibilities(
+                    $operandsByFields[ $field ][ InRule::operator ][0]->setPossibilities(
                         array_diff( $inRule->getPossibilities(), $notInRule->getPossibilities())
                     );
                     unset($operandsByFields[ $field ][ NotInRule::operator ]);

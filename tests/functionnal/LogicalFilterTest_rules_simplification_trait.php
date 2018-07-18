@@ -1537,7 +1537,7 @@ trait LogicalFilterTest_rules_simplification_trait
 
     /**
      */
-    public function test_simplify_simplifySameperands_multiple_in()
+    public function test_simplify_simplifySameOperands_multiple_in()
     {
         $filter = (new LogicalFilter(
             ["and",
@@ -1579,6 +1579,30 @@ trait LogicalFilterTest_rules_simplification_trait
                 ["field2", "=", 4],
                 ["field2", "in", [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
                 ["field2", "in", [1, 2]],
+            ],
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify_differentOperands_in_with_not_in()
+    {
+        $filter = (new LogicalFilter(
+            ["and",
+                ["field", "in", [1, 2, 3, 4]],
+                ["field", "!in", [3, 4, 5, 6]],
+            ]
+        ))
+        ->simplify()
+        ;
+
+        $this->assertEquals(
+            ["or",
+                ["field", "=", 1],
+                ["field", "=", 2],
             ],
             $filter
                 // ->dump(true)
