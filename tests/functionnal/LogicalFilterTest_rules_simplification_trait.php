@@ -1557,5 +1557,34 @@ trait LogicalFilterTest_rules_simplification_trait
         );
     }
 
+    /**
+     */
+    public function test_simplify_differentOperands_in_above_below()
+    {
+        $filter = (new LogicalFilter(
+            ["and",
+                ["or",
+                    ["field2", "=", 4],
+                    ["field2", ">", 10],
+                    ["field2", "<", 3],
+                ],
+                ["field2", "in", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+            ]
+        ))
+        ->simplify()
+        ;
+
+        $this->assertEquals(
+            ["or",
+                ["field2", "=", 4],
+                ["field2", "in", [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                ["field2", "in", [1, 2]],
+            ],
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
     /**/
 }

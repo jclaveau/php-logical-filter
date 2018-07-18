@@ -513,6 +513,43 @@ class AndRule extends AbstractOperationRule
                     );
                     unset($operandsByFields[ $field ][ NotInRule::operator ]);
                 }
+
+                if (!empty($operandsByOperator[ BelowRule::operator ])) {
+                    if (count($operandsByOperator[ BelowRule::operator ]) != 1) {
+                        throw new \LogicException(
+                            __METHOD__ . " MUST be called after unifyAtomicOperands()"
+                        );
+                    }
+
+                    $upper_limit = reset($operandsByOperator[ BelowRule::operator ])->getMaximum();
+
+                    $operandsByFields[ $field ][ InRule::operator ][0]->setPossibilities(
+                        array_filter( $inRule->getPossibilities(), function ($possibility) use ($upper_limit) {
+                            return $possibility < $upper_limit;
+                        } )
+                    );
+
+                    unset($operandsByFields[ $field ][ BelowRule::operator ]);
+                }
+
+                if (!empty($operandsByOperator[ AboveRule::operator ])) {
+                    if (count($operandsByOperator[ AboveRule::operator ]) != 1) {
+                        throw new \LogicException(
+                            __METHOD__ . " MUST be called after unifyAtomicOperands()"
+                        );
+                    }
+
+                    $lower_limit = reset($operandsByOperator[ AboveRule::operator ])->getMinimum();
+
+                    $operandsByFields[ $field ][ InRule::operator ][0]->setPossibilities(
+                        array_filter( $inRule->getPossibilities(), function ($possibility) use ($lower_limit) {
+                            return $possibility > $lower_limit;
+                        } )
+                    );
+
+                    unset($operandsByFields[ $field ][ AboveRule::operator ]);
+                }
+
             }
         }
 
