@@ -90,5 +90,29 @@ class NotInRule extends NotRule
         }
     }
 
+    /**
+     */
+    public function toString(array $options=[])
+    {
+        try {
+            // if (!$this->changed)
+                // return $this->cache;
+
+            // $this->changed = false;
+
+            $operator = self::operator;
+
+            $stringified_possibilities = '[' . implode(', ', array_map(function($possibility) {
+                return var_export($possibility, true);
+            }, $this->getPossibilities()) ) .']';
+
+            // return $this->cache = "['{$this->getField()}', '$operator', stringified_possibilities]";
+            return "['{$this->getField()}', '$operator', $stringified_possibilities]";
+        }
+        catch (\LogicException $e) {
+            return parent::toString();
+        }
+    }
+
     /**/
 }

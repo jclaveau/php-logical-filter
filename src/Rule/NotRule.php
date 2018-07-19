@@ -159,5 +159,17 @@ class NotRule extends AbstractOperationRule
         ];
     }
 
+    /**
+     */
+    public function toString(array $options=[])
+    {
+        $operator = self::operator;
+        if (!$this->operands) {
+            return "['{$operator}']";
+        }
+
+        return "['{$operator}', {$this->operands[0]->toString($options)}]";
+    }
+
     /**/
 }

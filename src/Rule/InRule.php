@@ -159,6 +159,26 @@ class InRule extends OrRule
 
     /**
      */
+    public function toString(array $options=[])
+    {
+        // if (!$this->changed)
+            // return $this->cache;
+
+        // $this->changed = false;
+
+        $operator = self::operator;
+
+        $stringified_possibilities = '[' . implode(', ', array_map(function($possibility) {
+            return var_export($possibility, true);
+        }, $this->getPossibilities()) ) .']';
+
+        // return $this->cache = "['{$this->getField()}', '$operator', stringified_possibilities]";
+        return "['{$this->getField()}', '$operator', $stringified_possibilities]";
+    }
+
+
+    /**
+     */
     public function isSimplificationAllowed()
     {
         return $this->simplification_allowed;

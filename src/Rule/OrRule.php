@@ -61,6 +61,31 @@ class OrRule extends AbstractOperationRule
     }
 
     /**
+     */
+    public function toString(array $options=[])
+    {
+        $operator = self::operator;
+        if (!$this->operands) {
+            return $this->cache = "['{$operator}']";
+        }
+
+        $indent_unit = isset($options['indent_unit']) ? $options['indent_unit'] : '';
+        $line_break  = $indent_unit ? "\n" : '';
+
+        $out = "['{$operator}',$line_break";
+
+        foreach ($this->operands as $operand) {
+            $out .= implode("\n", array_map(function($line) use (&$indent_unit) {
+                return $indent_unit.$line;
+            }, explode("\n", $operand->toString($options)) )) . ",$line_break";
+        }
+
+        $out .= ']';
+
+        return $out;
+    }
+
+    /**
      * + if A > 2 && A > 1 <=> A > 2
      * + if A < 2 && A < 1 <=> A < 1
      */

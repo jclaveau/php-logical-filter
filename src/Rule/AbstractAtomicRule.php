@@ -91,5 +91,22 @@ abstract class AbstractAtomicRule extends AbstractRule
         ];
     }
 
+    /**
+     */
+    public function toString(array $options=[])
+    {
+        if (!$this->changed)
+            return $this->cache;
+
+        $this->changed = false;
+
+        $class = get_class($this);
+        $operator = $class::operator;
+
+        $stringified_value = var_export($this->getValues(), true);
+
+        return $this->cache = "['{$this->getField()}', '$operator', $stringified_value]";
+    }
+
     /**/
 }

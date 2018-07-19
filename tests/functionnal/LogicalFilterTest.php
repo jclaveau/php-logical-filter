@@ -1115,5 +1115,79 @@ class LogicalFilterTest extends \AbstractTest
         );
     }
 
+    /**
+     */
+    public function test_toString()
+    {
+        $filter = (new LogicalFilter(
+            ['and',
+                ['or',
+                    ['field_1', '=', 3],
+                    ['field_1', '>', 20],
+                ],
+                ['not',
+                    ['field_2', '<', -5],
+                ],
+                ['field_1', 'regexp', "/^prefix-[^-]+-suffix$/"],
+                ['field_3', 'in', [2, null]],
+                ['field_4', '!in', [4, 12]],
+                ['field_5', '<=', 3],
+                ['field_5', '>=', 12],
+                ['field_6', '><', [20, 30]],
+                ['date', '>', new \DateTime("2018-07-19")],
+            ]
+        ))
+        // ->dump(true)
+        ;
+
+        // var_dump($filter->toString());
+        // exit;
+
+        // toArray must be iso to the provided descrition
+        $this->assertEquals(
+"['and',
+    ['or',
+        ['field_1', '=', 3],
+        ['field_1', '>', 20],
+    ],
+    ['not', ['field_2', '<', -5]],
+    ['field_1', 'regexp', '/^prefix-[^-]+-suffix$/'],
+    ['field_3', 'in', [2, NULL]],
+    ['field_4', '!in', [4, 12]],
+    ['field_5', '<=', 3],
+    ['field_5', '>=', 12],
+    ['field_6', '><', [20, 30]],
+    ['date', '>', DateTime::__set_state(array(
+       'date' => '2018-07-19 00:00:00.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    ))],
+]",
+            $filter->toString(['indent_unit' => "    "])
+        );
+
+        // toArray must be iso to the provided descrition
+        $this->assertEquals(
+"['and',['or',['field_1', '=', 3],['field_1', '>', 20],],['not', ['field_2', '<', -5]],['field_1', 'regexp', '/^prefix-[^-]+-suffix$/'],['field_3', 'in', [2, NULL]],['field_4', '!in', [4, 12]],['field_5', '<=', 3],['field_5', '>=', 12],['field_6', '><', [20, 30]],['date', '>', DateTime::__set_state(array(
+   'date' => '2018-07-19 00:00:00.000000',
+   'timezone_type' => 3,
+   'timezone' => 'UTC',
+))],]",
+            $filter->toString()
+        );
+
+        // toArray must be iso to the provided descrition
+        $this->assertEquals(
+"['and',['or',['field_1', '=', 3],['field_1', '>', 20],],['not', ['field_2', '<', -5]],['field_1', 'regexp', '/^prefix-[^-]+-suffix$/'],['field_3', 'in', [2, NULL]],['field_4', '!in', [4, 12]],['field_5', '<=', 3],['field_5', '>=', 12],['field_6', '><', [20, 30]],['date', '>', DateTime::__set_state(array(
+   'date' => '2018-07-19 00:00:00.000000',
+   'timezone_type' => 3,
+   'timezone' => 'UTC',
+))],]",
+            $filter . ''
+        );
+
+
+    }
+
     /**/
 }

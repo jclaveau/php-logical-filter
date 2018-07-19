@@ -82,5 +82,25 @@ class BelowOrEqualRule extends OrRule
         }
     }
 
+    /**
+     */
+    public function toString(array $options=[])
+    {
+        try {
+            // if (!$this->changed)
+                // return $this->cache;
+
+            // $this->changed = false;
+
+            $operator = self::operator;
+
+            // return $this->cache = "['{$this->getField()}', '$operator', stringified_possibilities]";
+            return "['{$this->getField()}', '$operator', " . var_export($this->getValues(), true). "]";
+        }
+        catch (\LogicException $e) {
+            return parent::toString();
+        }
+    }
+
     /**/
 }

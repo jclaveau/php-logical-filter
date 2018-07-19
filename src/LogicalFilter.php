@@ -401,6 +401,18 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     * Returns an array describing the rule tree of the Filter.
+     *
+     * @param $debug Provides a source oriented dump.
+     *
+     * @return array A description of the rules.
+     */
+    public function toString(array $options=[])
+    {
+        return $this->rules ? $this->rules->toString($options) : $this->rules;
+    }
+
+    /**
      * For implementing JsonSerializable interface.
      *
      * @see https://secure.php.net/manual/en/jsonserializable.jsonserialize.php
@@ -408,6 +420,14 @@ class LogicalFilter implements \JsonSerializable
     public function jsonSerialize()
     {
         return $this->toArray();
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->toString();
     }
 
     /**

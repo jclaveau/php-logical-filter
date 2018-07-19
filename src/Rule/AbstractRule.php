@@ -123,7 +123,7 @@ abstract class AbstractRule implements \JsonSerializable
      */
     public function __toString()
     {
-        return var_export($this->toArray(), true);
+        return $this->toString();
     }
 
     protected $instance_id;

@@ -105,6 +105,7 @@ class AndRule extends AbstractOperationRule
     }
 
     /**
+     * @todo same as OrRule
      */
     public function toArray($debug=false)
     {
@@ -115,6 +116,31 @@ class AndRule extends AbstractOperationRule
             $operandsAsArray[] = $operand->toArray($debug);
 
         return $operandsAsArray;
+    }
+
+    /**
+     */
+    public function toString(array $options=[])
+    {
+        $operator = self::operator;
+        if (!$this->operands) {
+            return $this->cache = "['{$operator}']";
+        }
+
+        $indent_unit = isset($options['indent_unit']) ? $options['indent_unit'] : '';
+        $line_break  = $indent_unit ? "\n" : '';
+
+        $out = "['{$operator}',$line_break";
+
+        foreach ($this->operands as $operand) {
+            $out .= implode("\n", array_map(function($line) use (&$indent_unit) {
+                return $indent_unit.$line;
+            }, explode("\n", $operand->toString($options)) )) . ",$line_break";
+        }
+
+        $out .= ']';
+
+        return $out;
     }
 
     /**

@@ -99,5 +99,29 @@ class BetweenRule extends AndRule
         }
     }
 
+    /**
+     */
+    public function toString(array $options=[])
+    {
+        try {
+            // if (!$this->changed)
+                // return $this->cache;
+
+            // $this->changed = false;
+
+            $operator = self::operator;
+
+            $stringified_limits = '[' . implode(', ', array_map(function($limit) {
+                return var_export($limit, true);
+            }, $this->getValues()) ) .']';
+
+            // return $this->cache = "['{$this->getField()}', '$operator', stringified_possibilities]";
+            return "['{$this->getField()}', '$operator', $stringified_limits]";
+        }
+        catch (\LogicException $e) {
+            return parent::toString();
+        }
+    }
+
     /**/
 }
