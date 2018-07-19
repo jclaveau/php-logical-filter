@@ -15,8 +15,11 @@ abstract class AbstractAtomicRule extends AbstractRule
     /** @var string $field The field to apply the rule on */
     protected $field;
 
-    /** @var bool $changed */
-    protected $changed = true;
+    /** @var array $cache */
+    protected $cache = [
+        'array'  => null,
+        'string' => null,
+    ];
 
     /**
      * @return string $field
@@ -39,8 +42,11 @@ abstract class AbstractAtomicRule extends AbstractRule
         }
 
         if ($this->field != $field) {
-            $this->field   = $field;
-            $this->changed = true;
+            $this->field = $field;
+            $this->cache = [
+                'array'  => null,
+                'string' => null,
+            ];
         }
 
         return $this;
@@ -71,20 +77,16 @@ abstract class AbstractAtomicRule extends AbstractRule
         return $this;
     }
 
-    protected $cache;
-
     /**
      */
     public function toArray($debug=false)
     {
-        if (!$this->changed)
-            return $this->cache;
-
-        $this->changed = false;
+        if (!empty($this->cache['array']))
+            return $this->cache['array'];
 
         $class = get_class($this);
 
-        return $this->cache = [
+        return $this->cache['array'] = [
             $this->getField(),
             $debug ? $this->getInstanceId() : $class::operator,
             $this->getValues(),
@@ -95,17 +97,15 @@ abstract class AbstractAtomicRule extends AbstractRule
      */
     public function toString(array $options=[])
     {
-        if (!$this->changed)
-            return $this->cache;
-
-        $this->changed = false;
+        if (!empty($this->cache['string']))
+            return $this->cache['string'];
 
         $class = get_class($this);
         $operator = $class::operator;
 
         $stringified_value = var_export($this->getValues(), true);
 
-        return $this->cache = "['{$this->getField()}', '$operator', $stringified_value]";
+        return $this->cache['string'] = "['{$this->getField()}', '$operator', $stringified_value]";
     }
 
     /**/

@@ -1140,10 +1140,9 @@ class LogicalFilterTest extends \AbstractTest
         // ->dump(true)
         ;
 
-        // var_dump($filter->toString());
-        // exit;
+        // This call is just meant to expose possible cache collision with toArray
+        $filter->toArray();
 
-        // toArray must be iso to the provided descrition
         $this->assertEquals(
 "['and',
     ['or',
