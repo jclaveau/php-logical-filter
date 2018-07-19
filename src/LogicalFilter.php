@@ -657,7 +657,7 @@ class LogicalFilter implements \JsonSerializable
      */
     public function applyOn($data_to_filter, $action_on_matches=null, $filterer=null)
     {
-        if ($filterer === null) {
+        if (!$filterer) {
             $filterer = $this->default_filterer;
         }
         elseif (is_callable($filterer)) {
