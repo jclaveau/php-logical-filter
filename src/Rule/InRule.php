@@ -24,6 +24,12 @@ class InRule extends OrRule
     /** @var string $field */
     protected $simplification_allowed = true;
 
+    /** @var array $native_possibilities */
+    protected $native_possibilities = [];
+
+    /** @var array $cache */
+    protected $cache = [];
+
     /**
      * @param string $field         The field to apply the rule on.
      * @param mixed  $possibilities The values the field can belong to.
@@ -39,20 +45,7 @@ class InRule extends OrRule
      */
     public function getField()
     {
-        $fields = [$this->field];
-        foreach ($this->operands as $operand)
-            $fields[] = $operand->getField();
-
-        $fields = array_unique($fields);
-        if (count($fields) > 1) {
-            throw new \RuntimeException(
-                "Unable to retrieve the field of an " . __CLASS__ . " as "
-                ."it contains now operands related to multiple fields: "
-                .implode(', ', $fields)
-            );
-        }
-
-        return reset($fields);
+        return $this->field;
     }
 
     /**
@@ -77,8 +70,6 @@ class InRule extends OrRule
             );
         }
 
-        parent::renameFields($renamings);
-
         return $this;
     }
 
@@ -87,11 +78,7 @@ class InRule extends OrRule
      */
     public function getPossibilities()
     {
-        $possibilities = [];
-        foreach ($this->operands as $operand)
-            $possibilities[] = $operand->getValue();
-
-        return $possibilities;
+        return $this->native_possibilities;
     }
 
     /**
@@ -104,21 +91,12 @@ class InRule extends OrRule
         if (!is_array($possibilities))
             $possibilities = [$possibilities];
 
-        foreach ($possibilities as $possibility) {
-            if ($possibility instanceof EqualRule && $possibility->getField() == $this->getField()) {
-                $possibility = $possibility->getValue();
-            }
-            elseif ($possibility instanceof AbstractRule) {
-                throw new \InvalidArgumentException(
-                    "A possibility cannot be a rule: "
-                    . var_export($possibility, true)
-                );
-            }
+        $this->native_possibilities = array_unique( array_merge(
+            $this->native_possibilities,
+            array_map([$this, 'checkOperandAndExtractValue'], $possibilities)
+        ));
 
-            $this->operands[] = new EqualRule($this->getField(), $possibility);
-        }
-
-        $this->simplification_allowed = count($this->operands) < self::simplification_threshold;
+        $this->cache['operands'] = [];
 
         return $this;
     }
@@ -130,10 +108,57 @@ class InRule extends OrRule
      */
     public function setPossibilities($possibilities)
     {
-        $this->operands = [];
+        $this->native_possibilities = [];
         $this->addPossibilities($possibilities);
 
         return $this;
+    }
+
+    /**
+     * @param  array possibilities
+     *
+     * @return InRule $this
+     */
+    public function setOperands(array $operands)
+    {
+        $possibilities = array_map([$this, 'checkOperandAndExtractValue'], $operands);
+        $this->addPossibilities($possibilities);
+
+        return $this;
+    }
+
+    /**
+     *
+     */
+    protected function checkOperandAndExtractValue($operand)
+    {
+        if (! $operand instanceof AbstractAtomicRule)
+            return $operand;
+
+        if ( ! ($operand instanceof EqualRule && $operand->getField() == $this->field) ) {
+            throw new \InvalidArgumentException(
+                "Trying to set an invalid operand of an InRule: "
+                .var_export($operand, true)
+            );
+        }
+
+        return $operand->getValue();
+    }
+
+    /**
+     * @return InRule $this
+     */
+    public function getOperands()
+    {
+        if (!empty($this->cache['operands'])) {
+            return $this->cache['operands'];
+        }
+
+        $operands = [];
+        foreach ($this->native_possibilities as $value)
+            $operands[] = new EqualRule($this->field, $value);
+
+        return $this->cache['operands'] = $operands;
     }
 
     /**
@@ -172,7 +197,6 @@ class InRule extends OrRule
             return var_export($possibility, true);
         }, $this->getPossibilities()) ) .']';
 
-        // return $this->cache = "['{$this->getField()}', '$operator', stringified_possibilities]";
         return "['{$this->getField()}', '$operator', $stringified_possibilities]";
     }
 
@@ -181,7 +205,7 @@ class InRule extends OrRule
      */
     public function isSimplificationAllowed()
     {
-        return $this->simplification_allowed;
+        return count($this->native_possibilities) < self::simplification_threshold;
     }
 
     /**/

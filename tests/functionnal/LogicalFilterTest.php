@@ -49,13 +49,13 @@ class LogicalFilterTest extends \AbstractTest
         );
 
         $this->assertEquals(
-            new AndRule([
+            (new AndRule([
                 new InRule('field', ['a', 'b', 'c']),
                 // new NotInRule(['a', 'b', 'c']),
                 new AboveRule('field', 3),
                 new BelowRule('field', 5)
-            ]),
-            $rules
+            ]))->toArray(),
+            $rules->toArray()
         );
     }
 

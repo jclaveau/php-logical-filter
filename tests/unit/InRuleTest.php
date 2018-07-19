@@ -48,16 +48,24 @@ class InRuleTest extends \AbstractTest
     public function test_getField()
     {
         $rule = new InRule('field', [4, 5, 6]);
+        $this->assertEquals('field', $rule->getField());
+    }
+
+    /**
+     */
+    public function test_setOperands()
+    {
+        $rule = new InRule('field', [4, 5, 6]);
 
         $operands = $rule->getOperands();
         $operands[0] = new BelowRule('field_2', 3);
-        $rule->setOperands($operands);
 
         try {
-            $this->assertFalse( $rule->getField() );
+            $rule->setOperands($operands);
+            // $this->assertFalse( $rule->getField() );
             $this->assertTrue(
                 false,
-                "An exception explaining that the two operands have different fields "
+                "An exception explaining that an invalid operand is set"
             );
         }
         catch (\Exception $e) {

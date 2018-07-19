@@ -616,7 +616,9 @@ trait LogicalFilterTest_rules_manipulation_trait
             ["and",
                 ["types", "in", ["my_type_1", "my_type_2"]],
             ],
-            $filtered_filter->toArray()
+            $filtered_filter
+                // ->dump(true)
+                ->toArray()
         );
     }
 
