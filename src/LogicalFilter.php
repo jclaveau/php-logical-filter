@@ -50,7 +50,18 @@ class LogicalFilter implements \JsonSerializable
         if ($rules)
             $this->and_( $rules );
 
-        $this->default_filterer = $default_filterer ? : new PhpFilterer();
+        if ($default_filterer)
+            $this->default_filterer = $default_filterer;
+    }
+
+    /**
+     */
+    protected function getDefaultFilterer()
+    {
+        if (!$this->default_filterer)
+            $this->default_filterer = new PhpFilterer();
+
+        return $this->default_filterer;
     }
 
     /**
@@ -658,7 +669,7 @@ class LogicalFilter implements \JsonSerializable
     public function applyOn($data_to_filter, $action_on_matches=null, $filterer=null)
     {
         if (!$filterer) {
-            $filterer = $this->default_filterer;
+            $filterer = $this->getDefaultFilterer();
         }
         elseif (is_callable($filterer)) {
             $filterer = new CustomizableFilterer($filterer);
