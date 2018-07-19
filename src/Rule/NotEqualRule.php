@@ -12,6 +12,12 @@ class NotEqualRule extends NotRule
     /** @var string null_field */
     protected $null_field = null;
 
+    /** @var array $cache */
+    protected $cache = [
+        'array'  => null,
+        'string' => null,
+    ];
+
     /**
      * @param string $field The field to apply the rule on.
      * @param array  $value The value the field can equal to.
@@ -77,6 +83,21 @@ class NotEqualRule extends NotRule
             $debug ? $this->getInstanceId() : self::operator,
             $this->getValue(),
         ];
+    }
+
+    /**
+     */
+    public function toString(array $options=[])
+    {
+        if (!empty($this->cache['string']))
+            return $this->cache['string'];
+
+        $class = get_class($this);
+        $operator = $class::operator;
+
+        $stringified_value = var_export($this->getValues(), true);
+
+        return $this->cache['string'] = "['{$this->getField()}', '$operator', $stringified_value]";
     }
 
     /**
