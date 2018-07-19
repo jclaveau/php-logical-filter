@@ -109,11 +109,11 @@ class LogicalFilterProfileTest extends \AbstractTest
         // ->dump(true)
         ;
 
-        var_dump($this->getMemoryUsage());
-        // $this->assertMemoryUsageBelow('1.3M');
+        // var_dump($this->getMemoryUsage());
+        $this->assertMemoryUsageBelow('10M');
 
-        var_dump($this->getExecutionTime());
-        // $this->assertExecutionTimeBelow(1.5);
+        // var_dump($this->getExecutionTime());
+        $this->assertExecutionTimeBelow(1.5);
     }
 
     /**/
