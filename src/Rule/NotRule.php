@@ -180,7 +180,19 @@ class NotRule extends AbstractOperationRule
             return "['{$operator}']";
         }
 
-        return "['{$operator}', {$this->operands[0]->toString($options)}]";
+        $indent_unit = isset($options['indent_unit']) ? $options['indent_unit'] : '';
+        $line_break  = $indent_unit ? "\n" : '';
+
+        $out = "['{$operator}',"
+            . $line_break
+            . ($indent_unit ? : ' ')
+            . $this->operands[0]->toString($options)
+            . ','
+            . $line_break
+            . ']'
+            ;
+
+        return $out;
     }
 
     /**/
