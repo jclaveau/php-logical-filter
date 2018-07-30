@@ -1032,7 +1032,7 @@ class LogicalFilterTest extends \AbstractTest
      * @todo debug the runInseparateProcess of php to test the exit call.
      * @ runInSeparateProcess
      */
-    public function test_dump()
+    public function test_dump_export()
     {
         ob_start();
         $filter = (new LogicalFilter( ['field_1', '=', 3] ))
@@ -1040,7 +1040,6 @@ class LogicalFilterTest extends \AbstractTest
             ;
         $dump = ob_get_clean();
 
-        // export mode
         $this->assertEquals(
             str_replace('    ', '', "
                 ". __FILE__ .":XX
@@ -1049,56 +1048,6 @@ class LogicalFilterTest extends \AbstractTest
                   1 => '=',
                   2 => 3,
                 )
-
-                "
-            ),
-            preg_replace('/:\d+/', ':XX', $dump)
-        );
-
-        // dump mode
-        ob_start();
-        $filter = (new LogicalFilter( ['field_1', '=', 3] ))
-            ->dump(false, ['mode' => 'dump'])
-            ;
-        $dump = ob_get_clean();
-        // echo $dump;
-        $this->assertEquals(
-            str_replace('    ', '', "
-                ". __FILE__ .":XX
-array(3) {
-  [0]=>
-  string(7) \"field_1\"
-  [1]=>
-  string(1) \"=\"
-  [2]=>
-  int(3)
-}
-
-
-                "
-            ),
-            preg_replace('/:\d+/', ':XX', $dump)
-        );
-
-        // xdebug mode
-        ob_start();
-        $filter = (new LogicalFilter( ['field_1', '=', 3] ))
-            ->dump(false, ['mode' => 'xdebug'])
-            ;
-        $dump = ob_get_clean();
-        // echo $dump;
-        $this->assertEquals(
-            str_replace('    ', '', "
-                ". __FILE__ .":XX
-array(3) {
-  [0] =>
-  string(7) \"field_1\"
-  [1] =>
-  string(1) \"=\"
-  [2] =>
-  int(3)
-}
-
 
                 "
             ),
@@ -1124,8 +1073,78 @@ array(3) {
             ),
             preg_replace('/:\d+/', ':XX', $dump)
         );
+    }
 
-        // instance debuging enabled
+    /**
+     */
+    public function test_dump_dump()
+    {
+        ob_start();
+        $filter = (new LogicalFilter( ['field_1', '=', 3] ))
+            ->dump(false, ['mode' => 'dump'])
+            ;
+        $dump = ob_get_clean();
+        // echo $dump;
+        $this->assertEquals(
+            str_replace('    ', '', "
+                ". __FILE__ .":XX
+array(3) {
+  [0]=>
+  string(7) \"field_1\"
+  [1]=>
+  string(1) \"=\"
+  [2]=>
+  int(3)
+}
+
+
+                "
+            ),
+            preg_replace('/:\d+/', ':XX', $dump)
+        );
+
+    }
+
+    /**
+     */
+    public function test_dump_xdebug()
+    {
+        if ( ! function_exists('xdebug_is_enabled')) {
+            $this->markTestSkipped();
+        }
+        if ( ! xdebug_is_enabled()) {
+            $this->markTestSkipped();
+        }
+
+        ob_start();
+        $filter = (new LogicalFilter( ['field_1', '=', 3] ))
+            ->dump(false, ['mode' => 'xdebug'])
+            ;
+        $dump = ob_get_clean();
+        // echo $dump;
+        $this->assertEquals(
+            str_replace('    ', '', "
+                ". __FILE__ .":XX
+array(3) {
+  [0] =>
+  string(7) \"field_1\"
+  [1] =>
+  string(1) \"=\"
+  [2] =>
+  int(3)
+}
+
+
+                "
+            ),
+            preg_replace('/:\d+/', ':XX', $dump)
+        );
+    }
+
+    /**
+     */
+    public function test_dump_string()
+    {
         ob_start();
         $filter = (new LogicalFilter( ['and', ['field_1', '=', 3], ['field_2', '!=', null]] ))
             ->dump(false, ['mode' => 'string', 'indent_unit' => '  '])
