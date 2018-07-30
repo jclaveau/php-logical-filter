@@ -120,8 +120,9 @@ class BetweenRule extends AndRule
                 // return $this->cache;
 
             // $this->changed = false;
+            $class = get_called_class();
 
-            $operator = self::operator;
+            $operator = $class::operator;
 
             $stringified_limits = '[' . implode(', ', array_map(function($limit) {
                 return var_export($limit, true);
