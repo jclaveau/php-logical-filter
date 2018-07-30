@@ -150,12 +150,24 @@ class NotRule extends AbstractOperationRule
     }
 
     /**
+     * @param array $options   + show_instance=false Display the operator of the rule or its instance id
+     *
+     * @return array
      */
-    public function toArray($debug=false)
+    public function toArray(array $options=[])
     {
+        $default_options = [
+            'show_instance' => false,
+        ];
+        foreach ($default_options as $default_option => &$default_value) {
+            if (!isset($options[ $default_option ]))
+                $options[ $default_option ] = $default_value;
+        }
+        extract($options);
+
         return [
-            $debug ? $this->getInstanceId() : self::operator,
-            isset($this->operands[0]) ? $this->operands[0]->toArray($debug) : false
+            $show_instance ? $this->getInstanceId() : self::operator,
+            isset($this->operands[0]) ? $this->operands[0]->toArray($options) : false
         ];
     }
 

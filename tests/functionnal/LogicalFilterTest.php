@@ -1036,11 +1036,11 @@ class LogicalFilterTest extends \AbstractTest
     {
         ob_start();
         $filter = (new LogicalFilter( ['field_1', '=', 3] ))
-            ->dump()
+            ->dump(false, ['mode' => 'export'])
             ;
         $dump = ob_get_clean();
 
-        // simple chained dump
+        // export mode
         $this->assertEquals(
             str_replace('    ', '', "
                 ". __FILE__ .":XX
@@ -1055,10 +1055,60 @@ class LogicalFilterTest extends \AbstractTest
             preg_replace('/:\d+/', ':XX', $dump)
         );
 
+        // dump mode
+        ob_start();
+        $filter = (new LogicalFilter( ['field_1', '=', 3] ))
+            ->dump(false, ['mode' => 'dump'])
+            ;
+        $dump = ob_get_clean();
+        // echo $dump;
+        $this->assertEquals(
+            str_replace('    ', '', "
+                ". __FILE__ .":XX
+array(3) {
+  [0]=>
+  string(7) \"field_1\"
+  [1]=>
+  string(1) \"=\"
+  [2]=>
+  int(3)
+}
+
+
+                "
+            ),
+            preg_replace('/:\d+/', ':XX', $dump)
+        );
+
+        // xdebug mode
+        ob_start();
+        $filter = (new LogicalFilter( ['field_1', '=', 3] ))
+            ->dump(false, ['mode' => 'xdebug'])
+            ;
+        $dump = ob_get_clean();
+        // echo $dump;
+        $this->assertEquals(
+            str_replace('    ', '', "
+                ". __FILE__ .":XX
+array(3) {
+  [0] =>
+  string(7) \"field_1\"
+  [1] =>
+  string(1) \"=\"
+  [2] =>
+  int(3)
+}
+
+
+                "
+            ),
+            preg_replace('/:\d+/', ':XX', $dump)
+        );
+
         // instance debuging enabled
         ob_start();
         $filter = (new LogicalFilter( ['field_1', '=', 3] ))
-            ->dump(false, true)
+            ->dump(false, ['mode' => 'export', 'show_instance' => true])
             ;
         $dump = ob_get_clean();
         $this->assertEquals(
@@ -1069,6 +1119,25 @@ class LogicalFilterTest extends \AbstractTest
                   1 => 'JClaveau\\\\LogicalFilter\\\\Rule\\\\EqualRule:XX',
                   2 => 3,
                 )
+
+                "
+            ),
+            preg_replace('/:\d+/', ':XX', $dump)
+        );
+
+        // instance debuging enabled
+        ob_start();
+        $filter = (new LogicalFilter( ['and', ['field_1', '=', 3], ['field_2', '!=', null]] ))
+            ->dump(false, ['mode' => 'string', 'indent_unit' => '  '])
+            ;
+        $dump = ob_get_clean();
+        $this->assertEquals(
+            str_replace('    ', '', "
+                ". __FILE__ .":XX
+['and',
+  ['field_1', '=', 3],
+  ['field_2', '!=', NULL],
+]
 
                 "
             ),
@@ -1097,7 +1166,6 @@ class LogicalFilterTest extends \AbstractTest
             // ),
             // preg_replace('/:\d+/', ':XX', $dump)
         // );
-
     }
 
     /**

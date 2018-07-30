@@ -92,16 +92,73 @@ abstract class AbstractRule implements \JsonSerializable
     }
 
     /**
-     * var_export() the rule with a chained syntax.
+     * Dumps the rule with a chained syntax.
+     *
+     * @param bool  $exit=false
+     * @param array $options    + callstack_depth=2 The level of the caller to dump
+     *                          + mode='string' in 'export' | 'dump' | 'string' | 'xdebug'
+     *
+     * @return $this
      */
-    public function dump($exit=false, $debug=false, $callstack_depth = 2)
+    public final function dump($exit=false, array $options=[])
     {
+        $default_options = [
+            'callstack_depth' => 2,
+            'mode'            => 'string',
+            // 'show_instance'   => false,
+        ];
+        foreach ($default_options as $default_option => &$default_value) {
+            if (!isset($options[ $default_option ]))
+                $options[ $default_option ] = $default_value;
+        }
+        extract($options);
+
         $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $callstack_depth);
         $caller = $bt[ $callstack_depth - 2 ];
 
         echo "\n" . $caller['file'] . ':' . $caller['line'] . "\n";
-        var_export($this->toArray($debug));
+        if ($mode == 'string') {
+            if ( ! isset($options['indent_unit']))
+                $options['indent_unit'] = "    ";
+
+            echo ($this->toString($options));
+        }
+        elseif ($mode == 'dump') {
+            if ($xdebug_enabled = ini_get('xdebug.overload_var_dump'))
+                ini_set('xdebug.overload_var_dump', 0);
+
+            var_dump($this->toArray($options));
+
+            if ($xdebug_enabled)
+                ini_set('xdebug.overload_var_dump', 1);
+        }
+        elseif ($mode == 'xdebug') {
+            if ( ! function_exists('xdebug_is_enabled')) {
+                throw new \RuntimeException("Xdebug is not installed");
+            }
+            if ( ! xdebug_is_enabled()) {
+                throw new \RuntimeException("Xdebug is disabled");
+            }
+
+            if ($xdebug_enabled = ini_get('xdebug.overload_var_dump'))
+                ini_set('xdebug.overload_var_dump', 1);
+
+            var_dump($this->toArray($options));
+
+            if ($xdebug_enabled)
+                ini_set('xdebug.overload_var_dump', 0);
+        }
+        elseif ($mode == 'export') {
+            var_export($this->toArray($options));
+        }
+        else {
+            throw new \InvalidArgumentException(
+                 "'mode' option must belong to ['string', 'export', 'dump'] "
+                ."instead of " . var_export($mode, true)
+            );
+        }
         echo "\n\n";
+
         if ($exit)
             exit;
 

@@ -105,17 +105,30 @@ class AndRule extends AbstractOperationRule
     }
 
     /**
+     * @param array $options   + show_instance=false Display the operator of the rule or its instance id
+     *
+     * @return array
+     *
      * @todo same as OrRule
      */
-    public function toArray($debug=false)
+    public function toArray(array $options=[])
     {
-        $operandsAsArray = [
-            $debug ? $this->getInstanceId() : self::operator,
+        $default_options = [
+            'show_instance' => false,
+        ];
+        foreach ($default_options as $default_option => &$default_value) {
+            if (!isset($options[ $default_option ]))
+                $options[ $default_option ] = $default_value;
+        }
+        extract($options);
+
+        $operands_as_array = [
+            $show_instance ? $this->getInstanceId() : self::operator,
         ];
         foreach ($this->operands as $operand)
-            $operandsAsArray[] = $operand->toArray($debug);
+            $operands_as_array[] = $operand->toArray($options);
 
-        return $operandsAsArray;
+        return $operands_as_array;
     }
 
     /**

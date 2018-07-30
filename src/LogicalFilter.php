@@ -402,13 +402,13 @@ class LogicalFilter implements \JsonSerializable
     /**
      * Returns an array describing the rule tree of the Filter.
      *
-     * @param $debug Provides a source oriented dump.
+     * @param array $options
      *
      * @return array A description of the rules.
      */
-    public function toArray($debug=false)
+    public function toArray(array $options=[])
     {
-        return $this->rules ? $this->rules->toArray($debug) : $this->rules;
+        return $this->rules ? $this->rules->toArray($options) : $this->rules;
     }
 
     /**
@@ -638,18 +638,34 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     * @param bool  $exit=false
+     * @param array $options    + callstack_depth=2 The level of the caller to dump
+     *                          + mode='string' in 'export' | 'dump' | 'string'
+     *
+     * @return $this
      */
-    public function dump($exit=false, $debug=false, $callstack_depth = 2)
+    public function dump($exit=false, array $options=[])
     {
+        $default_options = [
+            'callstack_depth' => 3,
+            'mode'            => 'string',
+        ];
+        foreach ($default_options as $default_option => &$default_value) {
+            if (!isset($options[ $default_option ]))
+                $options[ $default_option ] = $default_value;
+        }
+        extract($options);
+
         if ($this->rules) {
-            $this->rules->dump($exit, $debug, 3);
+            $this->rules->dump($exit, $options);
         }
         else {
+            // TODO dump a TrueRule
             $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $callstack_depth);
             $caller = $bt[ $callstack_depth - 2 ];
 
             echo "\n" . $caller['file'] . ':' . $caller['line'] . "\n";
-            var_export($this->toArray($debug));
+            var_export($this->toArray($options));
             echo "\n\n";
             if ($exit)
                 exit;
