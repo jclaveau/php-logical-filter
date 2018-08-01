@@ -42,7 +42,7 @@ class RuleFilterer extends Filterer
     /**
      * @return array
      */
-    public function getChildren( AbstractRule $row )
+    public function getChildren($row) // strict issue if forcing  AbstractRule with php 5.6 here
     {
         if ($row instanceof InRule && !$row->isSimplificationAllowed()) {
             // We do not need to parse the EqualRule operands of InRules
@@ -57,7 +57,7 @@ class RuleFilterer extends Filterer
 
     /**
      */
-    public function setChildren( AbstractRule &$row, $filtered_children )
+    public function setChildren( &$row, $filtered_children ) // strict issue if forcing  AbstractRule with php 5.6 here
     {
         if ($row instanceof AbstractOperationRule)
             return $row->setOperands( $filtered_children );
