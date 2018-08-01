@@ -593,7 +593,7 @@ class LogicalFilter implements \JsonSerializable
      * @return array The rules matching the filter
      *
      *
-     * @todo Merge with rules
+     * @todo Make it available on AbstractRule also
      */
     public function onEachRule($filter=[], $options)
     {
