@@ -54,7 +54,15 @@ class PhpFilterer extends Filterer
             }
             else {
                 throw new \InvalidArgumentException(
-                    "This case shouldn't occure with teh current simplification strategy"
+                    "This case shouldn't occure with the current simplification strategy: "
+                    ."'$field' $operator "
+                    .var_export($value, true)
+                    ."\n\n"
+                    ."[\n"
+                    . implode( ",\n", array_map( function($operand) {
+                        return $operand->toString(['indent_unit' => '    ']);
+                    }, $all_operands) )
+                    ."\n]\n"
                 );
                 // return $row[$field] == $operand->getValue();
             }

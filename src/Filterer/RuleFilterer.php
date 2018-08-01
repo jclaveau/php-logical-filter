@@ -16,6 +16,7 @@ use       JClaveau\LogicalFilter\Rule\NotRule;
 use       JClaveau\LogicalFilter\Rule\NotEqualRule;
 use       JClaveau\LogicalFilter\Rule\AbstractOperationRule;
 use       JClaveau\LogicalFilter\Rule\AbstractRule;
+use       JClaveau\LogicalFilter\Rule\InRule;
 
 /**
  * This filterer is intended to validate Rules.
@@ -39,9 +40,16 @@ class RuleFilterer extends Filterer
     const path        = 'path';
 
     /**
+     * @return array
      */
-    public function getChildren($row)
+    public function getChildren( AbstractRule $row )
     {
+        if ($row instanceof InRule && !$row->isSimplificationAllowed()) {
+            // We do not need to parse the EqualRule operands of InRules
+            // as they all share the same field
+            return [];
+        }
+
         if ($row instanceof AbstractOperationRule) {
             return $row->getOperands();
         }
@@ -49,7 +57,7 @@ class RuleFilterer extends Filterer
 
     /**
      */
-    public function setChildren(&$row, $filtered_children)
+    public function setChildren( AbstractRule &$row, $filtered_children )
     {
         if ($row instanceof AbstractOperationRule)
             return $row->setOperands( $filtered_children );
@@ -61,7 +69,7 @@ class RuleFilterer extends Filterer
      */
     public function validateRule ($field, $operator, $value, $rule, $depth, $all_operands, $options)
     {
-        if (    !empty($options['leafs_only'])
+        if (    !empty($options[ Filterer::leaves_only ])
             && in_array( get_class($rule), [OrRule::class, AndRule::class, NotRule::class] )
         ) {
             return true;
@@ -69,6 +77,7 @@ class RuleFilterer extends Filterer
 
         if ($field === self::field) {
             if (!method_exists($rule, 'getField'))
+            // if (in_array( get_class($rule), [AndRule::class, OrRule::class]))
                 return null; // The filter cannot be applied to this rule
 
             try {
@@ -176,7 +185,7 @@ class RuleFilterer extends Filterer
     /**
      * @param LogicalFilter      $filter
      * @param array|AbstractRule $ruleTree_to_filter
-     * @param array              $options leafs_only | debug
+     * @param array              $options leaves_only | debug
      */
     public function apply( LogicalFilter $filter, $ruleTree_to_filter, $options=[] )
     {

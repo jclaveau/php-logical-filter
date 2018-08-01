@@ -3,6 +3,7 @@ namespace JClaveau\LogicalFilter;
 
 use JClaveau\VisibilityViolator\VisibilityViolator;
 use JClaveau\LogicalFilter\LogicalFilter;
+use JClaveau\LogicalFilter\Filterer\Filterer;
 
 class LogicalFilterProfileTest extends \AbstractTest
 {
@@ -114,6 +115,53 @@ class LogicalFilterProfileTest extends \AbstractTest
 
         // var_dump($this->getExecutionTime());
         $this->assertExecutionTimeBelow(1.5);
+    }
+
+    /**
+     * @profile
+     * @coversNothing
+     */
+    public function test_profile_onEachRule_do_not_parse_in_operands()
+    {
+        $counts = [
+            'matches'    => [],
+            'mismatches' => [],
+        ];
+
+        $filter = (new LogicalFilter(
+            require __DIR__ . '/LogicalFilterProfileTest_very_big_filter.php'
+        ))
+        ->onEachRule(
+            ['field', 'in', ['adserver_id', 'campaign_id']],
+            [
+                Filterer::leaves_only => true,
+                Filterer::on_row_matches => function ($rule, $key, &$siblings) use (&$counts) {
+                    if (!isset($counts['matches'][$rule::operator]))
+                        $counts['matches'][$rule::operator] = 0;
+
+                    $counts['matches'][$rule::operator]++;
+                },
+                Filterer::on_row_mismatches => function ($rule, $key, &$siblings) use (&$counts) {
+                    if (!isset($counts['mismatches'][$rule::operator]))
+                        $counts['mismatches'][$rule::operator] = 0;
+
+                    $counts['mismatches'][$rule::operator]++;
+                },
+            ]
+        )
+        // ->dump(true)
+        ;
+
+        // var_dump($counts);
+
+        $this->assertEquals(22, $counts['matches']['=']);
+        $this->assertEquals(22, $counts['matches']['in']);
+
+        // var_dump($this->getMemoryUsage() / 1024 / 1024);
+        $this->assertMemoryUsageBelow('5M');
+
+        // var_dump($this->getExecutionTime());
+        $this->assertExecutionTimeBelow(0.3);
     }
 
     /**/

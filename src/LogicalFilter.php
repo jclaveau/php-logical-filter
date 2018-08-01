@@ -500,7 +500,7 @@ class LogicalFilter implements \JsonSerializable
      *                        that would rename the fields.
      *
      * @return array The rules matching the filter
-     * @return array $options debug | leafs_only | clean_empty_branches
+     * @return array $options debug | leaves_only | clean_empty_branches
      *
      *
      * @todo Merge with rules
@@ -513,7 +513,7 @@ class LogicalFilter implements \JsonSerializable
         // ->dump()
         ;
 
-        $options['leafs_only'] = true;
+        $options[ Filterer::leaves_only ] = true;
 
         $this->rules = (new RuleFilterer)->apply($filter, $this->rules, $options);
         // $this->rules->dump(true);

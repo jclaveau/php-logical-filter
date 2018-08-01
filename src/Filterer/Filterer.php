@@ -9,10 +9,13 @@ namespace JClaveau\LogicalFilter\Filterer;
 use       JClaveau\LogicalFilter\Filterer\FiltererInterface;
 use       JClaveau\LogicalFilter\LogicalFilter;
 
+use       JClaveau\LogicalFilter\Rule\InRule;
 use       JClaveau\LogicalFilter\Rule\EqualRule;
 use       JClaveau\LogicalFilter\Rule\BelowRule;
 use       JClaveau\LogicalFilter\Rule\AboveRule;
 use       JClaveau\LogicalFilter\Rule\NotEqualRule;
+use       JClaveau\LogicalFilter\Rule\AbstractAtomicRule;
+use       JClaveau\LogicalFilter\Rule\AbstractOperationRule;
 
 /**
  * This filterer provides the tools and API to apply a LogicalFilter once it has
@@ -20,6 +23,7 @@ use       JClaveau\LogicalFilter\Rule\NotEqualRule;
  */
 abstract class Filterer implements FiltererInterface
 {
+    const leaves_only       = 'leaves_only';
     const on_row_matches    = 'on_row_matches';
     const on_row_mismatches = 'on_row_mismatches';
 
@@ -122,7 +126,7 @@ abstract class Filterer implements FiltererInterface
         $root_OrRule = $filter
             ->simplify(['force_logical_core' => true])
             ->getRules()
-            // ->dump(!true)
+            // ->dump(true)
             ;
 
         if ($root_OrRule !== null) {
@@ -176,16 +180,19 @@ abstract class Filterer implements FiltererInterface
                     $case_is_good = null;
                     foreach ($and_case->getOperands() as $i => $rule) {
 
-                        $field = method_exists($rule, 'getField')
-                               ? $rule->getField()
-                               : null;
-
-                        if ($rule instanceof AbstractOperationRule) {
+                        if ($rule instanceof OrRule && $rule instanceof AndRule) {
+                            $field = null;
                             $value = $rule->getOperands();
                         }
+                        elseif ($rule instanceof NotEqualRule || $rule instanceof AbstractAtomicRule) {
+                            $field = $rule->getField();
+                            $value = $rule->getValues();
+                        }
                         else {
-                            // TODO set a getValue for every leaf rule
-                            $value = $rule->toArray()[2];
+                            throw new \LogicException(
+                                "Filtering with a rule which has not been simplified: "
+                                .var_export($rule, true)
+                            );
                         }
 
                         $operator = $rule::operator;
