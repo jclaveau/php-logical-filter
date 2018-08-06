@@ -45,16 +45,7 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function __construct( array $operands=[] )
     {
-        if ($nonRules = array_filter($operands, function($operand) {
-            return !$operand instanceof AbstractRule;
-        })) {
-            throw new \InvalidArgumentException(
-                "Operands must be instances of AbstractRule: \n"
-                . var_export($nonRules, true)
-            );
-        }
-
-        $this->operands = $operands;
+        $this->setOperands( $operands );
     }
 
     /**
@@ -74,8 +65,12 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function addOperand( AbstractRule $new_operand )
     {
-        $this->operands[] = $new_operand;
-        $this->current_simplification_step = null;
+        if (!isset($this->operands[ $id = $new_operand->getSemanticId() ]))
+            $this->operands[ $id ] = $new_operand;
+
+        if ($this->current_simplification_step)
+            $this->current_simplification_step = null;
+
         return $this;
     }
 
@@ -84,7 +79,7 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function getOperands()
     {
-        return $this->operands;
+        return array_values( $this->operands );
     }
 
     /**
@@ -92,9 +87,11 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function setOperands(array $operands)
     {
-        // keep the index start at 0
-        $this->operands = array_values($operands);
-        $this->current_simplification_step = null;
+        $this->operands = [];
+        foreach ($operands as $operand) {
+            $this->addOperand($operand);
+        }
+
         return $this;
     }
 
@@ -223,9 +220,6 @@ abstract class AbstractOperationRule extends AbstractRule
         while ($is_modified) {
             $is_modified = false;
 
-            if ($this->removeSameOperands())
-                $is_modified = true;
-
             if ($this->removeMonooperandOperationsOperands())
                 $is_modified = true;
 
@@ -295,25 +289,6 @@ abstract class AbstractOperationRule extends AbstractRule
         }
 
         return !empty($has_been_changed);
-    }
-
-    /**
-     * Removes same operands even if they are not leaves.
-     *
-     * @return bool
-     */
-    public function removeSameOperands()
-    {
-        $operands_count = count($this->operands);
-
-        $cleaned_operands = [];
-        foreach ($this->operands as $operand) {
-            $cleaned_operands[ $operand->getSemanticId() ] = $operand;
-        }
-
-        $this->operands = array_values($cleaned_operands);
-
-        return $operands_count != count( $this->operands );
     }
 
     /**
@@ -511,8 +486,8 @@ abstract class AbstractOperationRule extends AbstractRule
             // return $copy;
 
         $copied_operands = [];
-        foreach ($this->operands as $operand) {
-            $copied_operands[] = $operand->copy($token);
+        foreach ($this->operands as $operand_id => $operand) {
+            $copied_operands[$operand_id] = $operand->copy($token);
         }
 
         VisibilityViolator::setHiddenProperty(
@@ -560,6 +535,18 @@ abstract class AbstractOperationRule extends AbstractRule
     public function isSimplificationAllowed()
     {
         return true;
+    }
+
+    /**
+     * Returns an operand based on its position
+     *
+     * @return AbstractRule|null The operand if it exists or null
+     */
+    protected function getOperandAt($index=0)
+    {
+        $operands = array_values($this->operands);
+        if (isset($operands[$index]))
+            return $operands[$index];
     }
 
     /**/

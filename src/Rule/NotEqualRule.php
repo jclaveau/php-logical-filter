@@ -55,7 +55,7 @@ class NotEqualRule extends NotRule
     {
         return $this->null_field !== null
             ? $this->null_field
-            : $this->operands[0]->getField();
+            : $this->getOperandAt(0)->getField();
     }
 
     /**
@@ -64,7 +64,7 @@ class NotEqualRule extends NotRule
     {
         return $this->null_field !== null
             ? null
-            : $this->operands[0]->getValue();
+            : $this->getOperandAt(0)->getValue();
     }
 
     /**

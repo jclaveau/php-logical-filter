@@ -25,7 +25,7 @@ class BetweenRule extends AndRule
      */
     public function getMinimum()
     {
-        return $this->operands[0]->getMinimum();
+        return $this->getOperandAt(0)->getMinimum();
     }
 
     /**
@@ -33,7 +33,7 @@ class BetweenRule extends AndRule
      */
     public function getMaximum()
     {
-        return $this->operands[1]->getMaximum();
+        return $this->getOperandAt(1)->getMaximum();
     }
 
     /**
@@ -51,12 +51,12 @@ class BetweenRule extends AndRule
      */
     public function getField()
     {
-        $field1 = $this->operands[0]->getField();
+        $field1 = $this->getOperandAt(0)->getField();
 
-        if (!isset($this->operands[1]))
+        if (!$this->getOperandAt(1))
             return $field1;
 
-        $field2 = $this->operands[1]->getField();
+        $field2 = $this->getOperandAt(1)->getField();
 
         if ($field1 != $field2) {
             // TODO if this case occures, the current object should be
@@ -99,16 +99,16 @@ class BetweenRule extends AndRule
 
         $class = get_class($this);
 
-        try {
+        // try {
             return [
                 $this->getField(),
                 $show_instance ? $this->getInstanceId() : $class::operator,
                 $this->getValues(),
             ];
-        }
-        catch (\RuntimeException $e) {
-            return parent::toArray();
-        }
+        // }
+        // catch (\RuntimeException $e) {
+            // return parent::toArray();
+        // }
     }
 
     /**

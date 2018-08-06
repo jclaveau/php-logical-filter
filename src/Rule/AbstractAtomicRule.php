@@ -91,16 +91,22 @@ abstract class AbstractAtomicRule extends AbstractRule
         }
         extract($options);
 
-        if (!empty($this->cache['array']))
+
+        if (!$show_instance && !empty($this->cache['array']))
             return $this->cache['array'];
 
         $class = get_class($this);
 
-        return $this->cache['array'] = [
+        $array = [
             $this->getField(),
             $show_instance ? $this->getInstanceId() : $class::operator,
             $this->getValues(),
         ];
+
+        if (!$show_instance)
+            return $this->cache['array'] = $array;
+        else
+            return $array;
     }
 
     /**

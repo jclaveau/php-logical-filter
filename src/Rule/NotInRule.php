@@ -22,7 +22,7 @@ class NotInRule extends NotRule
      */
     public function getField()
     {
-        if (!isset($this->operands[0])) {
+        if (!$this->getOperandAt(0)) {
             // TODO a NotRule with no operand should be simplified as
             //      a TrueRule
             throw new \LogicException(
@@ -30,7 +30,7 @@ class NotInRule extends NotRule
             );
         }
 
-        return $this->operands[0]->getField();
+        return $this->getOperandAt(0)->getField();
     }
 
     /**
@@ -38,12 +38,12 @@ class NotInRule extends NotRule
      */
     public function getPossibilities()
     {
-        if ($this->operands[0] instanceof EqualRule) {
+        if ($this->getOperandAt(0) instanceof EqualRule) {
             // In can be simplified in =
-            return [$this->operands[0]->getValue()];
+            return [$this->getOperandAt(0)->getValue()];
         }
 
-        return $this->operands[0]->getPossibilities();
+        return $this->getOperandAt(0)->getPossibilities();
     }
 
     /**
@@ -51,18 +51,22 @@ class NotInRule extends NotRule
      */
     public function setPossibilities(array $possibilities)
     {
-        if ($this->operands[0] instanceof EqualRule) {
-            // TODO this case should occure anympore while a NotInRule
+        if ($this->getOperandAt(0) instanceof EqualRule) {
+            // TODO this case should occure anymore while a NotInRule
             // may not have the same class once simplified
-            $possibilities[] = $this->operands[0]->getValue();
+            $possibilities[] = $this->getOperandAt(0)->getValue();
 
-            $this->operands[0] = new InRule(
-                $this->operands[0]->getField(),
-                array_unique($possibilities)
-            );
+            $operands = [
+                new InRule(
+                    $this->getOperandAt(0)->getField(),
+                    array_unique($possibilities)
+                )
+            ];
+
+            $this->setOperands($operands);
         }
-        elseif ($this->operands[0] instanceof InRule) {
-            return $this->operands[0]->setPossibilities($possibilities);
+        elseif ($this->getOperandAt(0) instanceof InRule) {
+            return $this->getOperandAt(0)->setPossibilities($possibilities);
         }
 
     }

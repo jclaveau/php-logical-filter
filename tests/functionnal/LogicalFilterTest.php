@@ -27,8 +27,8 @@ class LogicalFilterTest extends \AbstractTest
         $filter = new LogicalFilter(['field', 'above', 3]);
 
         $this->assertEquals(
-            new AboveRule('field', 3),
-            $filter->getRules()
+            (new AboveRule('field', 3))->toArray(),
+            $filter->getRules()->toArray()
         );
     }
 
@@ -1060,6 +1060,7 @@ class LogicalFilterTest extends \AbstractTest
             ->dump(false, ['mode' => 'export', 'show_instance' => true])
             ;
         $dump = ob_get_clean();
+
         $this->assertEquals(
             str_replace('    ', '', "
                 ". __FILE__ .":XX
@@ -1284,6 +1285,74 @@ array(3) {
         );
 
 
+    }
+
+    /**
+     */
+    public function test_addRules_with_operands_indexed_by_semantic_ids()
+    {
+        $filter = (new LogicalFilter(
+            ['and',
+                ['field_1', '=', 3],
+                ['field_5', '>', 3],
+            ]
+        ))
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            '430bee96',
+            $filter->getRules()->getSemanticId()
+        );
+
+        $filter2 = (new LogicalFilter(
+            ['and',
+                ['field_1', '=', 2],
+                ['field_6', '>', 4],
+            ]
+        ))
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            '82fd9c71',
+            $filter2->getRules()->getSemanticId()
+        );
+
+        $filter3 = (new LogicalFilter(
+            ['and',
+                ['or',
+                    ['and',
+                        ['field_1', '=', 3],
+                        ['field_5', '>', 3],
+                    ],
+                    ['and',
+                        ['field_1', '=', 2],
+                        ['field_6', '>', 4],
+                    ],
+                ],
+                ['field_7', '=', 2],
+            ]
+        ))
+        // ->dump()
+        ;
+
+        $this->assertEquals(
+            ['and',
+                ['or',
+                    ['and',
+                        ['field_1', '=', 3],
+                        ['field_5', '>', 3],
+                    ],
+                    ['and',
+                        ['field_1', '=', 2],
+                        ['field_6', '>', 4],
+                    ],
+                ],
+                ['field_7', '=', 2],
+            ],
+            $filter3->toArray()
+        );
     }
 
     /**/

@@ -33,10 +33,10 @@ class BetweenOrEqualLowerRule extends BetweenRule
      */
     public function getMinimum()
     {
-        if ($this->operands[0] instanceof EqualRule)
-            return $this->operands[0]->getValue();
+        if ($this->getOperandAt(0) instanceof EqualRule)
+            return $this->getOperandAt(0)->getValue();
 
-        return $this->operands[0]->getMinimum();
+        return $this->getOperandAt(0)->getMinimum();
     }
 
     /**
@@ -44,13 +44,13 @@ class BetweenOrEqualLowerRule extends BetweenRule
      */
     public function getMaximum()
     {
-        if (!isset($this->operands[1]))
-            return $this->operands[0]->getValue();
+        if (!$this->getOperandAt(1))
+            return $this->getOperandAt(0)->getValue();
 
-        if ($this->operands[1] instanceof EqualRule)
-            return $this->operands[1]->getValue();
+        if ($this->getOperandAt(1) instanceof EqualRule)
+            return $this->getOperandAt(1)->getValue();
 
-        return $this->operands[1]->getMaximum();
+        return $this->getOperandAt(1)->getMaximum();
     }
 
     /**

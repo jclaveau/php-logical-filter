@@ -23,8 +23,8 @@ class BelowOrEqualRule extends OrRule
      */
     public function getMaximum()
     {
-        $maximum = $this->operands[0]->getMaximum();
-        $value   = $this->operands[1]->getValue();
+        $maximum = $this->getOperandAt(0)->getMaximum();
+        $value   = $this->getOperandAt(1)->getValue();
 
         if ($value != $maximum) {
             throw new \RuntimeException(
@@ -41,8 +41,8 @@ class BelowOrEqualRule extends OrRule
      */
     public function getField()
     {
-        $maximumField = $this->operands[0]->getField();
-        $valueField   = $this->operands[1]->getField();
+        $maximumField = $this->getOperandAt(0)->getField();
+        $valueField   = $this->getOperandAt(1)->getField();
 
         if ($maximumField != $valueField) {
             // TODO if this case occures, the current object should be

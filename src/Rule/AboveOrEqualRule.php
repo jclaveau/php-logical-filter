@@ -23,8 +23,8 @@ class AboveOrEqualRule extends OrRule
      */
     public function getMinimum()
     {
-        $minimum = $this->operands[0]->getMinimum();
-        $value   = $this->operands[1]->getValue();
+        $minimum = $this->getOperandAt(0)->getMinimum();
+        $value   = $this->getOperandAt(1)->getValue();
 
         if ($value != $minimum) {
             throw new \RuntimeException(
@@ -41,8 +41,8 @@ class AboveOrEqualRule extends OrRule
      */
     public function getField()
     {
-        $minimumField = $this->operands[0]->getField();
-        $valueField   = $this->operands[1]->getField();
+        $minimumField = $this->getOperandAt(0)->getField();
+        $valueField   = $this->getOperandAt(1)->getField();
 
         if ($minimumField != $valueField) {
             // TODO if this case occures, the current object should be

@@ -266,8 +266,6 @@ class LogicalFilter implements \JsonSerializable
                 );
             }
 
-            $recursion_position->addOperand( $rule );
-
             if ($operator == NotRule::operator && count($operands_descriptions) != 1) {
                 throw new \InvalidArgumentException(
                     "Negations can have only one operand: \n"
@@ -281,6 +279,8 @@ class LogicalFilter implements \JsonSerializable
                     $rule
                 );
             }
+
+            $recursion_position->addOperand( $rule );
         }
 
         return $this;
@@ -579,7 +579,8 @@ class LogicalFilter implements \JsonSerializable
                     ) {
                         $out[] = $matching_rule;
                     }
-                }
+                },
+                Filterer::leaves_only => true,
             ]
         );
 

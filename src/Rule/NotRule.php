@@ -36,7 +36,7 @@ class NotRule extends AbstractOperationRule
         if (!$this->operands)
             return $this;
 
-        $operand = $this->operands[0];
+        $operand = $this->getOperandAt(0);
 
         if (method_exists($operand, 'getField'))
             $field = $operand->getField();
@@ -56,7 +56,7 @@ class NotRule extends AbstractOperationRule
         }
         elseif ($operand instanceof NotRule) {
             // ! (  !  a) : a
-            $new_rule = $operand->getOperands()[0];
+            $new_rule = $operand->getOperandAt(0);
         }
         elseif ($operand instanceof EqualRule && $operand->getValue() === null) {
             $new_rule = new NotEqualRule($field, null);
@@ -167,7 +167,7 @@ class NotRule extends AbstractOperationRule
 
         return [
             $show_instance ? $this->getInstanceId() : self::operator,
-            isset($this->operands[0]) ? $this->operands[0]->toArray($options) : false
+            $this->getOperandAt(0) ? $this->getOperandAt(0)->toArray($options) : false
         ];
     }
 
@@ -186,7 +186,7 @@ class NotRule extends AbstractOperationRule
         $out = "['{$operator}',"
             . $line_break
             . ($indent_unit ? : ' ')
-            . $this->operands[0]->toString($options)
+            . $this->getOperandAt(0)->toString($options)
             . ','
             . $line_break
             . ']'
