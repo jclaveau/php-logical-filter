@@ -17,8 +17,9 @@ abstract class AbstractAtomicRule extends AbstractRule
 
     /** @var array $cache */
     protected $cache = [
-        'array'  => null,
-        'string' => null,
+        'array'       => null,
+        'string'      => null,
+        'semantic_id' => null,
     ];
 
     /**
@@ -43,10 +44,7 @@ abstract class AbstractAtomicRule extends AbstractRule
 
         if ($this->field != $field) {
             $this->field = $field;
-            $this->cache = [
-                'array'  => null,
-                'string' => null,
-            ];
+            $this->flushCache();
         }
 
         return $this;
@@ -118,6 +116,30 @@ abstract class AbstractAtomicRule extends AbstractRule
         $stringified_value = var_export($this->getValues(), true);
 
         return $this->cache['string'] = "['{$this->getField()}', '$operator', $stringified_value]";
+    }
+
+    /**
+     * Returns an id corresponding to the meaning of the rule.
+     *
+     * @return string
+     */
+    public function getSemanticId()
+    {
+        if ($this->cache['semantic_id'])
+            return $this->cache['semantic_id'];
+
+        return parent::getSemanticId();
+    }
+
+    /**
+     */
+    protected function flushCache()
+    {
+        $this->cache = [
+            'array'       => null,
+            'string'      => null,
+            'semantic_id' => null,
+        ];
     }
 
     /**/
