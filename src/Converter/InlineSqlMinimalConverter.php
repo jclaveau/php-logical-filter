@@ -12,6 +12,7 @@ use       JClaveau\LogicalFilter\Rule\NotEqualRule;
 use       JClaveau\LogicalFilter\Rule\AboveRule;
 use       JClaveau\LogicalFilter\Rule\BelowRule;
 use       JClaveau\LogicalFilter\Rule\RegexpRule;
+use       JClaveau\LogicalFilter\Rule\InRule;
 
 /**
  * This class implements a converter for MySQL.
@@ -61,6 +62,9 @@ class InlineSqlMinimalConverter extends MinimalConverter
         if ($rule instanceof EqualRule) {
             $value = $rule->getValue();
         }
+        elseif ($rule instanceof InRule) {
+            $value = $rule->getValues();
+        }
         elseif ($rule instanceof AboveRule) {
             $value = $rule->getMinimum();
         }
@@ -75,6 +79,7 @@ class InlineSqlMinimalConverter extends MinimalConverter
             $operator = 'REGEXP';
         }
 
+
         if (gettype($value) == 'integer') {
         }
         elseif (gettype($value) == 'double') {
@@ -83,7 +88,7 @@ class InlineSqlMinimalConverter extends MinimalConverter
         elseif ($value instanceof \DateTime) {
             $value = $value->format('Y-m-d H:i:s');
         }
-        elseif (gettype($value) == 'string') {
+        elseif (in_array( gettype($value), ['string', 'array'] )) {
             $id = 'param_' . count($this->parameters);
             $this->parameters[$id] = $value;
             $value = ':'.$id;

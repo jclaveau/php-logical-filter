@@ -16,7 +16,7 @@ class ConverterTest extends \AbstractTest
             ['or',
                 ['field_2', '>', 4],
                 ['field_2', '<', -4],
-            ]
+            ],
         ]);
 
         $mysql_where_part = "WHERE 1 ";
@@ -75,6 +75,7 @@ class ConverterTest extends \AbstractTest
             ['field_3', '=', null],
             ['field_4', '!=', null],
             ['field_5', 'regexp', "/^(ab)+/i"],
+            ['field_6', 'in', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]],
         ]))
         // ->dump()
         ;
@@ -82,14 +83,16 @@ class ConverterTest extends \AbstractTest
         $inline_sql = (new InlineSqlMinimalConverter())->convert( $filter );
 
         $this->assertEquals(
-            "(field_1 = 2 AND field_2 > 4 AND field_3 IS NULL AND field_4 IS NOT NULL AND field_5 REGEXP :param_0) OR (field_1 = 2 AND field_2 < -4 AND field_3 IS NULL AND field_4 IS NOT NULL AND field_5 REGEXP :param_1)",
+            "(field_1 = 2 AND field_2 > 4 AND field_3 IS NULL AND field_4 IS NOT NULL AND field_5 REGEXP :param_0 AND field_6 in :param_1) OR (field_1 = 2 AND field_2 < -4 AND field_3 IS NULL AND field_4 IS NOT NULL AND field_5 REGEXP :param_2 AND field_6 in :param_3)",
             $inline_sql['sql']
         );
 
         $this->assertEquals(
             [
                 'param_0' => '(?i)^(ab)+',
-                'param_1' => '(?i)^(ab)+',
+                'param_1' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+                'param_2' => '(?i)^(ab)+',
+                'param_3' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
             ],
             $inline_sql['parameters']
         );
