@@ -78,7 +78,7 @@ class InRule extends OrRule
      */
     public function getPossibilities()
     {
-        return $this->native_possibilities;
+        return array_values( $this->native_possibilities );
     }
 
     /**
@@ -91,10 +91,13 @@ class InRule extends OrRule
         if (!is_array($possibilities))
             $possibilities = [$possibilities];
 
-        $this->native_possibilities = array_unique( array_merge(
-            $this->native_possibilities,
-            array_map([$this, 'checkOperandAndExtractValue'], $possibilities)
-        ));
+        // $unique_possibilities
+        foreach ($possibilities as $possibility) {
+            $possibility = $this->checkOperandAndExtractValue($possibility);
+
+            $this->native_possibilities[ hash('crc32b', var_export($possibility, true)) ]
+                = $possibility;
+        }
 
         $this->cache['operands'] = [];
 

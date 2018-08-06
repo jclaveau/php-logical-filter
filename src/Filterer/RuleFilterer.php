@@ -72,7 +72,8 @@ class RuleFilterer extends Filterer
         if (    !empty($options[ Filterer::leaves_only ])
             && in_array( get_class($rule), [OrRule::class, AndRule::class, NotRule::class] )
         ) {
-            return true;
+            // return true;
+            return null;
         }
 
         if ($field === self::field) {
