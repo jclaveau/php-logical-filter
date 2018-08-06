@@ -109,7 +109,7 @@ class InRule extends OrRule
      *
      * @return InRule $this
      */
-    public function addOperand( EqualRule $operand )
+    public function addOperand( AbstractRule $operand )
     {
         $this->addPossibilities([$operand->getValue()]);
 
