@@ -251,11 +251,18 @@ abstract class AbstractOperationRule extends AbstractRule
             if (!method_exists($operand, 'getOperands'))
                 continue;
 
-            $sub_operands = $operand->getOperands();
+            if ($operand instanceof InRule && !$operand->isSimplificationAllowed()) {
+                $count = count($operand->getPossibilities());
+            }
+            else {
+                $count = count($operand->getOperands());
+            }
+
             if (
                     ($operand instanceof AndRule || $operand instanceof OrRule)
-                &&  count($sub_operands) == 1
+                &&  $count == 1
             ) {
+                $sub_operands = $operand->getOperands();
                 $this->operands[$i] = reset($sub_operands);
                 $has_been_changed = true;
             }

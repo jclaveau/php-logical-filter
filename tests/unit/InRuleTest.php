@@ -73,5 +73,39 @@ class InRuleTest extends \AbstractTest
         }
     }
 
+    /**
+     */
+    public function test_getOperands()
+    {
+        $rule = new InRule('field', [4, 5, 6]);
+
+        $operands = $rule->getOperands();
+
+        $this->assertEquals([
+                ['field', '=', 4],
+                ['field', '=', 5],
+                ['field', '=', 6],
+            ],
+            array_map(function($operand) {
+                    return $operand->toArray();
+                },
+                $operands
+            )
+        );
+
+        $rule = new InRule('field', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]);
+
+        try {
+            $rule->getOperands();
+            $this->assertTrue(
+                false,
+                "An exception explaining that an invalid operand is set"
+            );
+        }
+        catch (\Exception $e) {
+            $this->assertTrue(true, "Exception thrown: ".$e->getMessage());
+        }
+    }
+
     /**/
 }
