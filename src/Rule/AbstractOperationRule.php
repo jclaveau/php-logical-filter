@@ -435,7 +435,7 @@ abstract class AbstractOperationRule extends AbstractRule
 
         $cache_keys[] = $instance->getSemanticId().'-'.$options_id;
         foreach ($cache_keys as $cache_key) {
-            self::$simplification_cache[ $cache_key ] = $instance;
+            self::$simplification_cache[ $cache_key ] = $instance->copy();
         }
 
         return $instance;
