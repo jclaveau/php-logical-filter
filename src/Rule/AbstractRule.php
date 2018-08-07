@@ -27,6 +27,9 @@ abstract class AbstractRule implements \JsonSerializable
         'semantic_id' => null,
     ];
 
+    /** @var array $options */
+    protected $options = [];
+
     /**
      */
     public static function findSymbolicOperator($english_operator)
@@ -194,6 +197,15 @@ abstract class AbstractRule implements \JsonSerializable
     }
 
     /**
+     */
+    public static function flushStaticCache()
+    {
+        self::$static_cache = [
+            'rules_generation' => [],
+        ];
+    }
+
+    /**
      * For implementing JsonSerializable interface.
      *
      * @see https://secure.php.net/manual/en/jsonserializable.jsonserialize.php
@@ -239,7 +251,9 @@ abstract class AbstractRule implements \JsonSerializable
             return $this->cache['semantic_id'];
 
         // return hash('crc32b', serialize( $this->toArray() ));
-        return hash('md4', serialize( $this->toArray() ));  // faster but longer
+        return hash('md4', serialize( $this->toArray() ))  // faster but longer
+              // .hash('md4', serialize( $this->options ))
+              ;
     }
 
     /**

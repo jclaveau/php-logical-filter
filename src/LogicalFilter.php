@@ -39,6 +39,11 @@ class LogicalFilter implements \JsonSerializable
     /** @var  array $options */
     protected $options = [];
 
+    /** @var  array $default_options */
+    protected static $default_options = [
+        'inrule.simplification_threshold' => 5,
+    ];
+
     /**
      * Creates a filter. You can provide a description of rules as in
      * addRules() as paramater.
@@ -71,6 +76,36 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     */
+    public static function setDefaultOptions(array $options)
+    {
+        foreach ($options as $name => $default_value)
+            self::$default_options[$name] = $default_value;
+
+        AbstractRule::flushStaticCache();
+    }
+
+    /**
+     * @return array
+     */
+    public static function getDefaultOptions()
+    {
+        return self::$default_options;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions()
+    {
+        $options = self::$default_options;
+        foreach ($this->options as $name => $value)
+            $options[$name] = $value;
+
+        return $options;
+    }
+
+    /**
      * This method parses different ways to define the rules of a LogicalFilter.
      * + You can add N already instanciated Rules.
      * + You can provide 3 arguments: $field, $operator, $value
@@ -100,7 +135,7 @@ class LogicalFilter implements \JsonSerializable
                 $rules_description[0], // field
                 $rules_description[1], // operator
                 $rules_description[2], // value
-                $this->options
+                $this->getOptions()
             );
 
             $this->addRule($new_rule, $operation);
@@ -224,7 +259,7 @@ class LogicalFilter implements \JsonSerializable
             $operand_right = $rules_composition[2];
 
             $rule = AbstractRule::generateSimpleRule(
-                $operand_left, $operation, $operand_right, $this->options
+                $operand_left, $operation, $operand_right, $this->getOptions()
             );
             $recursion_position->addOperand( $rule );
         }

@@ -515,6 +515,53 @@ class LogicalFilterTest extends \AbstractTest
 
     /**
      */
+    public function test_setDefaultOptions()
+    {
+        $default_inrule_threshold = LogicalFilter::getDefaultOptions()['inrule.simplification_threshold'];
+
+        LogicalFilter::setDefaultOptions([
+            'inrule.simplification_threshold' => 20,
+        ]);
+
+        $filter = new LogicalFilter(
+            ['field_1', 'in', ['a', 'b', 'c']]
+        );
+
+        // toArray must be iso to the provided descrition
+        $this->assertEquals(
+            ['field_1', 'in', ['a', 'b', 'c']],
+            $filter->toArray()
+        );
+
+        $filter->getRules(false)->addPossibilities(['d', 'e']);
+
+        $this->assertEquals(
+            ['a', 'b', 'c', 'd', 'e'],
+            $filter->getRules()->getPossibilities()
+        );
+
+        $this->assertEquals(
+            [
+                'or',
+                ['field_1', '=', 'a'],
+                ['field_1', '=', 'b'],
+                ['field_1', '=', 'c'],
+                ['field_1', '=', 'd'],
+                ['field_1', '=', 'e'],
+            ],
+            $filter
+                ->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
+
+        LogicalFilter::setDefaultOptions([
+            'inrule.simplification_threshold' => $default_inrule_threshold,
+        ]);
+    }
+
+    /**
+     */
     public function test_add_NotEqualRule()
     {
         $filter = new LogicalFilter(

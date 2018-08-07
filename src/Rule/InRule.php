@@ -15,8 +15,10 @@ class InRule extends OrRule
     /** @var string operator */
     const operator = 'in';
 
-    /** @var integer simplification_threshold */
-    protected $simplification_threshold = 5;
+    /** @var array $options */
+    protected $options = [
+        'inrule.simplification_threshold' => 5,
+    ];
 
     /** @var string $field */
     protected $field;
@@ -40,10 +42,12 @@ class InRule extends OrRule
      */
     public function __construct( $field, $possibilities, array $options=[] )
     {
+        if (!empty($options)) {
+            foreach ($options as $name => $value)
+                $this->options[$name] = $value;
+        }
         $this->field = $field;
         $this->addPossibilities( $possibilities );
-        if (isset($options['inrule.simplification_threshold']))
-            $this->simplification_threshold = $options['inrule.simplification_threshold'];
     }
 
     /**
@@ -257,7 +261,7 @@ class InRule extends OrRule
      */
     public function isSimplificationAllowed()
     {
-        return count($this->native_possibilities) < $this->simplification_threshold;
+        return count($this->native_possibilities) < $this->options['inrule.simplification_threshold'];
     }
 
     /**/
