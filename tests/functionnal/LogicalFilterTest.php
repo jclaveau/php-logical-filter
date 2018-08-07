@@ -472,7 +472,9 @@ class LogicalFilterTest extends \AbstractTest
     public function test_add_InRule()
     {
         $filter = new LogicalFilter(
-            ['field_1', 'in', ['a', 'b', 'c']]
+            ['field_1', 'in', ['a', 'b', 'c']],
+            null,
+            ['inrule.simplification_threshold' => 20]
         );
 
         // toArray must be iso to the provided descrition

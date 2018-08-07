@@ -61,7 +61,7 @@ abstract class AbstractRule implements \JsonSerializable
      *
      * @return $this
      */
-    public static function generateSimpleRule($field, $type, $values)
+    public static function generateSimpleRule($field, $type, $values, array $options=[])
     {
         $cache_key = hash('md4', serialize( func_get_args()) );
         if (isset(self::$static_cache['rules_generation'][$cache_key]))
@@ -69,7 +69,7 @@ abstract class AbstractRule implements \JsonSerializable
 
         $ruleClass = self::getRuleClass($type);
 
-        return self::$static_cache['rules_generation'][$cache_key] = new $ruleClass( $field, $values );
+        return self::$static_cache['rules_generation'][$cache_key] = new $ruleClass( $field, $values, $options );
     }
 
     /**
@@ -256,7 +256,7 @@ abstract class AbstractRule implements \JsonSerializable
      */
     protected function forceLogicalCore()
     {
-        if ($this instanceof AbstractAtomicRule) {
+        if ($this instanceof AbstractAtomicRule || !$this->isSimplificationAllowed()) {
             $ruleTree = new OrRule([
                 new AndRule([
                     $this

@@ -36,6 +36,9 @@ class LogicalFilter implements \JsonSerializable
     /** @var  Filterer $default_filterer */
     protected $default_filterer;
 
+    /** @var  array $options */
+    protected $options = [];
+
     /**
      * Creates a filter. You can provide a description of rules as in
      * addRules() as paramater.
@@ -45,13 +48,16 @@ class LogicalFilter implements \JsonSerializable
      *
      * @see self::addRules
      */
-    public function __construct(array $rules=[], Filterer $default_filterer=null)
+    public function __construct(array $rules=[], Filterer $default_filterer=null, array $options=[])
     {
-        if ($rules)
-            $this->and_( $rules );
-
         if ($default_filterer)
             $this->default_filterer = $default_filterer;
+
+        if ($options)
+            $this->options = $options;
+
+        if ($rules)
+            $this->and_( $rules );
     }
 
     /**
@@ -93,7 +99,8 @@ class LogicalFilter implements \JsonSerializable
             $new_rule = AbstractRule::generateSimpleRule(
                 $rules_description[0], // field
                 $rules_description[1], // operator
-                $rules_description[2]  // value
+                $rules_description[2], // value
+                $this->options
             );
 
             $this->addRule($new_rule, $operation);
@@ -217,7 +224,7 @@ class LogicalFilter implements \JsonSerializable
             $operand_right = $rules_composition[2];
 
             $rule = AbstractRule::generateSimpleRule(
-                $operand_left, $operation, $operand_right
+                $operand_left, $operation, $operand_right, $this->options
             );
             $recursion_position->addOperand( $rule );
         }

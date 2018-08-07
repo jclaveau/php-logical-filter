@@ -1554,7 +1554,9 @@ trait LogicalFilterTest_rules_simplification_trait
                     ["field2", "<", 3],
                 ],
                 ["field2", "in", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
-            ]
+            ],
+            null,
+            ['inrule.simplification_threshold' => 20]
         ))
         ->simplify()
         ;
@@ -1580,6 +1582,28 @@ trait LogicalFilterTest_rules_simplification_trait
                 ['field2', '=', 1],
                 ['field2', '=', 2],
             ],
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify_in_without_threshold()
+    {
+        $filter = (new LogicalFilter(
+            ["and",
+                ["field", "in", [1, 2, 3, 4]],
+            ],
+            null,
+            ['inrule.simplification_threshold' => 0]
+        ))
+        ->simplify()
+        ;
+
+        $this->assertEquals(
+            ["field", "in", [1, 2, 3, 4]],
             $filter
                 // ->dump(true)
                 ->toArray()
