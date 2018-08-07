@@ -122,11 +122,12 @@ class BetweenRuleTest extends \AbstractTest
                     ["field_1", ">", 1],
                     ["field_1", "<", 2],
                 ],
-                ["field_1", "=", 1],
                 ["field_1", "=", 2],
+                ["field_1", "=", 1],
             ],
             $filter
                 ->simplify()
+                // ->dump()
                 ->toArray()
         );
     }

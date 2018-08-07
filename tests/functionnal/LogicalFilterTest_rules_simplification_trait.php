@@ -1575,10 +1575,25 @@ trait LogicalFilterTest_rules_simplification_trait
         ;
 
         $this->assertEquals(
-            ["or",
-                ["field2", "=", 4],
-                ["field2", "in", [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
-                ["field2", "in", [1, 2]],
+            // ["or",
+                // ["field2", "=", 4],
+                // ["field2", "in", [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                // ["field2", "in", [1, 2]],
+            // ],
+            ['or',
+                ['field2', '=', 4],
+                ['field2', '=', 11],
+                ['field2', '=', 12],
+                ['field2', '=', 13],
+                ['field2', '=', 14],
+                ['field2', '=', 15],
+                ['field2', '=', 16],
+                ['field2', '=', 17],
+                ['field2', '=', 18],
+                ['field2', '=', 19],
+                ['field2', '=', 20],
+                ['field2', '=', 1],
+                ['field2', '=', 2],
             ],
             $filter
                 // ->dump(true)

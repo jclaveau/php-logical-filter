@@ -313,6 +313,8 @@ abstract class AbstractOperationRule extends AbstractRule
         return $this;
     }
 
+    private static $simplification_cache = [];
+
     /**
      * Simplify the current OperationRule.
      * + If an OrRule or an AndRule contains only one operand, it's equivalent
@@ -336,8 +338,19 @@ abstract class AbstractOperationRule extends AbstractRule
             );
         }
 
+        ksort($options);
+        $options_id = hash('md4', serialize($options));
+
+        $id = $this->getSemanticId().'-'.$options_id;
+        if (isset(self::$simplification_cache[$id]))
+            return self::$simplification_cache[$id]->copy();
+
+        $cache_keys = [$id];
+
         $this->cleanOperations();
         $this->unifyAtomicOperands();
+
+        $cache_keys[] = $this->getSemanticId().'-'.$options_id;
         // $this->dump(true);
 
         if ($step_to_stop_before == self::remove_negations)
@@ -406,6 +419,7 @@ abstract class AbstractOperationRule extends AbstractRule
                 $instance = reset($operands);
         }
 
+
         if ($force_logical_core) {
             $instance = $instance->forceLogicalCore();
             // for the simplification status at
@@ -414,6 +428,14 @@ abstract class AbstractOperationRule extends AbstractRule
             }
             $instance->setOperands($operands);
             $instance->moveSimplificationStepForward(self::simplified, true);
+
+            $cache_keys[] = $instance->getSemanticId().'-'.$options_id;
+            // self::$simplification_cache[ $instance->getSemanticId().'-'.$options_id ] = $instance;
+        }
+
+        $cache_keys[] = $instance->getSemanticId().'-'.$options_id;
+        foreach ($cache_keys as $cache_key) {
+            self::$simplification_cache[ $cache_key ] = $instance;
         }
 
         return $instance;

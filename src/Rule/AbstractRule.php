@@ -216,6 +216,7 @@ abstract class AbstractRule implements \JsonSerializable
     public function getSemanticId()
     {
         return hash('crc32b', serialize( $this->toArray() ));
+        // return hash('md4', serialize( $this->toArray() ));
     }
 
     /**
