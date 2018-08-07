@@ -87,13 +87,19 @@ class OrRule extends AbstractOperationRule
         }
         extract($options);
 
+        if (!$show_instance && !empty($this->cache['array']))
+            return $this->cache['array'];
+
         $operands_as_array = [
             $show_instance ? $this->getInstanceId() : self::operator,
         ];
         foreach ($this->operands as $operand)
             $operands_as_array[] = $operand->toArray($options);
 
-        return $operands_as_array;
+        if (!$show_instance)
+            return $this->cache['array'] = $operands_as_array;
+        else
+            return $operands_as_array;
     }
 
     /**
@@ -102,7 +108,7 @@ class OrRule extends AbstractOperationRule
     {
         $operator = self::operator;
         if (!$this->operands) {
-            return $this->cache = "['{$operator}']";
+            return $this->cache['string'] = "['{$operator}']";
         }
 
         $indent_unit = isset($options['indent_unit']) ? $options['indent_unit'] : '';
@@ -118,7 +124,7 @@ class OrRule extends AbstractOperationRule
 
         $out .= ']';
 
-        return $out;
+        return $this->cache['string'] = $out;
     }
 
     /**

@@ -15,13 +15,6 @@ abstract class AbstractAtomicRule extends AbstractRule
     /** @var string $field The field to apply the rule on */
     protected $field;
 
-    /** @var array $cache */
-    protected $cache = [
-        'array'       => null,
-        'string'      => null,
-        'semantic_id' => null,
-    ];
-
     /**
      * @return string $field
      */
@@ -135,17 +128,6 @@ abstract class AbstractAtomicRule extends AbstractRule
             return $this->cache['semantic_id'];
 
         return parent::getSemanticId();
-    }
-
-    /**
-     */
-    protected function flushCache()
-    {
-        $this->cache = [
-            'array'       => null,
-            'string'      => null,
-            'semantic_id' => null,
-        ];
     }
 
     /**/

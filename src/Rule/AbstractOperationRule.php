@@ -46,6 +46,7 @@ abstract class AbstractOperationRule extends AbstractRule
     public function __construct( array $operands=[] )
     {
         $this->setOperands( $operands );
+        $this->flushCache();
     }
 
     /**
@@ -65,11 +66,14 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function addOperand( AbstractRule $new_operand )
     {
-        if (!isset($this->operands[ $id = $new_operand->getSemanticId() ]))
+        if (!isset($this->operands[ $id = $new_operand->getSemanticId() ])) {
             $this->operands[ $id ] = $new_operand;
 
-        if ($this->current_simplification_step)
-            $this->current_simplification_step = null;
+            if ($this->current_simplification_step)
+                $this->current_simplification_step = null;
+
+            $this->flushCache();
+        }
 
         return $this;
     }
@@ -109,6 +113,9 @@ abstract class AbstractOperationRule extends AbstractRule
             else
                 $operand->renameFields($renamings);
         }
+
+        // TODO flush cache only in case of change?
+        $this->flushCache();
 
         return $this;
     }
@@ -345,6 +352,8 @@ abstract class AbstractOperationRule extends AbstractRule
         if (isset(self::$simplification_cache[$id]))
             return self::$simplification_cache[$id]->copy();
 
+        $this->flushCache();
+
         $cache_keys = [$id];
 
         $this->cleanOperations();
@@ -435,10 +444,10 @@ abstract class AbstractOperationRule extends AbstractRule
 
         $cache_keys[] = $instance->getSemanticId().'-'.$options_id;
         foreach ($cache_keys as $cache_key) {
-            self::$simplification_cache[ $cache_key ] = $instance->copy();
+            self::$simplification_cache[ $cache_key ] = $instance;
         }
 
-        return $instance;
+        return $instance->copy();
     }
 
     /**
@@ -543,6 +552,25 @@ abstract class AbstractOperationRule extends AbstractRule
         $operands = array_values($this->operands);
         if (isset($operands[$index]))
             return $operands[$index];
+    }
+
+    /**
+     * Returns an id corresponding to the meaning of the rule.
+     *
+     * @return string
+     */
+    public function getSemanticId()
+    {
+        if (!array_key_exists('semantic_id', $this->cache)) {
+            // var_dump($this->cache);
+            $this->dump();
+            exit;
+        }
+
+        if (isset($this->cache['semantic_id']))
+            return $this->cache['semantic_id'];
+
+        return parent::getSemanticId();
     }
 
     /**/

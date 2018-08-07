@@ -19,7 +19,7 @@ class NotRule extends AbstractOperationRule
 
         // Negation has only one operand. If more is required, group them
         // into an AndRule
-        $this->operands = [$operand];
+        $this->addOperand($operand);
     }
 
     /**
@@ -165,10 +165,18 @@ class NotRule extends AbstractOperationRule
         }
         extract($options);
 
-        return [
+        if (!$show_instance && isset($this->cache['array']))
+            return $this->cache['array'];
+
+        $array = [
             $show_instance ? $this->getInstanceId() : self::operator,
             $this->getOperandAt(0) ? $this->getOperandAt(0)->toArray($options) : false
         ];
+
+        if (!$show_instance)
+            return $this->cache['array'] = $array;
+        else
+            return $array;
     }
 
     /**
@@ -186,7 +194,7 @@ class NotRule extends AbstractOperationRule
         $out = "['{$operator}',"
             . $line_break
             . ($indent_unit ? : ' ')
-            . $this->getOperandAt(0)->toString($options)
+            . str_replace($line_break, $line_break.$indent_unit, $this->getOperandAt(0)->toString($options))
             . ','
             . $line_break
             . ']'

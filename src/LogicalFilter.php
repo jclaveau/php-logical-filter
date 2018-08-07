@@ -476,21 +476,27 @@ class LogicalFilter implements \JsonSerializable
      */
     public function removeRules($filter)
     {
+        $cache_flush_required = false;
+
         $this->rules = (new RuleFilterer)->apply(
             new LogicalFilter($filter),
             $this->rules,
             [
-                Filterer::on_row_matches => function($rule, $key, &$rows, $matching_case) {
+                Filterer::on_row_matches => function($rule, $key, &$rows, $matching_case) use (&$cache_flush_required) {
                     // $rule->dump();
                     // $matching_case->dump(true);
                     unset( $rows[$key] );
+                    $cache_flush_required = true;
                 },
-                Filterer::on_row_mismatches => function($rule, $key, &$rows, $matching_case) {
+                // Filterer::on_row_mismatches => function($rule, $key, &$rows, $matching_case) {
                     // $rule->dump();
                     // $matching_case && $matching_case->dump(true);
-                }
+                // }
             ]
         );
+
+        if ($cache_flush_required)
+            $this->rules->flushCache();
 
         return $this;
     }

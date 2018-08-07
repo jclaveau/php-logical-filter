@@ -116,10 +116,6 @@ class BetweenRule extends AndRule
     public function toString(array $options=[])
     {
         try {
-            // if (!$this->changed)
-                // return $this->cache;
-
-            // $this->changed = false;
             $class = get_called_class();
 
             $operator = $class::operator;
@@ -128,7 +124,6 @@ class BetweenRule extends AndRule
                 return var_export($limit, true);
             }, $this->getValues()) ) .']';
 
-            // return $this->cache = "['{$this->getField()}', '$operator', stringified_possibilities]";
             return "['{$this->getField()}', '$operator', $stringified_limits]";
         }
         catch (\LogicException $e) {

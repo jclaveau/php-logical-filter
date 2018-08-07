@@ -36,7 +36,7 @@ class NotRuleTest extends \AbstractTest
             new NotRule(new BelowRule('field', 3))
         );
         $new_rule = $rule->negateOperand();
-        $this->assertEquals(new BelowRule('field', 3), $new_rule);
+        $this->assertEquals((new BelowRule('field', 3))->toArray(), $new_rule->toArray());
 
 
         // EqualRule

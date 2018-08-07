@@ -272,16 +272,5 @@ class InRule extends OrRule
         return parent::getSemanticId();
     }
 
-    /**
-     */
-    protected function flushCache()
-    {
-        $this->cache = [
-            'array'       => null,
-            'string'      => null,
-            'semantic_id' => null,
-        ];
-    }
-
     /**/
 }
