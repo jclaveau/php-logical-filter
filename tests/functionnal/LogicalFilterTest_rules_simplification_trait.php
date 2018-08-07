@@ -1421,7 +1421,7 @@ trait LogicalFilterTest_rules_simplification_trait
         $this->assertEquals(
             ["or"],
             $filter
-                // ->dump(true)
+                // ->dump(true, ['mode' => 'export'])
                 ->toArray()
         );
     }

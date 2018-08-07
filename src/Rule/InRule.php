@@ -28,7 +28,11 @@ class InRule extends OrRule
     protected $native_possibilities = [];
 
     /** @var array $cache */
-    protected $cache = [];
+    protected $cache = [
+        'array'       => null,
+        'string'      => null,
+        'semantic_id' => null,
+    ];
 
     /**
      * @param string $field         The field to apply the rule on.
@@ -56,6 +60,8 @@ class InRule extends OrRule
      */
     public final function renameFields($renamings)
     {
+        $old_field = $this->field;
+
         if (is_callable($renamings)) {
             $this->field = call_user_func($renamings, $this->field);
         }
@@ -69,6 +75,9 @@ class InRule extends OrRule
                 ."instead of: " . var_export($renamings, true)
             );
         }
+
+        if ($old_field != $this->field)
+            $this->flushCache();
 
         return $this;
     }
@@ -95,11 +104,14 @@ class InRule extends OrRule
         foreach ($possibilities as $possibility) {
             $possibility = $this->checkOperandAndExtractValue($possibility);
 
-            $this->native_possibilities[ hash('crc32b', serialize($possibility)) ]
-                = $possibility;
+            if (!isset($this->native_possibilities[ $id = hash('crc32b', serialize($possibility)) ])) {
+                $this->native_possibilities[ $id ] = $possibility;
+                $require_cache_flush = true;
+            }
         }
 
-        $this->cache['operands'] = [];
+        if (isset($require_cache_flush))
+            $this->flushCache();
 
         return $this;
     }
@@ -125,6 +137,7 @@ class InRule extends OrRule
     {
         $this->native_possibilities = [];
         $this->addPossibilities($possibilities);
+        $this->flushCache();
 
         return $this;
     }
@@ -201,21 +214,27 @@ class InRule extends OrRule
 
         $class = get_class($this);
 
-        return [
+        if (!$show_instance && isset($this->cache['array']))
+            return $this->cache['array'];
+
+        $array = [
             $this->getField(),
             $show_instance ? $this->getInstanceId() : $class::operator,
             $this->getValues(),
         ];
+
+        if (!$show_instance)
+            return $this->cache['array'] = $array;
+        else
+            return $array;
     }
 
     /**
      */
     public function toString(array $options=[])
     {
-        // if (!$this->changed)
-            // return $this->cache;
-
-        // $this->changed = false;
+        if (isset($this->cache['string']))
+            return $this->cache['string'];
 
         $operator = self::operator;
 
@@ -223,7 +242,7 @@ class InRule extends OrRule
             return var_export($possibility, true);
         }, $this->getPossibilities()) ) .']';
 
-        return "['{$this->getField()}', '$operator', $stringified_possibilities]";
+        return $this->cache['string'] = "['{$this->getField()}', '$operator', $stringified_possibilities]";
     }
 
 
@@ -232,6 +251,30 @@ class InRule extends OrRule
     public function isSimplificationAllowed()
     {
         return count($this->native_possibilities) < self::simplification_threshold;
+    }
+
+    /**
+     * Returns an id corresponding to the meaning of the rule.
+     *
+     * @return string
+     */
+    public function getSemanticId()
+    {
+        if ($this->cache['semantic_id'])
+            return $this->cache['semantic_id'];
+
+        return parent::getSemanticId();
+    }
+
+    /**
+     */
+    protected function flushCache()
+    {
+        $this->cache = [
+            'array'       => null,
+            'string'      => null,
+            'semantic_id' => null,
+        ];
     }
 
     /**/
