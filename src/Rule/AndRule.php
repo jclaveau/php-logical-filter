@@ -157,6 +157,28 @@ class AndRule extends AbstractOperationRule
     }
 
     /**
+     * Remove AndRules operands of AndRules
+     */
+    public function removeSameOperationOperands()
+    {
+        foreach ($this->operands as $i => &$operand) {
+            if ( ! is_a($operand, AndRule::class))
+                continue;
+
+            // Id AND is an operand on AND they can be merge (and the same with OR)
+            foreach ($operand->getOperands() as $sub_operand) {
+                $this->addOperand( $sub_operand->copy() );
+            }
+            unset($this->operands[$i]);
+
+            // possibility of mono-operand or dupicates
+            $has_been_changed = true;
+        }
+
+        return !empty($has_been_changed);
+    }
+
+    /**
      * Removes rule branches that cannot produce result like:
      * A = 1 || (B < 2 && B > 3) <=> A = 1
      *

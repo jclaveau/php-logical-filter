@@ -211,7 +211,7 @@ abstract class AbstractOperationRule extends AbstractRule
     public function cleanOperations($recurse=true)
     {
         if ($recurse) foreach ($this->operands as $i => $operand) {
-            if ($operand instanceof AbstractOperationRule && !$operand instanceof InRule) {
+            if ($operand instanceof AbstractOperationRule && !$operand instanceof InRule && !$operand instanceof NotRule) {
                 $this->operands[$i] = $operand->cleanOperations();
             }
         }
@@ -258,35 +258,6 @@ abstract class AbstractOperationRule extends AbstractRule
             ) {
                 $sub_operands = $operand->getOperands();
                 $this->operands[$i] = reset($sub_operands);
-                $has_been_changed = true;
-            }
-        }
-
-        return !empty($has_been_changed);
-    }
-
-    /**
-     * Remove AndRules operands of AndRules and OrRules of OrRules.
-     */
-    public function removeSameOperationOperands()
-    {
-        $this->is_clean = true;
-
-        if ($this instanceof NotRule)
-            return false;
-
-        if ($this instanceof InRule)
-            return false;
-
-        foreach ($this->operands as $i => $operand) {
-            if (get_class($operand) == get_class($this)) {
-                // Id AND is an operand on AND they can be merge (and the same with OR)
-                foreach ($operand->getOperands() as $sub_operand) {
-                    $this->addOperand( $sub_operand->copy() );
-                }
-                unset($this->operands[$i]);
-
-                // possibility of mono-operand or dupicates
                 $has_been_changed = true;
             }
         }

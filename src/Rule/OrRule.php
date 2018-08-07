@@ -14,6 +14,31 @@ class OrRule extends AbstractOperationRule
     const operator = 'or';
 
     /**
+     * Remove AndRules operands of AndRules and OrRules of OrRules.
+     */
+    public function removeSameOperationOperands()
+    {
+        foreach ($this->operands as $i => &$operand) {
+            if ( ! is_a($operand, OrRule::class))
+                continue;
+
+            if ( !$operand->isSimplificationAllowed() )
+                continue;
+
+            // Id AND is an operand on AND they can be merge (and the same with OR)
+            foreach ($operand->getOperands() as $sub_operand) {
+                $this->addOperand( $sub_operand->copy() );
+            }
+            unset($this->operands[$i]);
+
+            // possibility of mono-operand or dupicates
+            $has_been_changed = true;
+        }
+
+        return !empty($has_been_changed);
+    }
+
+    /**
      * Replace all the OrRules of the RuleTree by one OrRule at its root.
      *
      * @todo renjame as RootifyDisjunjctions?
