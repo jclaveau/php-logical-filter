@@ -211,7 +211,7 @@ abstract class AbstractOperationRule extends AbstractRule
     public function cleanOperations($recurse=true)
     {
         if ($recurse) foreach ($this->operands as $i => $operand) {
-            if ($operand instanceof AbstractOperationRule) {
+            if ($operand instanceof AbstractOperationRule && !$operand instanceof InRule) {
                 $this->operands[$i] = $operand->cleanOperations();
             }
         }
@@ -242,7 +242,7 @@ abstract class AbstractOperationRule extends AbstractRule
     public function removeMonooperandOperationsOperands()
     {
         foreach ($this->operands as $i => $operand) {
-            if (!method_exists($operand, 'getOperands'))
+            if (!$operand instanceof AbstractOperationRule)
                 continue;
 
             if ($operand instanceof InRule && !$operand->isSimplificationAllowed()) {
@@ -273,6 +273,9 @@ abstract class AbstractOperationRule extends AbstractRule
         $this->is_clean = true;
 
         if ($this instanceof NotRule)
+            return false;
+
+        if ($this instanceof InRule)
             return false;
 
         foreach ($this->operands as $i => $operand) {
