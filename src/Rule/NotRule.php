@@ -163,17 +163,16 @@ class NotRule extends AbstractOperationRule
             if (!isset($options[ $default_option ]))
                 $options[ $default_option ] = $default_value;
         }
-        extract($options);
 
-        if (!$show_instance && isset($this->cache['array']))
+        if (!$options['show_instance'] && isset($this->cache['array']))
             return $this->cache['array'];
 
         $array = [
-            $show_instance ? $this->getInstanceId() : self::operator,
+            $options['show_instance'] ? $this->getInstanceId() : self::operator,
             $this->getOperandAt(0) ? $this->getOperandAt(0)->toArray($options) : false
         ];
 
-        if (!$show_instance)
+        if (!$options['show_instance'])
             return $this->cache['array'] = $array;
         else
             return $array;

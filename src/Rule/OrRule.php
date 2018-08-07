@@ -85,18 +85,17 @@ class OrRule extends AbstractOperationRule
             if (!isset($options[ $default_option ]))
                 $options[ $default_option ] = $default_value;
         }
-        extract($options);
 
-        if (!$show_instance && !empty($this->cache['array']))
+        if (!$options['show_instance'] && !empty($this->cache['array']))
             return $this->cache['array'];
 
         $operands_as_array = [
-            $show_instance ? $this->getInstanceId() : self::operator,
+            $options['show_instance'] ? $this->getInstanceId() : self::operator,
         ];
         foreach ($this->operands as $operand)
             $operands_as_array[] = $operand->toArray($options);
 
-        if (!$show_instance)
+        if (!$options['show_instance'])
             return $this->cache['array'] = $operands_as_array;
         else
             return $operands_as_array;

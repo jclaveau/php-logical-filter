@@ -79,13 +79,12 @@ class AboveOrEqualRule extends OrRule
             if (!isset($options[ $default_option ]))
                 $options[ $default_option ] = $default_value;
         }
-        extract($options);
 
         try {
             // TODO replace this rule by a simple OrRule?
             return [
                 $this->getField(),
-                $show_instance ? $this->getInstanceId() : self::operator,
+                $options['show_instance'] ? $this->getInstanceId() : self::operator,
                 $this->getValues(),
             ];
         }

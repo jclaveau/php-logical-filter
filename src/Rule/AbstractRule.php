@@ -63,7 +63,7 @@ abstract class AbstractRule implements \JsonSerializable
      */
     public static function generateSimpleRule($field, $type, $values)
     {
-        $cache_key = hash('crc32b', serialize( func_get_args()) );
+        $cache_key = hash('md4', serialize( func_get_args()) );
         if (isset(self::$static_cache['rules_generation'][$cache_key]))
             return self::$static_cache['rules_generation'][$cache_key]->copy();
 
@@ -233,10 +233,13 @@ abstract class AbstractRule implements \JsonSerializable
      *
      * @return string
      */
-    public function getSemanticId()
+    public final function getSemanticId()
     {
-        return hash('crc32b', serialize( $this->toArray() ));
-        // return hash('md4', serialize( $this->toArray() ));  // faster but longer
+        if (isset($this->cache['semantic_id']))
+            return $this->cache['semantic_id'];
+
+        // return hash('crc32b', serialize( $this->toArray() ));
+        return hash('md4', serialize( $this->toArray() ));  // faster but longer
     }
 
     /**

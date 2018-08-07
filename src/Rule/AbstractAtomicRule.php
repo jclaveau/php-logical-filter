@@ -82,21 +82,20 @@ abstract class AbstractAtomicRule extends AbstractRule
             if (!isset($options[ $default_option ]))
                 $options[ $default_option ] = $default_value;
         }
-        extract($options);
 
 
-        if (!$show_instance && !empty($this->cache['array']))
+        if (!$options['show_instance'] && !empty($this->cache['array']))
             return $this->cache['array'];
 
         $class = get_class($this);
 
         $array = [
             $this->getField(),
-            $show_instance ? $this->getInstanceId() : $class::operator,
+            $options['show_instance'] ? $this->getInstanceId() : $class::operator,
             $this->getValues(),
         ];
 
-        if (!$show_instance)
+        if (!$options['show_instance'])
             return $this->cache['array'] = $array;
         else
             return $array;
@@ -115,19 +114,6 @@ abstract class AbstractAtomicRule extends AbstractRule
         $stringified_value = var_export($this->getValues(), true);
 
         return $this->cache['string'] = "['{$this->getField()}', '$operator', $stringified_value]";
-    }
-
-    /**
-     * Returns an id corresponding to the meaning of the rule.
-     *
-     * @return string
-     */
-    public function getSemanticId()
-    {
-        if ($this->cache['semantic_id'])
-            return $this->cache['semantic_id'];
-
-        return parent::getSemanticId();
     }
 
     /**/

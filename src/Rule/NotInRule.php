@@ -92,12 +92,11 @@ class NotInRule extends NotRule
             if (!isset($options[ $default_option ]))
                 $options[ $default_option ] = $default_value;
         }
-        extract($options);
 
         try {
             return [
                 $this->getField(),
-                $show_instance ? $this->getInstanceId() : self::operator,
+                $options['show_instance'] ? $this->getInstanceId() : self::operator,
                 $this->getPossibilities(),
             ];
         }

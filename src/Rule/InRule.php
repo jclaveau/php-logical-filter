@@ -216,20 +216,19 @@ class InRule extends OrRule
             if (!isset($options[ $default_option ]))
                 $options[ $default_option ] = $default_value;
         }
-        extract($options);
 
         $class = get_class($this);
 
-        if (!$show_instance && isset($this->cache['array']))
+        if (!$options['show_instance'] && isset($this->cache['array']))
             return $this->cache['array'];
 
         $array = [
             $this->getField(),
-            $show_instance ? $this->getInstanceId() : $class::operator,
+            $options['show_instance'] ? $this->getInstanceId() : $class::operator,
             $this->getValues(),
         ];
 
-        if (!$show_instance)
+        if (!$options['show_instance'])
             return $this->cache['array'] = $array;
         else
             return $array;
@@ -257,19 +256,6 @@ class InRule extends OrRule
     public function isSimplificationAllowed()
     {
         return count($this->native_possibilities) < self::simplification_threshold;
-    }
-
-    /**
-     * Returns an id corresponding to the meaning of the rule.
-     *
-     * @return string
-     */
-    public function getSemanticId()
-    {
-        if ($this->cache['semantic_id'])
-            return $this->cache['semantic_id'];
-
-        return parent::getSemanticId();
     }
 
     /**/

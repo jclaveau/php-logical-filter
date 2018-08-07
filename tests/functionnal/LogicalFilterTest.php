@@ -761,7 +761,7 @@ class LogicalFilterTest extends \AbstractTest
             ],
             $filter
                 ->simplify(['force_logical_core' => true])
-                // ->dump(!true)
+                // ->dump(true)
                 ->toArray()
         );
 
@@ -1301,7 +1301,7 @@ array(3) {
         ;
 
         $this->assertEquals(
-            '430bee96',
+            '2346e4a9a35d326683500788ad9d71ac',
             $filter->getRules()->getSemanticId()
         );
 
@@ -1315,7 +1315,7 @@ array(3) {
         ;
 
         $this->assertEquals(
-            '82fd9c71',
+            'b8006963ebcf542d8b4e8a24449fff5d',
             $filter2->getRules()->getSemanticId()
         );
 

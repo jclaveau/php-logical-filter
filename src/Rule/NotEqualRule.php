@@ -82,18 +82,17 @@ class NotEqualRule extends NotRule
             if (!isset($options[ $default_option ]))
                 $options[ $default_option ] = $default_value;
         }
-        extract($options);
 
-        if (!$show_instance && isset($this->cache['array']))
+        if (!$options['show_instance'] && isset($this->cache['array']))
             return $this->cache['array'];
 
         $array = [
             $this->getField(),
-            $show_instance ? $this->getInstanceId() : self::operator,
+            $options['show_instance'] ? $this->getInstanceId() : self::operator,
             $this->getValue(),
         ];
 
-        if (!$show_instance)
+        if (!$options['show_instance'])
             return $this->cache['array'] = $array;
         else
             return $array;

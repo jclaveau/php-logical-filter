@@ -95,14 +95,13 @@ class BetweenRule extends AndRule
             if (!isset($options[ $default_option ]))
                 $options[ $default_option ] = $default_value;
         }
-        extract($options);
 
         $class = get_class($this);
 
         // try {
             return [
                 $this->getField(),
-                $show_instance ? $this->getInstanceId() : $class::operator,
+                $options['show_instance'] ? $this->getInstanceId() : $class::operator,
                 $this->getValues(),
             ];
         // }

@@ -554,24 +554,5 @@ abstract class AbstractOperationRule extends AbstractRule
             return $operands[$index];
     }
 
-    /**
-     * Returns an id corresponding to the meaning of the rule.
-     *
-     * @return string
-     */
-    public function getSemanticId()
-    {
-        if (!array_key_exists('semantic_id', $this->cache)) {
-            // var_dump($this->cache);
-            $this->dump();
-            exit;
-        }
-
-        if (isset($this->cache['semantic_id']))
-            return $this->cache['semantic_id'];
-
-        return parent::getSemanticId();
-    }
-
     /**/
 }
