@@ -489,7 +489,7 @@ abstract class AbstractOperationRule extends AbstractRule
             // return $copy;
 
         $copied_operands = [];
-        foreach ($this->operands as $operand_id => $operand) {
+        foreach ($this->operands as $operand_id => &$operand) {
             $copied_operands[$operand_id] = $operand->copy($token);
         }
 

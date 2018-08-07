@@ -100,11 +100,17 @@ class InRule extends OrRule
         if (!is_array($possibilities))
             $possibilities = [$possibilities];
 
-        // unique possibilities
-        foreach ($possibilities as $possibility) {
-            $possibility = $this->checkOperandAndExtractValue($possibility);
+        $possibilities = array_map([$this, 'checkOperandAndExtractValue'], $possibilities);
 
-            if (!isset($this->native_possibilities[ $id = hash('crc32b', serialize($possibility)) ])) {
+        // unique possibilities
+        foreach ($possibilities as &$possibility) {
+
+            if (is_scalar($possibility))
+                $id = hash('crc32b', $possibility);
+            else
+                $id = hash('crc32b', serialize($possibility));
+
+            if (!isset($this->native_possibilities[ $id ])) {
                 $this->native_possibilities[ $id ] = $possibility;
                 $require_cache_flush = true;
             }

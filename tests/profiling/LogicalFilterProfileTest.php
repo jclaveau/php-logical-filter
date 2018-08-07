@@ -4,6 +4,7 @@ namespace JClaveau\LogicalFilter;
 use JClaveau\VisibilityViolator\VisibilityViolator;
 use JClaveau\LogicalFilter\LogicalFilter;
 use JClaveau\LogicalFilter\Filterer\Filterer;
+use JClaveau\LogicalFilter\Converter\InlineSqlMinimalConverter;
 
 class LogicalFilterProfileTest extends \AbstractTest
 {
@@ -162,6 +163,39 @@ class LogicalFilterProfileTest extends \AbstractTest
 
         // var_dump($this->getExecutionTime());
         $this->assertExecutionTimeBelow(0.3);
+    }
+
+    /**
+     * @profile
+     * @coversNothing
+     */
+    public function test_profile_simplify_reduce_calls()
+    {
+        $in_rules = [];
+
+        $filter = (new LogicalFilter(
+            require __DIR__ . '/LogicalFilterProfileTest_very_big_filter_2.php'
+        ))
+        ->simplify()
+        // ->dump(true)
+        ->onEachRule(
+            ['operator', '=', 'in'],
+            [
+                Filterer::leaves_only => true,
+                Filterer::on_row_matches => function ($rule, $key, &$siblings) use (&$in_rules) {
+                    $in_rules[] = count($rule->getPossibilities());
+                },
+            ]
+        )
+        ;
+
+        $this->assertEquals(13344, array_sum($in_rules));
+
+        // var_dump($this->getMemoryUsage() / 1024 / 1024);
+        $this->assertMemoryUsageBelow('3.3M');
+
+        // var_dump($this->getExecutionTime());
+        $this->assertExecutionTimeBelow(0.26);
     }
 
     /**/

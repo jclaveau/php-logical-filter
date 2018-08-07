@@ -42,6 +42,10 @@ abstract class AbstractRule implements \JsonSerializable
         return $symbolic_operator;
     }
 
+    protected static $static_cache = [
+        'rules_generation' => [],
+    ];
+
     /**
      *
      * @param  string $field
@@ -52,9 +56,13 @@ abstract class AbstractRule implements \JsonSerializable
      */
     public static function generateSimpleRule($field, $type, $values)
     {
+        $cache_key = hash('crc32b', serialize( func_get_args()) );
+        if (isset(self::$static_cache['rules_generation'][$cache_key]))
+            return self::$static_cache['rules_generation'][$cache_key]->copy();
+
         $ruleClass = self::getRuleClass($type);
 
-        return new $ruleClass( $field, $values );
+        return self::$static_cache['rules_generation'][$cache_key] = new $ruleClass( $field, $values );
     }
 
     /**
