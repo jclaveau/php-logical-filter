@@ -51,7 +51,9 @@ class BetweenRuleTest extends \AbstractTest
 
         $this->assertEquals(
             ["field_1", "><", [1, 2]],
-            $filter->toArray()
+            $filter
+                // ->dump()
+                ->toArray()
         );
 
         $this->assertEquals(

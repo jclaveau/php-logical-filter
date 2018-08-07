@@ -67,8 +67,8 @@ class LogicalFilterTest extends \AbstractTest
         $filter->and_('field', 'in', ['a', 'b', 'c']);
 
         $this->assertEquals(
-            new InRule('field', ['a', 'b', 'c']),
-            $filter->getRules()
+            (new InRule('field', ['a', 'b', 'c']))->toArray(),
+            $filter->getRules()->toArray()
         );
     }
 
