@@ -184,14 +184,13 @@ abstract class Filterer implements FiltererInterface
                             $field = null;
                             $value = $rule->getOperands();
                         }
-                        elseif ($rule instanceof NotEqualRule || $rule instanceof AbstractAtomicRule) {
+                        elseif ($rule instanceof NotEqualRule || $rule instanceof AbstractAtomicRule || $rule instanceof InRule) {
                             $field = $rule->getField();
                             $value = $rule->getValues();
                         }
                         else {
                             throw new \LogicException(
-                                "Filtering with a rule which has not been simplified: "
-                                .var_export($rule, true)
+                                "Filtering with a rule which has not been simplified: $rule"
                             );
                         }
 

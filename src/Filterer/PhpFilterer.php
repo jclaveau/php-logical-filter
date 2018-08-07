@@ -11,6 +11,7 @@ use       JClaveau\LogicalFilter\Rule\EqualRule;
 use       JClaveau\LogicalFilter\Rule\BelowRule;
 use       JClaveau\LogicalFilter\Rule\AboveRule;
 use       JClaveau\LogicalFilter\Rule\NotEqualRule;
+use       JClaveau\LogicalFilter\Rule\InRule;
 
 /**
  */
@@ -30,6 +31,14 @@ class PhpFilterer extends Filterer
             else {
                 // TODO support strict comparisons
                 $result = $row[$field] == $value;
+            }
+        }
+        elseif ($operator === InRule::operator) {
+            if (!isset($row[$field])) {
+                $result = false;
+            }
+            else {
+                $result = in_array($row[$field], $value);
             }
         }
         elseif ($operator === BelowRule::operator) {

@@ -147,6 +147,9 @@ class RuleFilterer extends Filterer
                 $out = $value_to_compare == $value;
             }
         }
+        elseif ($operator === InRule::operator) {
+            $out = in_array($value_to_compare, $value);
+        }
         elseif ($operator === BelowRule::operator) {
             $out = $value_to_compare < $value;
         }
@@ -159,7 +162,7 @@ class RuleFilterer extends Filterer
             }
             else {
                 throw new \InvalidArgumentException(
-                    "This case shouldn't occure with teh current simplification strategy"
+                    "This case shouldn't occure with the current simplification strategy"
                 );
                 // $out = $row[$field] == $operand->getValue();
             }
