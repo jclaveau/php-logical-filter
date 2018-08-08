@@ -315,7 +315,7 @@ abstract class AbstractOperationRule extends AbstractRule
             }
         }
 
-        $this->operands = $unifiedOperands;
+        $this->setOperands( $unifiedOperands );
 
         return $this;
     }
