@@ -59,6 +59,15 @@ class InRule extends OrRule
     }
 
     /**
+     * @return $this
+     */
+    public function setField($field)
+    {
+        $this->field = $field;
+        return $this;
+    }
+
+    /**
      * @param  array|callable Associative array of renamings or callable
      *                        that would rename the fields.
      *
@@ -264,5 +273,12 @@ class InRule extends OrRule
         return count($this->native_possibilities) < $this->options['inrule.simplification_threshold'];
     }
 
+    /**
+     * @return bool If the InRule can have a solution or not
+     */
+    public function hasSolution()
+    {
+        return !empty($this->getPossibilities());
+    }
     /**/
 }

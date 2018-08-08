@@ -26,6 +26,24 @@ class InlineSqlMinimalConverter extends MinimalConverter
     protected $parameters = [];
 
     /**
+     * @return string parameter id
+     */
+    public function addParameter($value)
+    {
+        if (is_numeric($value))
+            return $value;
+
+        $uid = 'param_'.hash('crc32b', serialize($value));
+
+        if (isset($this->parameters[$uid]))
+            return $this->parameters[$uid];
+
+        $this->parameters[$uid] = $value;
+
+        return ':'.$uid;
+    }
+
+    /**
      * @param LogicalFilter $filter
      */
     public function convert( LogicalFilter $filter )
@@ -74,6 +92,9 @@ class InlineSqlMinimalConverter extends MinimalConverter
         elseif ($rule instanceof NotEqualRule) {
             $value = $rule->getValue();
         }
+        elseif ($rule instanceof InRule) {
+            $value = $rule->getPossibilities();
+        }
         elseif ($rule instanceof RegexpRule) {
             $value = RegexpRule::php2mariadbPCRE( $rule->getPattern() );
             $operator = 'REGEXP';
@@ -88,10 +109,15 @@ class InlineSqlMinimalConverter extends MinimalConverter
         elseif ($value instanceof \DateTime) {
             $value = $value->format('Y-m-d H:i:s');
         }
-        elseif (in_array( gettype($value), ['string', 'array'] )) {
-            $id = 'param_' . count($this->parameters);
-            $this->parameters[$id] = $value;
-            $value = ':'.$id;
+        elseif (gettype($value) == 'string') {
+            $value = $this->addParameter($value);
+        }
+        elseif (gettype($value) == 'array') {
+            $sql_part = [];
+            foreach ($value as $possibility) {
+                $sql_part[] = $this->addParameter($possibility);
+            }
+            $value = '(' . implode(', ', $sql_part) . ')';
         }
         elseif ($value === null) {
             $value = "NULL";
@@ -112,6 +138,8 @@ class InlineSqlMinimalConverter extends MinimalConverter
                 "Unhandled type of value: ".gettype($value). ' | ' .var_export($value, true)
             );
         }
+
+        $operator = strtoupper($operator);
 
         $new_rule = "$field $operator $value";
 
