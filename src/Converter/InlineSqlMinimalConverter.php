@@ -81,7 +81,7 @@ class InlineSqlMinimalConverter extends MinimalConverter
             $value = $rule->getValue();
         }
         elseif ($rule instanceof InRule) {
-            $value = $rule->getValues();
+            $value = $rule->getPossibilities();
         }
         elseif ($rule instanceof AboveRule) {
             $value = $rule->getMinimum();
@@ -92,14 +92,14 @@ class InlineSqlMinimalConverter extends MinimalConverter
         elseif ($rule instanceof NotEqualRule) {
             $value = $rule->getValue();
         }
-        elseif ($rule instanceof InRule) {
-            $value = $rule->getPossibilities();
-        }
         elseif ($rule instanceof RegexpRule) {
             $value = RegexpRule::php2mariadbPCRE( $rule->getPattern() );
-            $operator = 'REGEXP';
         }
-
+        else {
+            throw new \InvalidArgumentException(
+                "Unhandled operator '$operator' during SQL query generation"
+            );
+        }
 
         if (gettype($value) == 'integer') {
         }

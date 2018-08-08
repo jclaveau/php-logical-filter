@@ -65,18 +65,19 @@ class ConverterTest extends \AbstractTest
      */
     public function test_convert_with_sql_converter()
     {
-        $filter = (new LogicalFilter([
-            'and',
-            ['field_1', '=', 2],
-            ['or',
-                ['field_2', '>', 4],
-                ['field_2', '<', -4],
-            ],
-            ['field_3', '=', null],
-            ['field_4', '!=', null],
-            ['field_5', 'regexp', "/^(ab)+/i"],
-            ['field_6', 'in', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]],
-        ]))
+        $filter = (new LogicalFilter(
+            ['and',
+                ['field_1', '=', 2],
+                ['or',
+                    ['field_2', '>', 4],
+                    ['field_2', '<', -4],
+                ],
+                ['field_3', '=', null],
+                ['field_4', '!=', null],
+                ['field_5', 'regexp', "/^(ab)+/i"],
+                ['field_6', 'in', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]],
+            ]
+        ))
         // ->dump()
         ;
 
@@ -99,18 +100,19 @@ class ConverterTest extends \AbstractTest
      */
     public function test_convert_with_elasticsearch_converter()
     {
-        $filter = (new LogicalFilter([
-            'and',
-            ['field_1', '=', 2],
-            [
-                'or',
-                ['field_2', '>', 4],
-                ['field_2', '<', -4],
-            ],
-            ['field_3', '=', null],
-            ['field_4', '!=', null],
-            ['field_5', 'regexp', "/^(ab)+/i"],
-        ]))
+        $filter = (new LogicalFilter(
+            ['and',
+                ['field_1', '=', 2],
+                ['or',
+                    ['field_2', '>', 4],
+                    ['field_2', '<', -4],
+                ],
+                ['field_3', '=', null],
+                ['field_4', '!=', null],
+                ['field_5', 'regexp', "/^(ab)+/i"],
+                ['field_6', 'in', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]],
+            ]
+        ))
         // ->dump(true)
         ;
 
@@ -153,6 +155,11 @@ class ConverterTest extends \AbstractTest
                                             ],
                                         ],
                                     ],
+                                    [
+                                        "terms" => [
+                                            "field_6" => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+                                        ],
+                                    ],
                                 ],
                             ],
                         ],
@@ -186,6 +193,11 @@ class ConverterTest extends \AbstractTest
                                             "field_5" => [
                                                 "value" => "/^(ab)+/i",
                                             ],
+                                        ],
+                                    ],
+                                    [
+                                        "terms" => [
+                                            "field_6" => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
                                         ],
                                     ],
                                 ],

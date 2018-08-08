@@ -76,6 +76,13 @@ class ElasticSearchMinimalConverter extends MinimalConverter
                 ];
             }
         }
+        elseif ($operator == 'in') {
+            $new_rule = [
+                'terms' => [
+                    $field => $operand->getPossibilities()
+                ]
+            ];
+        }
         elseif ($operator == '<') {
             $new_rule = [
                 'range' => [
