@@ -75,7 +75,6 @@ class AboveOrEqualRule extends OrRule
         $above_value = null;
 
         foreach ($operands as $operand) {
-            $operand->getValues();
             if ($operand instanceof EqualRule && $this->field == $operand->getField()) {
                 $equal_value = $operand->getValue();
             }
@@ -85,24 +84,25 @@ class AboveOrEqualRule extends OrRule
             else {
                 throw new \LogicException(
                     "Setting invalid operand for $this: "
-                    .var_export($operand, true)
+                    .($operand instanceof AbstractRule ? $operand : var_export($operand, true))
                 );
             }
         }
 
         if (!isset($equal_value) || !isset($above_value)) {
             throw new \LogicException(
-                "Trying to set null values for $this: "
-                .var_export([$equal_value, $above_value], true)
+                "Trying to set null values for $this"
             );
         }
 
         if ($equal_value != $above_value) {
             throw new \LogicException(
                 "Trying to set different values for $this: "
-                .var_export([$equal_value, $above_value], true)
+                .var_export(['equal' => $equal_value, 'above' => $above_value], true)
             );
         }
+
+        $this->lower_limit = $equal_value;
 
         return $this;
     }
