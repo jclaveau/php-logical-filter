@@ -60,7 +60,7 @@ class RuleFilterer extends Filterer
     public function setChildren( &$row, $filtered_children ) // strict issue if forcing  AbstractRule with php 5.6 here
     {
         if ($row instanceof AbstractOperationRule)
-            return $row->setOperands( $filtered_children );
+            return $row->setOperandsOrReplaceByOperation( $filtered_children );
     }
 
     /**

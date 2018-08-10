@@ -139,6 +139,17 @@ abstract class Filterer implements FiltererInterface
             $root_cases = [];
         }
 
+        if (!isset($options['recurse'])) {
+            $options['recurse'] = 'before';
+        }
+        elseif (!in_array($options['recurse'], ['before', 'after', null])) {
+            throw new \InvalidArgumentException(
+                "Invalid value for 'recurse' option: "
+                .var_export($options['recurse'], true)
+                ."\nInstead of ['before', 'after', null]"
+            );
+        }
+
         return $this->applyRecursion(
             $root_cases,
             $tree_to_filter,
@@ -156,15 +167,17 @@ abstract class Filterer implements FiltererInterface
         foreach ($tree_to_filter as $row_index => $row_to_filter) {
             $operands_validation_row_cache = [];
 
-            if ($children = $this->getChildren($row_to_filter)) {
-                $filtered_children = $this->applyRecursion(
-                    $root_cases,
-                    $children,
-                    $depth++,
-                    $options
-                );
+            if ($options['recurse'] == 'before') {
+                if ($children = $this->getChildren($row_to_filter)) {
+                    $filtered_children = $this->applyRecursion(
+                        $root_cases,
+                        $children,
+                        $depth++,
+                        $options
+                    );
 
-                $this->setChildren($row_to_filter, $filtered_children);
+                    $this->setChildren($row_to_filter, $filtered_children);
+                }
             }
 
             if (!$root_cases) {
@@ -252,6 +265,19 @@ abstract class Filterer implements FiltererInterface
             elseif ($matching_case === null) {
                 // We simply avoid rules
                 // row out of scope
+            }
+
+            if ($options['recurse'] == 'after') {
+                if ($children = $this->getChildren($row_to_filter)) {
+                    $filtered_children = $this->applyRecursion(
+                        $root_cases,
+                        $children,
+                        $depth++,
+                        $options
+                    );
+
+                    $this->setChildren($row_to_filter, $filtered_children);
+                }
             }
         }
 

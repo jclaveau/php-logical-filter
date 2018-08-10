@@ -504,16 +504,17 @@ trait LogicalFilterTest_rules_manipulation_trait
      */
     public function test_applyOn_another_filter_with_custom_action()
     {
-        $filter_to_filter = new LogicalFilter([
-            'and',
-            ['field_1', '=', 2],
-            ['or',
-                ['field_2', '>', 4],
-                ['field_2', '<', -4],
-            ],
-            ['field_3', '=', null],
-            ['field_2', '!=', null],
-        ]);
+        $filter_to_filter = new LogicalFilter(
+            ['and',
+                ['field_1', '=', 2],
+                ['or',
+                    ['field_2', '>', 4],
+                    ['field_2', '<', -4],
+                ],
+                ['field_3', '=', null],
+                ['field_2', '!=', null],
+            ]
+        );
 
         $filtered_filter = (new LogicalFilter(
             ['and',
