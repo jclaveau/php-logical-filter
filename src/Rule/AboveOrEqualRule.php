@@ -9,52 +9,40 @@ class AboveOrEqualRule extends OrRule
     /** @var string operator */
     const operator = '>=';
 
+    protected $lower_limit;
+    protected $field;
+
     /**
-     * @param string $field The field to apply the rule on.
-     * @param array  $value The value the field can above to.
+     * @param string $field       The field to apply the rule on.
+     * @param array  $lower_limit The value the field can above to.
      */
-    public function __construct( $field, $minimum )
+    public function __construct( $field, $lower_limit )
     {
-        $this->addOperand( new AboveRule($field, $minimum) );
-        $this->addOperand( new EqualRule($field, $minimum) );
+        $this->field = $field;
+        $this->lower_limit = $lower_limit;
     }
 
     /**
+     * @deprecated getLowerLimit
      */
     public function getMinimum()
     {
-        $minimum = $this->getOperandAt(0)->getMinimum();
-        $value   = $this->getOperandAt(1)->getValue();
+        return $this->getLowerLimit();
+    }
 
-        if ($value != $minimum) {
-            throw new \RuntimeException(
-                "The value of the EqualRule (".var_export($value, true).") "
-                ."and the minimum of the AboveRule (".var_export($minimum, true).") "
-                ."of an ". __CLASS__ ." do not match anymore"
-            );
-        }
-
-        return $minimum;
+    /**
+     * @deprecated getLowerLimit
+     */
+    public function getLowerLimit()
+    {
+        return $this->lower_limit;
     }
 
     /**
      */
     public function getField()
     {
-        $minimumField = $this->getOperandAt(0)->getField();
-        $valueField   = $this->getOperandAt(1)->getField();
-
-        if ($minimumField != $valueField) {
-            // TODO if this case occures, the current object should be
-            // replaced by a simple OrRule
-            throw new \RuntimeException(
-                "The field of the EqualRule (".var_export($valueField, true).") "
-                ."and the field of the AboveRule (".var_export($minimumField, true).") "
-                ."of an ". __CLASS__ ." do not match anymore"
-            );
-        }
-
-        return $minimumField;
+        return $this->field;
     }
 
     /**
@@ -62,7 +50,61 @@ class AboveOrEqualRule extends OrRule
      */
     public function getValues()
     {
-        return $this->getMinimum();
+        return $this->getLowerLimit();
+    }
+
+    /**
+     * @return array
+     */
+    public function getOperands()
+    {
+        return [
+            new AboveRule($this->field, $this->lower_limit),
+            new EqualRule($this->field, $this->lower_limit),
+        ];
+    }
+
+    /**
+     * @param  array possibilities
+     *
+     * @return InRule $this
+     */
+    public function setOperands(array $operands)
+    {
+        $equal_value = null;
+        $above_value = null;
+
+        foreach ($operands as $operand) {
+            $operand->getValues();
+            if ($operand instanceof EqualRule && $this->field == $operand->getField()) {
+                $equal_value = $operand->getValue();
+            }
+            elseif ($operand instanceof AboveRule && $this->field == $operand->getField()) {
+                $above_value = $operand->getMinimum();
+            }
+            else {
+                throw new \LogicException(
+                    "Setting invalid operand for $this: "
+                    .var_export($operand, true)
+                );
+            }
+        }
+
+        if (!isset($equal_value) || !isset($above_value)) {
+            throw new \LogicException(
+                "Trying to set null values for $this: "
+                .var_export([$equal_value, $above_value], true)
+            );
+        }
+
+        if ($equal_value != $above_value) {
+            throw new \LogicException(
+                "Trying to set different values for $this: "
+                .var_export([$equal_value, $above_value], true)
+            );
+        }
+
+        return $this;
     }
 
     /**

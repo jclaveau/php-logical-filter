@@ -7,36 +7,12 @@ class AboveOrEqualRuleTest extends \PHPUnit_Framework_TestCase
 {
     /**
      */
-    public function test_exception_thrown_because_of_inconsistency()
+    public function test_setOperandsOrReplaceByOperation()
     {
         $rule = new AboveOrEqualRule('field', 4);
         $operands = $rule->getOperands();
         $operands[0] = new AboveRule('field_2', 3);
-        $rule->setOperands($operands);
-
-        try {
-            $this->assertFalse( $rule->getMinimum() );
-            $this->assertTrue(
-                false,
-                "An exception explaining that the two operands are do not mean "
-                ." 'above or equal' should have been thrown"
-            );
-        }
-        catch (\Exception $e) {
-            $this->assertTrue(true, "Exception thrown: ".$e->getMessage());
-        }
-
-        try {
-            $this->assertFalse( $rule->getField() );
-            $this->assertTrue(
-                false,
-                "An exception explaining that the two operands do not target "
-                ." the same field"
-            );
-        }
-        catch (\Exception $e) {
-            $this->assertTrue(true, "Exception thrown: ".$e->getMessage());
-        }
+        $rule = $rule->setOperandsOrReplaceByOperation($operands);
 
         $this->assertEquals(
             ['or',
@@ -45,6 +21,24 @@ class AboveOrEqualRuleTest extends \PHPUnit_Framework_TestCase
             ],
             $rule
                 // ->dump()
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify()
+    {
+        $rule = new AboveOrEqualRule('field', 4);
+
+        $this->assertEquals(
+            ['or',
+                ['field', '>', 4],
+                ['field', '=', 4],
+            ],
+            $rule
+                ->simplify()
+                ->dump()
                 ->toArray()
         );
     }

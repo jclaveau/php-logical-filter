@@ -279,9 +279,6 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function unifyAtomicOperands($simplification_strategy_step = false)
     {
-        // if (!$this->isSimplificationAllowed())
-            // return $this;
-
         if ($simplification_strategy_step)
             $this->moveSimplificationStepForward( self::unify_atomic_operands );
 
@@ -290,21 +287,21 @@ abstract class AbstractOperationRule extends AbstractRule
         if (!$this->isSimplificationAllowed())
             return $this;
 
-        foreach ($this->operands as $operand) {
+        $operands = $this->getOperands();
+        foreach ($operands as &$operand) {
             if ($operand instanceof AbstractOperationRule) {
-                $operand->unifyAtomicOperands($simplification_strategy_step);
+                $operand = $operand->unifyAtomicOperands($simplification_strategy_step);
             }
         }
 
-        $operandsByFields = $this->groupOperandsByFieldAndOperator();
-        // var_dump($operandsByFields);
+        $class = get_class($this);
 
-        $operandsByFields = $this->simplifySameOperands($operandsByFields);
-        // var_dump($operandsByFields);
+        $operandsByFields = $class::groupOperandsByFieldAndOperator_static($operands);
+        $operandsByFields = $class::simplifySameOperands($operandsByFields);
 
         if ($this instanceof AndRule) {
             // unifiying operands of different types
-            $operandsByFields = $this->simplifyDifferentOperands($operandsByFields);
+            $operandsByFields = $class::simplifyDifferentOperands($operandsByFields);
         }
 
         // Remove the index by fields and operators
@@ -315,9 +312,7 @@ abstract class AbstractOperationRule extends AbstractRule
             }
         }
 
-        $this->setOperands( $unifiedOperands );
-
-        return $this;
+        return $this->setOperandsOrReplaceByOperation( $unifiedOperands );
     }
 
     private static $simplification_cache = [];
@@ -357,31 +352,28 @@ abstract class AbstractOperationRule extends AbstractRule
         $cache_keys = [$id];
 
         $this->cleanOperations();
-        $this->unifyAtomicOperands();
+        $instance = $this->unifyAtomicOperands();
+        // $instance->dump(true);
 
-        $cache_keys[] = $this->getSemanticId().'-'.$options_id;
-        // $this->dump(true);
+        $cache_keys[] = $instance->getSemanticId().'-'.$options_id;
 
         if ($step_to_stop_before == self::remove_negations)
-            return $this;
+            return $instance;
 
-        $this->removeNegations();
+        $instance->removeNegations();
 
-        // $this->dump(true);
+        // $instance->dump(true);
 
         if ($step_to_stop_after  == self::remove_negations ||
             $step_to_stop_before == self::rootify_disjunctions )
-            return $this;
+            return $instance;
 
-        // $this->dump(true);
+        // $instance->dump(true);
 
-        $this->cleanOperations();
-        // FIXME return $this while RootifyingDisjunctions!
-        if (method_exists($this, 'rootifyDisjunctions')) {
-            $instance = $this->rootifyDisjunctions();
-        }
-        else {
-            $instance = $this;
+        $instance->cleanOperations();
+        // FIXME return $instance while RootifyingDisjunctions!
+        if (method_exists($instance, 'rootifyDisjunctions')) {
+            $instance = $instance->rootifyDisjunctions();
         }
 
         // $instance->dump(true);
@@ -460,6 +452,32 @@ abstract class AbstractOperationRule extends AbstractRule
     {
         $operandsByFields = [];
         foreach ($this->operands as $operand) {
+
+            // Operation rules have no field but we need to keep them anyway
+            $field = method_exists($operand, 'getField') ? $operand->getField() : '';
+
+            if (!isset($operandsByFields[ $field ]))
+                $operandsByFields[ $field ] = [];
+
+            if (!isset($operandsByFields[ $field ][ $operand::operator ]))
+                $operandsByFields[ $field ][ $operand::operator ] = [];
+
+            $operandsByFields[ $field ][ $operand::operator ][] = $operand;
+        }
+
+        return $operandsByFields;
+    }
+
+    /**
+     * Indexes operands by their fields and operators. This sorting is
+     * used during the simplification step.
+     *
+     * @return array The 3 dimensions array of operands: field > operator > i
+     */
+    protected static function groupOperandsByFieldAndOperator_static($operands)
+    {
+        $operandsByFields = [];
+        foreach ($operands as $operand) {
 
             // Operation rules have no field but we need to keep them anyway
             $field = method_exists($operand, 'getField') ? $operand->getField() : '';

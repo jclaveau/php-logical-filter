@@ -308,7 +308,7 @@ class AndRule extends AbstractOperationRule
      * + if A > 2 && A > 1 <=> A > 2
      * + if A < 2 && A < 1 <=> A < 1
      */
-    protected function simplifySameOperands(array $operandsByFields)
+    protected static function simplifySameOperands(array $operandsByFields)
     {
         // unifying same operands
         foreach ($operandsByFields as $field => $operandsByOperator) {
@@ -397,7 +397,7 @@ class AndRule extends AbstractOperationRule
                 catch (\Exception $e) {
                     VisibilityViolator::setHiddenProperty($e, 'message', $e->getMessage() . "\n" . var_export([
                             'operands' => $operands,
-                            'this'     => $this,
+                            // 'this'     => $this,
                         ], true)
                     );
 
@@ -416,7 +416,7 @@ class AndRule extends AbstractOperationRule
      * + if A = 2 && A > 1 <=> A = 2
      * + if A = 2 && A < 4 <=> A = 2
      */
-    protected function simplifyDifferentOperands(array $operandsByFields)
+    protected static function simplifyDifferentOperands(array $operandsByFields)
     {
         foreach ($operandsByFields as $field => &$operandsByOperator) {
 
@@ -620,6 +620,22 @@ class AndRule extends AbstractOperationRule
         }
 
         return $operandsByFields;
+    }
+
+    /**
+     * This method is meant to be used during simplification that would
+     * need to change the class of the current instance by a normal one.
+     *
+     * @return AndRule The current instance (of or or subclass) or a new AndRule
+     */
+    public function setOperandsOrReplaceByOperation($new_operands)
+    {
+        try {
+            return $this->setOperands( $new_operands );
+        }
+        catch (\LogicException $e) {
+            return new AndRule( $new_operands );
+        }
     }
 
     /**/
