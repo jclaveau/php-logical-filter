@@ -179,6 +179,21 @@ class NotRuleTest extends \AbstractTest
                 // ->dump()
                 ->toArray()
         );
+
+        $rule = new NotRule();
+        try {
+            $rule = $rule->setOperandsOrReplaceByOperation([
+                new EqualRule('field', 3),
+                new EqualRule('field_2', 4),
+            ]);
+            $this->markTestIncomplete("An exception has not been thrown here");
+        }
+        catch (\InvalidArgumentException $e) {
+            $this->assertRegexp(
+                "/^Negations can handle only one operand instead of: /",
+                $e->getMessage()
+            );
+        }
     }
 
     /**/

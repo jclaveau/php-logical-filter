@@ -210,9 +210,15 @@ class NotRule extends AbstractOperationRule
      */
     public function setOperandsOrReplaceByOperation($new_operands)
     {
-        if (count($new_operands) != 1) {
-            throw new InvalidArgumentException(
-                "Negations can handle only one operand"
+        if (count($new_operands) > 1) {
+            foreach ($new_operands as &$new_operand) {
+                if ($new_operand instanceof AbstractRule)
+                    $new_operand = $new_operand->toString();
+            }
+
+            throw new \InvalidArgumentException(
+                "Negations can handle only one operand instead of: "
+                .var_export($new_operands, true)
             );
         }
 
