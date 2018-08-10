@@ -154,5 +154,32 @@ class NotRuleTest extends \AbstractTest
         }
     }
 
+    /**
+     */
+    public function test_setOperandsOrReplaceByOperation()
+    {
+        $rule = new NotRule();
+        $rule->setOperandsOrReplaceByOperation([
+            new EqualRule('field', 3)
+        ]);
+
+        $this->assertEquals(
+            ['not', ['field', '=', 3]],
+            $rule
+                ->toArray()
+        );
+
+        $rule = $rule->setOperandsOrReplaceByOperation([
+            new NotRule(new EqualRule('field', 3))
+        ]);
+
+        $this->assertEquals(
+            ['field', '=', 3],
+            $rule
+                // ->dump()
+                ->toArray()
+        );
+    }
+
     /**/
 }

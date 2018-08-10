@@ -202,5 +202,33 @@ class NotRule extends AbstractOperationRule
         return $out;
     }
 
+    /**
+     * This method is meant to be used during simplification that would
+     * need to change the class of the current instance by a normal one.
+     *
+     * @return OrRule The current instance (of or or subclass) or a new OrRule
+     */
+    public function setOperandsOrReplaceByOperation($new_operands)
+    {
+        if (count($new_operands) != 1) {
+            throw new InvalidArgumentException(
+                "Negations can handle only one operand"
+            );
+        }
+
+        $new_operand = reset($new_operands);
+
+        if ($new_operand instanceof NotRule)
+            return reset( $new_operand->getOperands() );
+
+        try {
+            // Don't use addOperand here to allow inheritance for optimizations (e.g. NotInRule)
+            return $this->setOperands( $new_operands );
+        }
+        catch (\LogicException $e) {
+            return new NotRule( $new_operand );
+        }
+    }
+
     /**/
 }
