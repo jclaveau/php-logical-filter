@@ -107,5 +107,21 @@ class InRuleTest extends \AbstractTest
         }
     }
 
+    /**
+     */
+    public function test_setField_with_cache()
+    {
+        $rule = new InRule('field', [4, 5, 6]);
+        // set the cache
+        $rule->toArray();
+
+        $rule->setField('field_2');
+
+        $this->assertEquals(
+            ['field_2', 'in', [4, 5, 6]],
+            $rule->toArray()
+        );
+    }
+
     /**/
 }

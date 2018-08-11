@@ -63,7 +63,11 @@ class InRule extends OrRule
      */
     public function setField($field)
     {
-        $this->field = $field;
+        if ($this->field != $field) {
+            $this->field = $field;
+            $this->flushCache();
+        }
+
         return $this;
     }
 
