@@ -218,7 +218,10 @@ abstract class AbstractOperationRule extends AbstractRule
     public function cleanOperations($recurse=true)
     {
         if ($recurse) foreach ($this->operands as $i => $operand) {
-            if ($operand instanceof AbstractOperationRule && !$operand instanceof InRule && !$operand instanceof NotRule) {
+            if (    $operand instanceof AbstractOperationRule
+                && !$operand instanceof InRule
+                && !$operand instanceof NotRule
+            ) {
                 $this->operands[$i] = $operand->cleanOperations();
             }
         }
@@ -351,9 +354,10 @@ abstract class AbstractOperationRule extends AbstractRule
 
         $cache_keys = [$id];
 
+        // $this->dump(true);
         $this->cleanOperations();
+        // $this->dump(true);
         $instance = $this->unifyAtomicOperands();
-        // $instance->dump(true);
 
         $cache_keys[] = $instance->getSemanticId().'-'.$options_id;
 

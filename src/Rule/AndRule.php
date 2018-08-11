@@ -166,12 +166,15 @@ class AndRule extends AbstractOperationRule
      */
     public function removeSameOperationOperands()
     {
-        foreach ($this->operands as $i => &$operand) {
+        foreach ($this->operands as $i => $operand) {
             if ( ! is_a($operand, AndRule::class))
                 continue;
 
+            if ( ! $operands = $operand->getOperands())
+                continue;
+
             // Id AND is an operand on AND they can be merge (and the same with OR)
-            foreach ($operand->getOperands() as $sub_operand) {
+            foreach ($operands as $sub_operand) {
                 $this->addOperand( $sub_operand->copy() );
             }
             unset($this->operands[$i]);

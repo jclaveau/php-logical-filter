@@ -224,8 +224,10 @@ class NotRule extends AbstractOperationRule
 
         $new_operand = reset($new_operands);
 
-        if ($new_operand instanceof NotRule)
-            return reset( $new_operand->getOperands() );
+        if ($new_operand instanceof NotRule) {
+            $operands = $new_operand->getOperands();
+            return reset( $operands );
+        }
 
         try {
             // Don't use addOperand here to allow inheritance for optimizations (e.g. NotInRule)

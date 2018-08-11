@@ -1661,5 +1661,48 @@ trait LogicalFilterTest_rules_simplification_trait
         );
     }
 
+    /**
+     */
+    public function test_simplification_empty_operations()
+    {
+        $filter = (new LogicalFilter(
+            ['and',
+                ['or',
+                    ['field', '=', 'plop'],
+                ],
+                ['and'],
+            ]
+        ))
+        // ->dump()
+        ;
+
+        $this->assertEquals(
+            ["and"],
+            $filter
+                ->simplify()
+                // ->dump()
+                ->toArray()
+        );
+
+        $filter = (new LogicalFilter(
+            ['and',
+                ['or',
+                    ['field', '=', 'plop'],
+                ],
+                ['or'],
+            ]
+        ))
+        // ->dump()
+        ;
+
+        $this->assertEquals(
+            ["or"],
+            $filter
+                ->simplify()
+                // ->dump()
+                ->toArray()
+        );
+    }
+
     /**/
 }
