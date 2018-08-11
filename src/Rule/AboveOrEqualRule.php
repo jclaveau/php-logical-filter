@@ -46,6 +46,19 @@ class AboveOrEqualRule extends OrRule
     }
 
     /**
+     * @return $this
+     */
+    public function setField($field)
+    {
+        if ($this->field != $field) {
+            $this->field = $field;
+            $this->flushCache();
+        }
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getValues()

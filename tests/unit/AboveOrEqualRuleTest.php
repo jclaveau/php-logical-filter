@@ -121,5 +121,21 @@ class AboveOrEqualRuleTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     */
+    public function test_setField_with_cache()
+    {
+        $rule = new AboveOrEqualRule('field', 3);
+        // set the cache
+        $rule->toArray();
+
+        $rule->setField('field_2');
+
+        $this->assertEquals(
+            ['field_2', '>=', 3],
+            $rule->toArray()
+        );
+    }
+
     /**/
 }
