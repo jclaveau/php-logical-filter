@@ -1556,37 +1556,104 @@ trait LogicalFilterTest_rules_simplification_trait
                 ["field2", "in", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
             ],
             null,
-            ['inrule.simplification_threshold' => 20]
+            ['inrule.simplification_threshold' => 9]
         ))
         ->simplify()
         ;
 
         $this->assertEquals(
-            // ["or",
-                // ["field2", "=", 4],
-                // ["field2", "in", [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
-                // ["field2", "in", [1, 2]],
-            // ],
-            ['or',
-                ['field2', '=', 4],
-                ['field2', '=', 11],
-                ['field2', '=', 12],
-                ['field2', '=', 13],
-                ['field2', '=', 14],
-                ['field2', '=', 15],
-                ['field2', '=', 16],
-                ['field2', '=', 17],
-                ['field2', '=', 18],
-                ['field2', '=', 19],
-                ['field2', '=', 20],
-                ['field2', '=', 1],
-                ['field2', '=', 2],
+            ["or",
+                ["field2", "=", 4],
+                ["field2", "in", [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                ["field2", "=", 1],
+                ["field2", "=", 2],
             ],
             $filter
                 // ->dump(true)
                 ->toArray()
         );
     }
+
+    /**
+     */
+    public function test_simplify_in_rules_changing_simplification_threshold()
+    {
+        $filter = (new LogicalFilter(
+            ["and",
+                ["field", "in", [1, 2, 3, 4, 5, 6, 7]],
+                ["field_2", "in", [1, 2, 3, 4, 5, 6, 7, 8]],
+            ],
+            null,
+            ['inrule.simplification_threshold' => 5]
+        ))
+        ->simplify()
+        ;
+
+        $this->assertEquals(
+            ["or",
+                ["and",
+                    ["field", "in", [1, 2, 3, 4, 5, 6, 7]],
+                    ["field_2", "in", [1, 2, 3, 4, 5, 6, 7, 8]],
+                ],
+            ],
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+
+        $filter->onEachRule(
+            ['and',
+                ['operator', '=', 'in'],
+                ['field', '=', 'field_2'],
+            ],
+            function (InRule $rule, $key, array &$siblings) {
+                $rule->setOptions(['inrule.simplification_threshold' => 10]);
+            }
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ["field", "in", [1, 2, 3, 4, 5, 6, 7]],
+                    ['field_2', '=', 1],
+                ],
+                ['and',
+                    ["field", "in", [1, 2, 3, 4, 5, 6, 7]],
+                    ['field_2', '=', 2],
+                ],
+                ['and',
+                    ["field", "in", [1, 2, 3, 4, 5, 6, 7]],
+                    ['field_2', '=', 3],
+                ],
+                ['and',
+                    ["field", "in", [1, 2, 3, 4, 5, 6, 7]],
+                    ['field_2', '=', 4],
+                ],
+                ['and',
+                    ["field", "in", [1, 2, 3, 4, 5, 6, 7]],
+                    ['field_2', '=', 5],
+                ],
+                ['and',
+                    ["field", "in", [1, 2, 3, 4, 5, 6, 7]],
+                    ['field_2', '=', 6],
+                ],
+                ['and',
+                    ["field", "in", [1, 2, 3, 4, 5, 6, 7]],
+                    ['field_2', '=', 7],
+                ],
+                ['and',
+                    ["field", "in", [1, 2, 3, 4, 5, 6, 7]],
+                    ['field_2', '=', 8],
+                ],
+            ],
+            $filter
+                ->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+
 
     /**
      */
