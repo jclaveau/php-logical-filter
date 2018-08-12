@@ -17,6 +17,7 @@ use       JClaveau\LogicalFilter\Rule\NotEqualRule;
 use       JClaveau\LogicalFilter\Rule\AbstractOperationRule;
 use       JClaveau\LogicalFilter\Rule\AbstractRule;
 use       JClaveau\LogicalFilter\Rule\InRule;
+use       JClaveau\LogicalFilter\Rule\RegexpRule;
 
 /**
  * This filterer is intended to validate Rules.
@@ -155,6 +156,17 @@ class RuleFilterer extends Filterer
         }
         elseif ($operator === AboveRule::operator) {
             $out = $value_to_compare > $value;
+        }
+        elseif ($operator === RegexpRule::operator) {
+            // TODO support optionnal parameters
+            $out = preg_match($value, $value_to_compare);
+            if ($out === false) {
+                throw new \InvalidArgumentEXception(
+                    "Error while calling preg_match( $value ) on: \n"
+                    .var_export($value_to_compare, true)
+                );
+            }
+            $out = (bool) $out;
         }
         elseif ($operator === NotEqualRule::operator) {
             if ($value === null) {

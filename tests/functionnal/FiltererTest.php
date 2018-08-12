@@ -229,18 +229,23 @@ class FiltererTest extends \AbstractTest
             ],
             ['field_3', '=', null],
             ['field_2', '!=', null],
+            ['field_4', '><', ['a', 'z']],
         ]);
 
         $filtered_rules = (new RuleFilterer)
         ->apply(
-            new LogicalFilter([
-                'and',
-                ['field',    '=',  'field_2'],
-                ['operator', '!=', '!='],
-            ]),
+            new LogicalFilter(
+                ['and',
+                    ['or',
+                        ['field', '=', 'field_2'],
+                        ['field', 'regexp', '/^field_4$/'],
+                    ],
+                    ['operator', '!=', '!='],
+                ]
+            ),
             $filter_to_filter->getRules()
         )
-        // ->dump()
+        // ->dump(true)
         ;
 
         $this->assertEquals(
@@ -249,6 +254,7 @@ class FiltererTest extends \AbstractTest
                     ['field_2', '>', 4],
                     ['field_2', '<', -4],
                 ],
+                ['field_4', '><', ['a', 'z']],
             ],
             $filtered_rules->toArray()
         );
