@@ -51,8 +51,18 @@ class LogicalFilter implements \JsonSerializable
      *
      * @see self::addRules
      */
-    public function __construct(array $rules=[], Filterer $default_filterer=null, array $options=[])
+    public function __construct($rules=[], Filterer $default_filterer=null, array $options=[])
     {
+        if ($rules instanceof AbstractRule) {
+            $rules = $rules->copy();
+        }
+        elseif (!is_array($rules)) {
+            throw new \InvalidArgumentException(
+                "\$ules must be a rules description or an AbstractRule instead of"
+                .var_export($rules, true)
+            );
+        }
+
         if ($default_filterer)
             $this->default_filterer = $default_filterer;
 

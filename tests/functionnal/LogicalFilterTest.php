@@ -30,6 +30,13 @@ class LogicalFilterTest extends \AbstractTest
             (new AboveRule('field', 3))->toArray(),
             $filter->getRules()->toArray()
         );
+
+        $filter = new LogicalFilter(new AboveRule('field', 3));
+
+        $this->assertEquals(
+            (new AboveRule('field', 3))->toArray(),
+            $filter->getRules()->toArray()
+        );
     }
 
     /**
