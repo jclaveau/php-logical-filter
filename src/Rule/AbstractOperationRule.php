@@ -1,6 +1,5 @@
 <?php
 namespace JClaveau\LogicalFilter\Rule;
-use       JClaveau\VisibilityViolator\VisibilityViolator;
 
 /**
  * Operation rules:
@@ -503,58 +502,19 @@ abstract class AbstractOperationRule extends AbstractRule
      *
      * @return OperationRule A copy of the current instance with copied operands.
      */
-    public final function copy($token=null)
+    public final function copy()
     {
-        // copying the instance first avoids the copy_cache array to be copied
-        $copied_rule = clone $this;
-
-        // TODO enable copy registration only in debug mode
-        // if ($copy = $this->registerCopy($token))
-            // return $copy;
-
-        $copied_operands = [];
-        foreach ($this->operands as $operand_id => &$operand) {
-            $copied_operands[$operand_id] = $operand->copy($token);
-        }
-
-        VisibilityViolator::setHiddenProperty(
-            $copied_rule,
-            'operands',
-            $copied_operands
-        );
-
-        $this->copy_cache = [];
-        // Emptying the gc once the explicitly required copy() has ended
-        // too slow
-        // if (!array_filter(func_get_args()))
-            // gc_collect_cycles();
-
-        return $copied_rule;
+        return clone $this;
     }
 
-
-    /** @var array $copy_cache */
-    private $copy_cache = [];
-
     /**
+     * Make a deep copy of operands
      */
-    protected final function registerCopy( &$token )
+    public function __clone()
     {
-        if ($token === null)
-            $token = $this->getInstanceId().'-'.uniqid();
-
-        if (!isset($this->copy_cache[ $token ]))
-            $this->copy_cache[$token] = [];
-
-        if (isset($this->copy_cache[$token][ $this->getInstanceId() ])) {
-            throw new \Exception(
-                 "Copying multiple times the same object during the copy recursion "
-                ."identified by $token: {$this->getInstanceId()} => " . $this
-            );
-            // return $this->copy_cache[$token][ $this->getInstanceId() ];
+        foreach ($this->operands as $operand_id => &$operand) {
+            $this->operands[$operand_id] = $operand->copy();
         }
-
-        $this->copy_cache[$token][ $this->getInstanceId() ] = $this;
     }
 
     /**

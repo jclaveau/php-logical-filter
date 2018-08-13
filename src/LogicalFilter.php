@@ -18,8 +18,6 @@ use JClaveau\LogicalFilter\Filterer\PhpFilterer;
 use JClaveau\LogicalFilter\Filterer\CustomizableFilterer;
 use JClaveau\LogicalFilter\Filterer\RuleFilterer;
 
-use JClaveau\VisibilityViolator\VisibilityViolator;
-
 /**
  * LogicalFilter describes a set of logical rules structured by
  * conjunctions and disjunctions (AND and OR).
@@ -675,15 +673,16 @@ class LogicalFilter implements \JsonSerializable
      */
     public function copy()
     {
-        $newFilter = clone $this;
+        return clone $this;
+    }
 
-        if ($this->rules instanceof AbstractRule) {
-            VisibilityViolator::setHiddenProperty(
-                $newFilter, 'rules', $this->rules->copy()
-            );
-        }
-
-        return $newFilter;
+    /**
+     * Make a deep copy of the rules
+     */
+    public function __clone()
+    {
+        if ($this->rules)
+            $this->rules = $this->rules->copy();
     }
 
     /**
