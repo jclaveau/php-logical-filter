@@ -652,5 +652,48 @@ trait LogicalFilterTest_rules_manipulation_trait
         );
     }
 
+    /**
+     */
+    public function test_matches()
+    {
+        $filter = (new LogicalFilter(
+            ["and",
+                ['field_1', '=', 2],
+                ['or',
+                    ['field_2', '>', 4],
+                    ['field_2', '<', -4],
+                ],
+                ['field_3', '=', null],
+                ['field_2', '!=', null],
+            ]
+        ))
+        // ->dump(true)
+        ;
+
+        $this->assertTrue(
+            $filter->matches([
+                'and',
+                ['field_2', '<', -4],
+                ['field_2', '!=', null],
+            ])
+        );
+
+        $this->assertTrue(
+            $filter->matches([
+                'or',
+                ['field_2', '<', -5],
+                ['field_2', '>', 6],
+            ])
+        );
+
+        $this->assertFalse(
+            $filter->matches([
+                'and',
+                ['field_2', '=', 3],
+                ['field_3', '=', null],
+            ])
+        );
+    }
+
     /**/
 }

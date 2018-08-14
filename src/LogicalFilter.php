@@ -403,6 +403,23 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     * Checks that a filter matches another one.
+     *
+     * @param array|AbstractRule $rules_to_match
+     *
+     * @return bool Whether or not this combination of filters has
+     *              potential solutions
+     */
+    public function matches($rules_to_match)
+    {
+        return $this
+            ->copy()
+            ->and_($rules_to_match)
+            ->hasSolution()
+            ;
+    }
+
+    /**
      * Retrieve all the rules.
      *
      * @param  bool $copy By default copy the rule tree to avoid side effects.
