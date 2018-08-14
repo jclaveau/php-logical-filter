@@ -84,6 +84,86 @@ class LogicalFilterTest extends \AbstractTest
 
     /**
      */
+    public function test_or_with_rules_instances()
+    {
+        $filter = new LogicalFilter();
+
+        $filter
+            ->or_(new InRule('field', ['a', 'b', 'c']))
+            ->or_(new AboveRule('field', 3))
+            ->or_(new BelowRule('field', 5))
+            ;
+
+        $this->assertEquals(
+            (new OrRule([
+                new InRule('field', ['a', 'b', 'c']),
+                new AboveRule('field', 3),
+                new BelowRule('field', 5)
+            ]))
+                ->toArray(),
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_or_with_rules_instances_in_array()
+    {
+        // in an array
+        $filter = new LogicalFilter();
+
+        $filter->or_([
+            new InRule('field', ['a', 'b', 'c']),
+            new AboveRule('field', 3),
+            new BelowRule('field', 5)
+        ])
+        ;
+
+        $this->assertEquals(
+            (new OrRule([
+                new InRule('field', ['a', 'b', 'c']),
+                new AboveRule('field', 3),
+                new BelowRule('field', 5)
+            ]))
+                ->toArray(),
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_and_with_rules_instances_in_array()
+    {
+        // in an array
+        $filter = new LogicalFilter();
+
+        $filter->and_([
+            new InRule('field', ['a', 'b', 'c']),
+            new AboveRule('field', 3),
+            new BelowRule('field', 5)
+        ])
+        // ->dump()
+        ;
+
+        $this->assertEquals(
+            (new AndRule([
+                new InRule('field', ['a', 'b', 'c']),
+                new AboveRule('field', 3),
+                new BelowRule('field', 5)
+            ]))
+                ->toArray(),
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
     public function test_getRules()
     {
         $filter = new LogicalFilter();

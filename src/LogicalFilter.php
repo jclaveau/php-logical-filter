@@ -165,14 +165,25 @@ class LogicalFilter implements \JsonSerializable
             }
         }
         elseif (count($rules_description) == 1 && is_array($rules_description[0])) {
-            $fake_root = new AndRule;
 
-            $this->addCompositeRule_recursion(
-                $rules_description[0],
-                $fake_root
-            );
+            if (count($rules_description[0]) == count(array_filter($rules_description[0], function($arg) {
+                return $arg instanceof AbstractRule;
+            })) ) {
+                // Case of $filter->or_([AbstractRule, AbstractRule, AbstractRule, ...])
+                foreach ($rules_description[0] as $i => $new_rule) {
+                    $this->addRule( $new_rule, $operation );
+                }
+            }
+            else {
+                $fake_root = new AndRule;
 
-            $this->addRule( $fake_root->getOperands()[0], $operation );
+                $this->addCompositeRule_recursion(
+                    $rules_description[0],
+                    $fake_root
+                );
+
+                $this->addRule( $fake_root->getOperands()[0], $operation );
+            }
         }
         else {
             throw new \InvalidArgumentException(
