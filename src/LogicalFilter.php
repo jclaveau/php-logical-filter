@@ -387,8 +387,7 @@ class LogicalFilter implements \JsonSerializable
      */
     public function or_()
     {
-        if ($this->rules !== null)
-            $this->addRules( OrRule::operator, func_get_args());
+        $this->addRules( OrRule::operator, func_get_args());
         return $this;
     }
 
@@ -722,9 +721,27 @@ class LogicalFilter implements \JsonSerializable
             $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $callstack_depth);
             $caller = $bt[ $callstack_depth - 2 ];
 
-            echo "\n" . $caller['file'] . ':' . $caller['line'] . "\n";
-            var_export($this->toArray($options));
+            // get line and file from the previous level of the caller
+            // TODO go deeper if this case exist?
+            if (!isset($caller['file']))
+                $caller['file'] = $bt[ $callstack_depth - 3 ]['file'];
+            if (!isset($caller['line']))
+                $caller['line'] = $bt[ $callstack_depth - 3 ]['line'];
+
+            try {
+                echo "\n" . $caller['file'] . ':' . $caller['line'] . "\n";
+                var_export($this->toArray($options));
+            }
+            catch (\Exception $e) {
+                echo "\nError while dumping: " . $e->getMessage() . "\n";
+                var_export($caller);
+                echo "\n\n";
+                var_export($bt);
+                echo "\n\n";
+                var_export($this->toArray($options));
+            }
             echo "\n\n";
+
             if ($exit)
                 exit;
         }

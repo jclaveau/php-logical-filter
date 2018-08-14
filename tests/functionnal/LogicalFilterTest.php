@@ -46,23 +46,39 @@ class LogicalFilterTest extends \AbstractTest
         $filter = new LogicalFilter();
 
         $filter->and_('field', 'in', ['a', 'b', 'c']);
-        // $filter->addRule('field', 'not_in', ['a', 'b', 'c']);
         $filter->and_('field', 'above', 3);
         $filter->and_('field', 'below', 5);
-
-        $rules = VisibilityViolator::getHiddenProperty(
-            $filter,
-            'rules'
-        );
 
         $this->assertEquals(
             (new AndRule([
                 new InRule('field', ['a', 'b', 'c']),
-                // new NotInRule(['a', 'b', 'c']),
                 new AboveRule('field', 3),
                 new BelowRule('field', 5)
             ]))->toArray(),
-            $rules->toArray()
+            $filter->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_or_simple()
+    {
+        $filter = new LogicalFilter();
+
+        $filter->or_('field', 'in', ['a', 'b', 'c']);
+        $filter->or_('field', 'above', 3);
+        $filter->or_('field', 'below', 5);
+
+        $this->assertEquals(
+            (new OrRule([
+                new InRule('field', ['a', 'b', 'c']),
+                new AboveRule('field', 3),
+                new BelowRule('field', 5)
+            ]))
+                ->toArray(),
+            $filter
+                // ->dump(true)
+                ->toArray()
         );
     }
 
