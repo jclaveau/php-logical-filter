@@ -17,7 +17,7 @@ class InRule extends OrRule
 
     /** @var array $options */
     protected $options = [
-        'inrule.simplification_threshold' => 5,
+        'inrule.simplification_threshold' => 0,
     ];
 
     /** @var string $field */
