@@ -251,7 +251,7 @@ abstract class AbstractRule implements \JsonSerializable
             return $this->cache['semantic_id'];
 
         // return hash('crc32b', serialize( $this->toArray() ));
-        return hash('md4', serialize( $this->toArray() ))  // faster but longer
+        return hash('md4', serialize( $this->toArray(['semantic' => true]) ))  // faster but longer
               // .hash('md4', serialize( $this->options ))
               ;
     }

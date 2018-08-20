@@ -1453,7 +1453,7 @@ array(3) {
         ;
 
         $this->assertEquals(
-            '2346e4a9a35d326683500788ad9d71ac',
+            'e647e7aa7e6bac47aa2be1425690c801',
             $filter->getRules()->getSemanticId()
         );
 
@@ -1467,7 +1467,7 @@ array(3) {
         ;
 
         $this->assertEquals(
-            'b8006963ebcf542d8b4e8a24449fff5d',
+            '6d62240a7e950247288d83a062fb1852',
             $filter2->getRules()->getSemanticId()
         );
 
@@ -1505,6 +1505,49 @@ array(3) {
             ],
             $filter3->toArray()
         );
+    }
+
+    /**
+     */
+    public function test_getSemanticId_with_same_operands_in_different_order()
+    {
+        $filter = (new LogicalFilter(
+            ['or',
+                ['and',
+                    ['field_1', '=', 3],
+                    ['field_5', '>', 3],
+                ],
+                ['and',
+                    ['field_1', '=', 3],
+                    ['field_5', '>', 3],
+                ],
+                ['field_2', '!=', 4],
+            ]
+        ))
+        // ->dump(true)
+        ;
+
+        $filter2 = (new LogicalFilter(
+            ['or',
+                ['and',
+                    ['field_1', '=', 3],
+                    ['field_5', '>', 3],
+                ],
+                ['field_2', '!=', 4],
+                ['and',
+                    ['field_1', '=', 3],
+                    ['field_5', '>', 3],
+                ],
+            ]
+        ))
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            $filter->getRules()->getSemanticId(),
+            $filter2->getRules()->getSemanticId()
+        );
+
     }
 
     /**/

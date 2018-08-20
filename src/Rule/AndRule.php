@@ -115,6 +115,8 @@ class AndRule extends AbstractOperationRule
     {
         $default_options = [
             'show_instance' => false,
+            'sort_operands' => false,
+            'semantic'      => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
             if (!isset($options[ $default_option ]))
@@ -127,13 +129,27 @@ class AndRule extends AbstractOperationRule
         $operands_as_array = [
             $options['show_instance'] ? $this->getInstanceId() : self::operator,
         ];
-        foreach ($this->operands as $operand)
-            $operands_as_array[] = $operand->toArray($options);
 
-        if (!$options['show_instance'])
-            return $this->cache['array'] = $operands_as_array;
-        else
-            return $operands_as_array;
+        $operands = $this->operands;
+        if ($options['semantic']) {
+            // Semantic array: ['operator', 'semantic_id_of_operand1', 'semantic_id_of_operand2', ...]
+            // with sorted semantic ids
+            $operands_semantic_ids = array_keys($operands);
+            sort($operands_semantic_ids);
+            return array_merge(
+                [self::operator],
+                $operands_semantic_ids
+            );
+        }
+        else {
+            foreach ($operands as $operand)
+                $operands_as_array[] = $operand->toArray($options);
+
+            if (!$options['show_instance'])
+                return $this->cache['array'] = $operands_as_array;
+            else
+                return $operands_as_array;
+        }
     }
 
     /**
