@@ -13,6 +13,7 @@ use       JClaveau\LogicalFilter\Rule\AboveRule;
 use       JClaveau\LogicalFilter\Rule\BelowRule;
 use       JClaveau\LogicalFilter\Rule\RegexpRule;
 use       JClaveau\LogicalFilter\Rule\InRule;
+use       JClaveau\LogicalFilter\Rule\NotInRule;
 
 /**
  * This class implements a converter for MySQL.
@@ -81,6 +82,10 @@ class InlineSqlMinimalConverter extends MinimalConverter
             $value = $rule->getValue();
         }
         elseif ($rule instanceof InRule) {
+            $value = $rule->getPossibilities();
+        }
+        elseif ($rule instanceof NotInRule) {
+            $operator = 'NOT IN';
             $value = $rule->getPossibilities();
         }
         elseif ($rule instanceof AboveRule) {
