@@ -9,6 +9,8 @@ namespace JClaveau\LogicalFilter\Rule;
  */
 abstract class AbstractOperationRule extends AbstractRule
 {
+    use Trait_RuleWithOptions;
+
     /**
      * This property should never be null.
      *
@@ -122,7 +124,7 @@ abstract class AbstractOperationRule extends AbstractRule
     /**
      * @param string $step_to_go_to
      */
-    public function moveSimplificationStepForward($step_to_go_to, $force=false)
+    public function moveSimplificationStepForward($step_to_go_to, array $simplification_options, $force=false)
     {
         if (!in_array($step_to_go_to, self::simplification_steps)) {
             throw new \InvalidArgumentException(
@@ -130,7 +132,8 @@ abstract class AbstractOperationRule extends AbstractRule
             );
         }
 
-        if ($this->isSimplificationAllowed() && !$force && $this->current_simplification_step != null) {
+        // if ($this->isNormalizationAllowed($simplification_options) && !$force && $this->current_simplification_step != null) {
+        if (!$force && $this->current_simplification_step != null) {
             $steps_indices = array_flip(self::simplification_steps);
 
             $current_index = $steps_indices[ $this->current_simplification_step ];
@@ -181,27 +184,33 @@ abstract class AbstractOperationRule extends AbstractRule
     /**
      * Replace NotRule objects by the negation of their operands.
      *
-     * @return $this
+     * @return $this|$new_rule
      */
-    public function removeNegations()
+    public function removeNegations(array $contextual_options)
     {
-        if (!$this->isSimplificationAllowed())
+        if (!$this->isNormalizationAllowed($contextual_options))
             return $this;
 
-        $this->moveSimplificationStepForward(self::remove_negations);
+        $this->moveSimplificationStepForward(self::remove_negations, $contextual_options);
 
-        foreach ($this->operands as $i => $operand) {
+        $new_rule = $this;
+        if ($operands = $this->operands) {
 
-            if ($operand instanceof NotRule) {
-                $this->operands[$i] = $operand->negateOperand();
+            foreach ($operands as $i => $operand) {
+
+                if ($operand instanceof NotRule) {
+                    $operands[$i] = $operand->negateOperand(false, $contextual_options);
+                }
+
+                if ($operands[$i] instanceof AbstractOperationRule) {
+                    $operands[$i]->removeNegations( $contextual_options );
+                }
             }
 
-            if ($this->operands[$i] instanceof AbstractOperationRule) {
-                $this->operands[$i]->removeNegations();
-            }
+            $new_rule = $this->setOperandsOrReplaceByOperation($operands, $contextual_options);
         }
 
-        return $this;
+        return $new_rule;
     }
 
     /**
@@ -214,25 +223,29 @@ abstract class AbstractOperationRule extends AbstractRule
      *
      * @return $this;
      */
-    public function cleanOperations($recurse=true)
+    public function cleanOperations($simplification_options, $recurse=true)
     {
         if ($recurse) foreach ($this->operands as $i => $operand) {
             if (    $operand instanceof AbstractOperationRule
                 && !$operand instanceof InRule
-                && !$operand instanceof NotRule
+                && !$operand instanceof NotEqualRule
+                && !$operand instanceof NotInRule
             ) {
-                $this->operands[$i] = $operand->cleanOperations();
+                $this->operands[$i] = $operand->cleanOperations($simplification_options);
             }
         }
+
+        if ($this instanceof NotRule)
+            return $this;
 
         $is_modified = true;
         while ($is_modified) {
             $is_modified = false;
 
-            if ($this->removeMonooperandOperationsOperands())
+            if ($this->removeMonooperandOperationsOperands($simplification_options))
                 $is_modified = true;
 
-            if ($this->removeSameOperationOperands())
+            if ($this->removeSameOperationOperands($simplification_options))
                 $is_modified = true;
         }
 
@@ -248,13 +261,13 @@ abstract class AbstractOperationRule extends AbstractRule
      *
      * @return bool If something has been simplified or not
      */
-    public function removeMonooperandOperationsOperands()
+    public function removeMonooperandOperationsOperands(array $simplification_options)
     {
         foreach ($this->operands as $i => $operand) {
-            if (!$operand instanceof AbstractOperationRule)
+            if (!$operand instanceof AbstractOperationRule || $operand instanceof NotRule)
                 continue;
 
-            if ($operand instanceof InRule && !$operand->isSimplificationAllowed()) {
+            if ($operand instanceof InRule && !$operand->isNormalizationAllowed($simplification_options)) {
                 $count = count($operand->getPossibilities());
             }
             else {
@@ -279,20 +292,20 @@ abstract class AbstractOperationRule extends AbstractRule
      *
      * @return AbstractOperationRule the simplified rule
      */
-    public function unifyAtomicOperands($simplification_strategy_step = false)
+    public function unifyAtomicOperands($simplification_strategy_step = false, array $contextual_options)
     {
         if ($simplification_strategy_step)
-            $this->moveSimplificationStepForward( self::unify_atomic_operands );
+            $this->moveSimplificationStepForward( self::unify_atomic_operands, $contextual_options );
 
         // $this->dump(true);
 
-        if (!$this->isSimplificationAllowed())
+        if (!$this->isNormalizationAllowed($contextual_options))
             return $this;
 
         $operands = $this->getOperands();
         foreach ($operands as &$operand) {
             if ($operand instanceof AbstractOperationRule) {
-                $operand = $operand->unifyAtomicOperands($simplification_strategy_step);
+                $operand = $operand->unifyAtomicOperands($simplification_strategy_step, $contextual_options);
             }
         }
 
@@ -314,7 +327,7 @@ abstract class AbstractOperationRule extends AbstractRule
             }
         }
 
-        return $this->setOperandsOrReplaceByOperation( $unifiedOperands );
+        return $this->setOperandsOrReplaceByOperation( $unifiedOperands, $contextual_options );
     }
 
     private static $simplification_cache = [];
@@ -354,16 +367,17 @@ abstract class AbstractOperationRule extends AbstractRule
         $cache_keys = [$id];
 
         // $this->dump(true);
-        $this->cleanOperations();
+        $this->cleanOperations($options);
         // $this->dump(true);
-        $instance = $this->unifyAtomicOperands();
+        $instance = $this->unifyAtomicOperands(false, $options);
 
         $cache_keys[] = $instance->getSemanticId().'-'.$options_id;
 
         if ($step_to_stop_before == self::remove_negations)
             return $instance;
 
-        $instance->removeNegations();
+        // $this->dump(!true);
+        $instance = $instance->removeNegations($options);
 
         // $instance->dump(true);
 
@@ -373,10 +387,9 @@ abstract class AbstractOperationRule extends AbstractRule
 
         // $instance->dump(true);
 
-        $instance->cleanOperations();
-        // FIXME return $instance while RootifyingDisjunctions!
-        if (method_exists($instance, 'rootifyDisjunctions')) {
-            $instance = $instance->rootifyDisjunctions();
+        $instance->cleanOperations($options);
+        if ($instance instanceof AbstractOperationRule) {
+            $instance = $instance->rootifyDisjunctions($options);
         }
 
         // $instance->dump(true);
@@ -387,8 +400,8 @@ abstract class AbstractOperationRule extends AbstractRule
 
         if (!$instance instanceof AbstractAtomicRule) {
 
-            $instance->cleanOperations();
-            $instance->unifyAtomicOperands(true);
+            $instance->cleanOperations($options);
+            $instance->unifyAtomicOperands(true, $options);
 
             // $instance->dump(true);
 
@@ -396,14 +409,14 @@ abstract class AbstractOperationRule extends AbstractRule
                 $step_to_stop_before == self::remove_invalid_branches )
                 return $instance;
 
-            $instance->cleanOperations();
+            $instance->cleanOperations($options);
             if (method_exists($instance, 'removeInvalidBranches')) {
-                $instance->removeInvalidBranches();
+                $instance->removeInvalidBranches($options);
             }
         }
 
         // $instance->dump(true);
-        $instance->cleanOperations();
+        $instance->cleanOperations($options);
 
         // the root rule cannot be cleaned so we wrap it and apply a
         // last non recursive clean
@@ -415,7 +428,7 @@ abstract class AbstractOperationRule extends AbstractRule
                 return $instance;
 
             $operands = (new AndRule([$instance]))
-                ->cleanOperations(false)
+                ->cleanOperations($options, false)
                 // ->dump(true)
                 ->getOperands();
 
@@ -428,10 +441,19 @@ abstract class AbstractOperationRule extends AbstractRule
             $instance = $instance->forceLogicalCore();
             // for the simplification status at
             foreach ($operands = $instance->getOperands() as &$andOperand) {
-                $andOperand->moveSimplificationStepForward(self::simplified, true);
+                if (!$andOperand instanceof AndRule) {
+                    throw new \LogicException(
+                        "A rule is intended to be an and case: \n"
+                        .$andOperand
+                        ."\nof:\n"
+                        .$instance
+                    );
+                }
+
+                $andOperand->moveSimplificationStepForward(self::simplified, $options, true);
             }
             $instance->setOperands($operands);
-            $instance->moveSimplificationStepForward(self::simplified, true);
+            $instance->moveSimplificationStepForward(self::simplified, $options, true);
 
             $cache_keys[] = $instance->getSemanticId().'-'.$options_id;
             // self::$simplification_cache[ $instance->getSemanticId().'-'.$options_id ] = $instance;
@@ -519,7 +541,7 @@ abstract class AbstractOperationRule extends AbstractRule
 
     /**
      */
-    public function isSimplificationAllowed()
+    public function isNormalizationAllowed(array $current_simplification_options)
     {
         return true;
     }

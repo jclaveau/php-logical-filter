@@ -20,6 +20,14 @@ class NotInRule extends NotRule
 
     /**
      */
+    public function isNormalizationAllowed(array $contextual_options=[])
+    {
+        $operand = $this->getOperandAt(0);
+        return $operand->isNormalizationAllowed($contextual_options);
+    }
+
+    /**
+     */
     public function getField()
     {
         if (!$this->getOperandAt(0)) {
@@ -76,6 +84,13 @@ class NotInRule extends NotRule
     public function getValues()
     {
         return $this->getPossibilities();
+    }
+
+    /**
+     */
+    public function hasSolution()
+    {
+        return count($this->getPossibilities()) != 0;
     }
 
     /**

@@ -39,7 +39,7 @@ class LogicalFilter implements \JsonSerializable
 
     /** @var  array $default_options */
     protected static $default_options = [
-        'inrule.simplification_threshold' => 5,
+        'in.normalization_threshold' => 0,
     ];
 
     /**

@@ -13,7 +13,7 @@ class NotRuleTest extends \AbstractTest
         $rule = new NotRule(
             new AboveRule('field', 3)
         );
-        $new_rule = $rule->negateOperand();
+        $new_rule = $rule->negateOperand(false, []);
         $this->assertEquals(new OrRule([
             new BelowRule('field', 3),
             new EqualRule('field', 3)
@@ -24,7 +24,7 @@ class NotRuleTest extends \AbstractTest
         $rule = new NotRule(
             new BelowRule('field', 3)
         );
-        $new_rule = $rule->negateOperand();
+        $new_rule = $rule->negateOperand(false, []);
         $this->assertEquals(new OrRule([
             new AboveRule('field', 3),
             new EqualRule('field', 3)
@@ -35,7 +35,7 @@ class NotRuleTest extends \AbstractTest
         $rule = new NotRule(
             new NotRule(new BelowRule('field', 3))
         );
-        $new_rule = $rule->negateOperand();
+        $new_rule = $rule->negateOperand(false, []);
         $this->assertEquals((new BelowRule('field', 3))->toArray(), $new_rule->toArray());
 
 
@@ -43,17 +43,30 @@ class NotRuleTest extends \AbstractTest
         $rule = new NotRule(
             new EqualRule('field', 3)
         );
-        $new_rule = $rule->negateOperand();
+        $new_rule = $rule->negateOperand(false, [
+            'not_equal.normalization' => true
+        ]);
         $this->assertEquals(new OrRule([
             new AboveRule('field', 3),
             new BelowRule('field', 3),
         ]), $new_rule);
 
+        // EqualRule
+        $rule = new NotRule(
+            new EqualRule('field', 3)
+        );
+        $new_rule = $rule->negateOperand(false, [
+            'not_equal.normalization' => false
+        ])
+        // ->dump(true)
+        ;
+        $this->assertEquals(new NotEqualRule('field', 3), $new_rule);
+
         // EqualRule null
         $rule = new NotRule(
             new EqualRule('field', null)
         );
-        $new_rule = $rule->negateOperand();
+        $new_rule = $rule->negateOperand(false, []);
         $this->assertEquals(
             new NotEqualRule('field', null),
             $new_rule
@@ -92,7 +105,7 @@ class NotRuleTest extends \AbstractTest
             ]))
             ->toArray(),
             $rule
-                ->negateOperand()
+                ->negateOperand(false, [])
                 ->toArray()
         );
 
@@ -104,11 +117,11 @@ class NotRuleTest extends \AbstractTest
             ])
         );
 
-        $new_rule = $rule->negateOperand();
+        $new_rule = $rule->negateOperand(false, [])
+            // ->dump()
+            ;
         $expected = new AndRule([
-            new NotRule(
-                new EqualRule('field', 3)
-            ),
+            new NotEqualRule('field', 3),
             new NotRule(
                 new AboveRule('field', 10)
             ),
@@ -120,17 +133,21 @@ class NotRuleTest extends \AbstractTest
         $rule = new NotRule(
             new InRule('field', [3, 10])
         );
-        $new_rule = $rule->negateOperand();
+        $new_rule = $rule->negateOperand(false, [
+            'not_equal.normalization'    => false,
+            'in.normalization_threshold' => 3,
+        ])
+        // ->dump()
+        ;
         $expected = new AndRule([
-            new NotRule(
-                new EqualRule('field', 3)
-            ),
-            new NotRule(
-                new EqualRule('field', 10)
-            ),
+            new NotEqualRule('field', 3),
+            new NotEqualRule('field', 10),
         ]);
 
-        $this->assertEquals($expected, $new_rule);
+        $this->assertEquals(
+            $expected->toArray(),
+            $new_rule->toArray()
+        );
 
     }
 
@@ -142,7 +159,7 @@ class NotRuleTest extends \AbstractTest
         VisibilityViolator::setHiddenProperty($rule, 'operands', ['dsfghjk']);
 
         try {
-            $rule->negateOperand();
+            $rule->negateOperand(false, []);
             $this->assertTrue(
                 false, "NotRule should have thrown an exceptrion as its "
                 . "operand is neither null either an AbstractRule"
@@ -159,19 +176,20 @@ class NotRuleTest extends \AbstractTest
     public function test_setOperandsOrReplaceByOperation()
     {
         $rule = new NotRule();
-        $rule->setOperandsOrReplaceByOperation([
+         $rule = $rule->setOperandsOrReplaceByOperation([
             new EqualRule('field', 3)
-        ]);
+        ], []);
 
         $this->assertEquals(
-            ['not', ['field', '=', 3]],
+            ['field', '!=', 3],
             $rule
+                // ->dump()
                 ->toArray()
         );
 
         $rule = $rule->setOperandsOrReplaceByOperation([
             new NotRule(new EqualRule('field', 3))
-        ]);
+        ], []);
 
         $this->assertEquals(
             ['field', '=', 3],
@@ -185,7 +203,7 @@ class NotRuleTest extends \AbstractTest
             $rule = $rule->setOperandsOrReplaceByOperation([
                 new EqualRule('field', 3),
                 new EqualRule('field_2', 4),
-            ]);
+            ], []);
             $this->markTestIncomplete("An exception has not been thrown here");
         }
         catch (\InvalidArgumentException $e) {

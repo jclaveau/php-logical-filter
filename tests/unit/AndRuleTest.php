@@ -34,21 +34,21 @@ class AndRuleTest extends \AbstractTest
         $this->assertEmpty(
             (new AndRule([$below, $equal]))
                 ->simplify( ['stop_before' => AbstractOperationRule::remove_invalid_branches] )
-                ->removeInvalidBranches()
+                ->removeInvalidBranches([])
                 ->getOperands()
         );
 
         $this->assertEmpty(
             (new AndRule([$equal, $above]))
                 ->simplify( ['stop_before' => AbstractOperationRule::remove_invalid_branches] )
-                ->removeInvalidBranches()
+                ->removeInvalidBranches([])
                 ->getOperands()
         );
 
         $this->assertEmpty(
             (new AndRule([$below, $above]))
                 ->simplify( ['stop_before' => AbstractOperationRule::remove_invalid_branches] )
-                ->removeInvalidBranches()
+                ->removeInvalidBranches([])
                 ->getOperands()
         );
 
@@ -121,7 +121,9 @@ class AndRuleTest extends \AbstractTest
         );
 
         $this->assertFalse(
-            (new AndRule([$equal, new NotRule($equal)]))->simplify()->hasSolution()
+            (new AndRule([$equal, new NotRule($equal)]))->simplify()
+                // ->dump()
+                ->hasSolution()
         );
 
         $this->assertTrue(

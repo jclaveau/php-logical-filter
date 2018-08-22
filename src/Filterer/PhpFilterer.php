@@ -62,18 +62,7 @@ class PhpFilterer extends Filterer
                 $result = isset($row[$field]);
             }
             else {
-                throw new \InvalidArgumentException(
-                    "This case shouldn't occure with the current simplification strategy: "
-                    ."'$field' $operator "
-                    .var_export($value, true)
-                    ."\n\n"
-                    ."[\n"
-                    . implode( ",\n", array_map( function($operand) {
-                        return $operand->toString(['indent_unit' => '    ']);
-                    }, $all_operands) )
-                    ."\n]\n"
-                );
-                // return $row[$field] == $operand->getValue();
+                $result = $row[$field] != $value;
             }
         }
         else {

@@ -16,13 +16,13 @@ class OrRule extends AbstractOperationRule
     /**
      * Remove AndRules operands of AndRules and OrRules of OrRules.
      */
-    public function removeSameOperationOperands()
+    public function removeSameOperationOperands(array $simplification_options)
     {
         foreach ($this->operands as $i => &$operand) {
             if ( ! is_a($operand, OrRule::class))
                 continue;
 
-            if ( !$operand->isSimplificationAllowed() )
+            if ( !$operand->isNormalizationAllowed($simplification_options) )
                 continue;
 
             // Id AND is an operand on AND they can be merge (and the same with OR)
@@ -46,18 +46,18 @@ class OrRule extends AbstractOperationRule
      *
      * @return $this
      */
-    public function rootifyDisjunctions()
+    public function rootifyDisjunctions($simplification_options)
     {
-        if (!$this->isSimplificationAllowed())
+        if (!$this->isNormalizationAllowed($simplification_options))
             return $this->copy();
 
-        $this->moveSimplificationStepForward( self::rootify_disjunctions );
+        $this->moveSimplificationStepForward( self::rootify_disjunctions, $simplification_options );
 
         $upLiftedOperands = [];
         foreach ($this->getOperands() as $operand) {
             $operand = $operand->copy();
             if ($operand instanceof AbstractOperationRule)
-                $operand = $operand->rootifyDisjunctions();
+                $operand = $operand->rootifyDisjunctions($simplification_options);
 
             if ($operand instanceof OrRule) {
                 foreach ($operand->getOperands() as $subOperand)
@@ -225,17 +225,17 @@ class OrRule extends AbstractOperationRule
      *
      * @return OrRule
      */
-    public function removeInvalidBranches()
+    public function removeInvalidBranches(array $simplification_options)
     {
-        if (!$this->isSimplificationAllowed())
+        if (!$this->isNormalizationAllowed($simplification_options))
             return $this;
 
-        $this->moveSimplificationStepForward(self::remove_invalid_branches);
+        $this->moveSimplificationStepForward(self::remove_invalid_branches, $simplification_options);
 
         foreach ($this->operands as $i => $operand) {
 
             if ($operand instanceof AndRule || $operand instanceof OrRule) {
-                $this->operands[$i] = $operand->removeInvalidBranches();
+                $this->operands[$i] = $operand->removeInvalidBranches($simplification_options);
                 if (!$this->operands[$i]->getOperands()) {
                     unset($this->operands[$i]);
                     continue;
@@ -256,9 +256,9 @@ class OrRule extends AbstractOperationRule
      *
      * @return bool If the rule can have a solution or not
      */
-    public function hasSolution()
+    public function hasSolution(array $simplification_options=[])
     {
-        if (!$this->isSimplificationAllowed())
+        if (!$this->isNormalizationAllowed($simplification_options))
             return true;
 
         if (!$this->simplicationStepReached(self::simplified)) {

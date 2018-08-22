@@ -46,9 +46,10 @@ class AbstractOperationRuleTest extends \AbstractTest
         $above4 = new AboveRule('field_name4', 2);
 
         // OrRule
-        $subOrRule1 = new OrRule([$above1, $above2]);
-        $subOrRule2 = new OrRule([$above3, $above4]);
-        $orRule = new OrRule([$subOrRule1, $subOrRule2]);
+        $orRule = new OrRule([
+            new OrRule([$above1, $above2]),
+            new OrRule([$above3, $above4])
+        ]);
 
         $expectedOrRule = new OrRule([
             $above1,
@@ -60,14 +61,17 @@ class AbstractOperationRuleTest extends \AbstractTest
         $this->assertEquals(
             $expectedOrRule->toArray(),
             $orRule
+                // ->dump()
                 ->simplify()
+                // ->dump()
                 ->toArray()
         );
 
         // AndRule
-        $subAndRule1 = new AndRule([$above1, $above2]);
-        $subAndRule2 = new AndRule([$above3, $above4]);
-        $andRule = new AndRule([$subAndRule1, $subAndRule2]);
+        $andRule = new AndRule([
+            new AndRule([$above1, $above2]),
+            new AndRule([$above3, $above4]),
+        ]);
 
         $expectedAndRule = new AndRule([
             $above1,
@@ -157,8 +161,11 @@ class AbstractOperationRuleTest extends \AbstractTest
 
         $this->assertEmpty(
             (new AndRule([$above, new NotRule($above)]))
-                ->simplify( ['stop_before' => AbstractOperationRule::remove_invalid_branches] )
-                ->removeInvalidBranches()
+                // ->dump(true)
+                ->simplify(
+                    // ['stop_before' => AbstractOperationRule::remove_invalid_branches]
+                 )
+                // ->removeInvalidBranches([])
                 ->getOperands()
         );
 
@@ -183,7 +190,7 @@ class AbstractOperationRuleTest extends \AbstractTest
                     (new AndRule([$above, $equal])),
                 ]))
                 ->simplify()
-                ->removeInvalidBranches()
+                ->removeInvalidBranches([])
                 ->getOperands()
         );
     }

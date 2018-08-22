@@ -12,19 +12,13 @@ namespace JClaveau\LogicalFilter\Rule;
  */
 class InRule extends OrRule
 {
+    use Trait_RuleWithOptions;
+
     /** @var string operator */
     const operator = 'in';
 
-    /** @var array $options */
-    protected $options = [
-        'inrule.simplification_threshold' => 0,
-    ];
-
     /** @var string $field */
     protected $field;
-
-    /** @var string $field */
-    protected $simplification_allowed = true;
 
     /** @var array $native_possibilities */
     protected $native_possibilities = [];
@@ -45,6 +39,7 @@ class InRule extends OrRule
         if (!empty($options)) {
             $this->setOptions($options);
         }
+
         $this->field = $field;
         $this->addPossibilities( $possibilities );
     }
@@ -268,15 +263,15 @@ class InRule extends OrRule
         return $this->cache['string'] = "['{$this->getField()}', '$operator', $stringified_possibilities]";
     }
 
-
     /**
      */
-    public function isSimplificationAllowed()
+    public function isNormalizationAllowed(array $contextual_options)
     {
-        if (!isset($this->options['inrule.simplification_threshold']))
-            return true;
+        if (($threshold = $this->getOption('in.normalization_threshold', $contextual_options)) === null) {
+            return false;
+        }
 
-        return count($this->native_possibilities) <= $this->options['inrule.simplification_threshold'];
+        return count($this->native_possibilities) <= $threshold;
     }
 
     /**
@@ -288,11 +283,11 @@ class InRule extends OrRule
     }
 
     /**
+     * There is no negations into an InRule
      */
-    public function setOptions(array $options)
+    public function removeNegations(array $contextual_options)
     {
-        foreach ($options as $name => $value)
-            $this->options[$name] = $value;
+        return $this;
     }
 
     /**/

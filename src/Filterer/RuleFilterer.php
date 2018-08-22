@@ -45,7 +45,7 @@ class RuleFilterer extends Filterer
      */
     public function getChildren($row) // strict issue if forcing  AbstractRule with php 5.6 here
     {
-        if ($row instanceof InRule && !$row->isSimplificationAllowed()) {
+        if ($row instanceof InRule) {
             // We do not need to parse the EqualRule operands of InRules
             // as they all share the same field
             return [];
@@ -61,7 +61,7 @@ class RuleFilterer extends Filterer
     public function setChildren( &$row, $filtered_children ) // strict issue if forcing  AbstractRule with php 5.6 here
     {
         if ($row instanceof AbstractOperationRule)
-            return $row->setOperandsOrReplaceByOperation( $filtered_children );
+            return $row->setOperandsOrReplaceByOperation( $filtered_children, [] ); // no simplification options?
     }
 
     /**
@@ -173,10 +173,7 @@ class RuleFilterer extends Filterer
                 $out = !is_null($value_to_compare);
             }
             else {
-                throw new \InvalidArgumentException(
-                    "This case shouldn't occure with the current simplification strategy"
-                );
-                // $out = $row[$field] == $operand->getValue();
+                $out = $value != $value_to_compare;
             }
         }
         else {

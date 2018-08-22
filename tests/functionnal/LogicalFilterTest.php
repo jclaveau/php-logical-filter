@@ -610,6 +610,7 @@ class LogicalFilterTest extends \AbstractTest
                     // AbstractOperationRule::rootify_disjunctions,
                     // AbstractOperationRule::unify_atomic_operands,
                     // AbstractOperationRule::remove_invalid_branches,
+                    'in.normalization_threshold' => 6
                 ])
                 // ->dump(true)
                 ->toArray()
@@ -620,10 +621,10 @@ class LogicalFilterTest extends \AbstractTest
      */
     public function test_setDefaultOptions()
     {
-        $default_inrule_threshold = LogicalFilter::getDefaultOptions()['inrule.simplification_threshold'];
+        $default_inrule_threshold = LogicalFilter::getDefaultOptions()['in.normalization_threshold'];
 
         LogicalFilter::setDefaultOptions([
-            'inrule.simplification_threshold' => 20,
+            'in.normalization_threshold' => 20,
         ]);
 
         $filter = new LogicalFilter(
@@ -653,13 +654,15 @@ class LogicalFilterTest extends \AbstractTest
                 ['field_1', '=', 'e'],
             ],
             $filter
-                ->simplify()
+                ->simplify([
+
+                ])
                 // ->dump(true)
                 ->toArray()
         );
 
         LogicalFilter::setDefaultOptions([
-            'inrule.simplification_threshold' => $default_inrule_threshold,
+            'in.normalization_threshold' => $default_inrule_threshold,
         ]);
     }
 
@@ -675,15 +678,6 @@ class LogicalFilterTest extends \AbstractTest
         $this->assertEquals(
             ['field_1', '!=', 'a'],
             $filter->toArray()
-        );
-
-        $this->assertEquals(
-            [
-                'or',
-                ['field_1', '>', 'a'],
-                ['field_1', '<', 'a'],
-            ],
-            $filter->simplify()->toArray()
         );
     }
 
@@ -747,22 +741,6 @@ class LogicalFilterTest extends \AbstractTest
         $this->assertEquals(
             ['field_1', '!in', [2, 3]],
             $filter->toArray()
-        );
-
-        $this->assertEquals(
-            [
-                'or',
-                ['field_1', '>', 3],
-                ['field_1', '<', 2],
-                [
-                    'and',
-                    ['field_1', '>', 2],
-                    ['field_1', '<', 3],
-                ],
-            ],
-            $filter->simplify()
-                // ->dump(true)
-                ->toArray()
         );
     }
 
@@ -878,7 +856,7 @@ class LogicalFilterTest extends \AbstractTest
             ],
             $filter
                 ->getRules()
-                ->negateOperand()
+                ->negateOperand(false, [])
                 // ->dump(true)
                 ->toArray()
         );
@@ -1168,16 +1146,18 @@ class LogicalFilterTest extends \AbstractTest
             // ->dump()
             ;
 
-        try {
-            VisibilityViolator::callHiddenMethod(
-                $filter->getRules(), 'forceLogicalCore'
-            );
+        $result = VisibilityViolator::callHiddenMethod(
+            $filter->getRules(), 'forceLogicalCore'
+        );
 
-            $this->assertTrue(false, "forceLogicalCore() must throw an exception here");
-        }
-        catch (\LogicException $e) {
-            $this->assertTrue(true, "Exception thrown: " . $e->getMessage());
-        }
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ['not', ['field_1', '=', 3]],
+                ],
+            ],
+            $result->toArray()
+        );
     }
 
     /**
@@ -1453,7 +1433,7 @@ array(3) {
         ;
 
         $this->assertEquals(
-            'e647e7aa7e6bac47aa2be1425690c801',
+            '2c56a5c6c510a7951a95909bbe59176c-511711247b38d5ed3ee96dee4d3bf89a',
             $filter->getRules()->getSemanticId()
         );
 
@@ -1467,7 +1447,7 @@ array(3) {
         ;
 
         $this->assertEquals(
-            '6d62240a7e950247288d83a062fb1852',
+            '53c79fcddef526b3293af07c9631d1f4-511711247b38d5ed3ee96dee4d3bf89a',
             $filter2->getRules()->getSemanticId()
         );
 
@@ -1518,8 +1498,8 @@ array(3) {
                     ['field_5', '>', 3],
                 ],
                 ['and',
-                    ['field_1', '=', 3],
                     ['field_5', '>', 3],
+                    ['field_1', '=', 3],
                 ],
                 ['field_2', '!=', 4],
             ]
@@ -1530,8 +1510,8 @@ array(3) {
         $filter2 = (new LogicalFilter(
             ['or',
                 ['and',
-                    ['field_1', '=', 3],
                     ['field_5', '>', 3],
+                    ['field_1', '=', 3],
                 ],
                 ['field_2', '!=', 4],
                 ['and',

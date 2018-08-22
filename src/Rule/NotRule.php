@@ -12,14 +12,25 @@ class NotRule extends AbstractOperationRule
 
     /**
      */
-    public function __construct( AbstractRule $operand=null )
+    public function __construct( AbstractRule $operand=null, array $options=[] )
     {
-        if (!$operand)
-            return;
+        if (!empty($options)) {
+            $this->setOptions($options);
+        }
 
         // Negation has only one operand. If more is required, group them
         // into an AndRule
-        $this->addOperand($operand);
+        if ($operand)
+            $this->addOperand($operand);
+    }
+
+    /**
+     */
+    public function isNormalizationAllowed()
+    {
+        $operand = $this->getOperandAt(0);
+
+        return $operand !== null;
     }
 
     /**
@@ -31,9 +42,9 @@ class NotRule extends AbstractOperationRule
      *
      * @return array
      */
-    public function negateOperand($remove_generated_negations=false)
+    public function negateOperand($remove_generated_negations=false, array $current_simplification_options)
     {
-        if (!$this->operands)
+        if ( ! $this->isNormalizationAllowed($current_simplification_options))
             return $this;
 
         $operand = $this->getOperandAt(0);
@@ -63,10 +74,18 @@ class NotRule extends AbstractOperationRule
         }
         elseif ($operand instanceof EqualRule) {
             // ! (v =  a) : (v < a) || (v > a)
-            $new_rule = new OrRule([
-                new AboveRule($field, $operand->getValue()),
-                new BelowRule($field, $operand->getValue()),
-            ]);
+            if ($this->getOption('not_equal.normalization', $current_simplification_options)) {
+                $new_rule = new OrRule([
+                    new AboveRule($field, $operand->getValue()),
+                    new BelowRule($field, $operand->getValue()),
+                ]);
+            }
+            else {
+                $new_rule = new NotEqualRule( $field, $operand->getValue() );
+            }
+        }
+        elseif ($operand instanceof NotEqualRule) {
+            $new_rule = new EqualRule( $field, $operand->getValue() );
         }
         elseif ($operand instanceof AndRule) {
             // @see https://github.com/jclaveau/php-logical-filter/issues/40
@@ -119,11 +138,27 @@ class NotRule extends AbstractOperationRule
                 ;
         }
         elseif ($operand instanceof OrRule) {
-            // ! (A || B) : !A && !B
-            // ! (A || B || C || D) : !A && !B && !C && !D
-            $new_rule = new AndRule;
-            foreach ($operand->getOperands() as $operand)
-                $new_rule->addOperand( new NotRule($operand->copy()) );
+
+            if ($operand instanceof InRule && ! $operand->isNormalizationAllowed($current_simplification_options)) {
+                // ['not', ['field', 'in', [2, 3]]] <=> ['field', '!in', [2, 3]]
+                $new_rule = new NotInRule(
+                    $operand->getField(),
+                    $operand->getPossibilities()
+                );
+            }
+            else {
+                // ! (A || B) : !A && !B
+                // ! (A || B || C || D) : !A && !B && !C && !D
+                $new_rule = new AndRule;
+                foreach ($operand->getOperands() as $operand) {
+                    $negation = new NotRule;
+                    $negation = $negation->setOperandsOrReplaceByOperation(
+                        [$operand->copy()],
+                        $current_simplification_options
+                    );
+                    $new_rule->addOperand( $negation );
+                }
+            }
         }
         else {
             throw new \LogicException(
@@ -132,7 +167,29 @@ class NotRule extends AbstractOperationRule
             );
         }
 
+        // $new_rule->dump(!true);
+
         return $new_rule;
+    }
+
+    /**
+     * Replace all the OrRules of the RuleTree by one OrRule at its root.
+     *
+     * @todo rename as RootifyDisjunjctions?
+     * @todo return $this (implements a Rule monad?)
+     *
+     * @return OrRule copied operands with one OR at its root
+     */
+    public function rootifyDisjunctions($simplification_options)
+    {
+        $this->moveSimplificationStepForward( self::rootify_disjunctions, $simplification_options );
+
+        foreach ($this->operands as $id => $operand) {
+            if ($operand instanceof AbstractOperationRule)
+                $this->operands[$id] = $operand->rootifyDisjunctions($simplification_options);
+        }
+
+        return $this;
     }
 
     /**
@@ -140,12 +197,14 @@ class NotRule extends AbstractOperationRule
      *
      * @return $this
      */
-    public function unifyAtomicOperands($unifyDifferentOperands = true)
+    public function unifyAtomicOperands($simplification_strategy_step = false, array $contextual_options)
     {
-        if (!$this->isSimplificationAllowed())
+        if (!$this->isNormalizationAllowed($contextual_options))
             return $this;
 
-        $this->moveSimplificationStepForward( self::unify_atomic_operands );
+        if ($simplification_strategy_step)
+            $this->moveSimplificationStepForward( self::unify_atomic_operands, $contextual_options );
+
         return $this;
     }
 
@@ -208,7 +267,7 @@ class NotRule extends AbstractOperationRule
      *
      * @return OrRule The current instance (of or or subclass) or a new OrRule
      */
-    public function setOperandsOrReplaceByOperation($new_operands)
+    public function setOperandsOrReplaceByOperation($new_operands, array $contextual_options)
     {
         if (count($new_operands) > 1) {
             foreach ($new_operands as &$new_operand) {
@@ -217,25 +276,46 @@ class NotRule extends AbstractOperationRule
             }
 
             throw new \InvalidArgumentException(
-                "Negations can handle only one operand instead of: "
+                "Negations can handle only one operand instead of: \n"
                 .var_export($new_operands, true)
             );
         }
 
         $new_operand = reset($new_operands);
+        // $new_operand->dump();
 
         if ($new_operand instanceof NotRule) {
             $operands = $new_operand->getOperands();
             return reset( $operands );
         }
+        elseif ($new_operand instanceof EqualRule && ! $this->getOption('not_equal.normalization', $contextual_options)) {
+            return new NotEqualRule( $new_operand->getField(), $new_operand->getValue(), $this->options );
+        }
+        elseif ($new_operand instanceof InRule && ! $this->getOption('not_in.normalization', $contextual_options)) {
+            return new NotInRule( $new_operand->getField(), $new_operand->getPossibilities(), $this->options );
+        }
 
         try {
             // Don't use addOperand here to allow inheritance for optimizations (e.g. NotInRule)
-            return $this->setOperands( $new_operands );
+            $out = $this->setOperands( $new_operands );
         }
         catch (\LogicException $e) {
-            return new NotRule( $new_operand );
+            $out = new NotRule( $new_operand );
         }
+
+        // $out->dump();
+
+        return $out;
+    }
+
+    /**
+     *
+     */
+    public function hasSolution()
+    {
+        $operand = $this->getOperandAt(0);
+
+        return $operand instanceof AbstractAtomicRule ? ! $operand->hasSolution() : true;
     }
 
     /**/

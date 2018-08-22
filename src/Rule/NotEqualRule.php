@@ -6,59 +6,44 @@ namespace JClaveau\LogicalFilter\Rule;
  */
 class NotEqualRule extends NotRule
 {
+    use Trait_RuleWithField;
+
     /** @var string operator */
     const operator = '!=';
 
-    /** @var string null_field */
-    protected $null_field = null;
+    /** @var mixed value */
+    protected $value;
 
     /**
      * @param string $field The field to apply the rule on.
      * @param array  $value The value the field can equal to.
      */
-    public function __construct( $field, $value )
+    public function __construct( $field, $value, array $options=[] )
     {
-        if ($value === null) {
-            $this->null_field = $field;
-        }
-        else {
-            $this->addOperand(new EqualRule($field, $value));
-        }
-    }
+        $this->field = $field;
+        $this->value = $value;
 
-    /**
-     * Replace all the OrRules of the RuleTree by one OrRule at its root.
-     *
-     * @todo rename as RootifyDisjunjctions?
-     * @todo return $this (implements a Rule monad?)
-     *
-     * @return OrRule copied operands with one OR at its root
-     */
-    public function rootifyDisjunctions()
-    {
-        if (!$this->isSimplificationAllowed())
-            return $this;
-
-        $this->moveSimplificationStepForward( self::rootify_disjunctions );
-        return $this;
+        // TODO use the operand instead of properties or don't create EqualRule
+        parent::__construct(new EqualRule($field, $value), $options);
     }
 
     /**
      */
-    public function getField()
+    public function isNormalizationAllowed(array $contextual_options=[])
     {
-        return $this->null_field !== null
-            ? $this->null_field
-            : $this->getOperandAt(0)->getField();
+        $operand = $this->getOperandAt(0);
+
+        $out = parent::isNormalizationAllowed()
+            && $this->getOption('not_equal.normalization', $contextual_options)
+            ;
+        return $out;
     }
 
     /**
      */
     public function getValue()
     {
-        return $this->null_field !== null
-            ? null
-            : $this->getOperandAt(0)->getValue();
+        return $this->value;
     }
 
     /**

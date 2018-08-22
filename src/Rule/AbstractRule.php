@@ -252,7 +252,8 @@ abstract class AbstractRule implements \JsonSerializable
 
         // return hash('crc32b', serialize( $this->toArray() ));
         return hash('md4', serialize( $this->toArray(['semantic' => true]) ))  // faster but longer
-              // .hash('md4', serialize( $this->options ))
+              .'-'
+              .hash('md4', serialize( $this->options ))
               ;
     }
 
@@ -270,7 +271,7 @@ abstract class AbstractRule implements \JsonSerializable
      */
     protected function forceLogicalCore()
     {
-        if ($this instanceof AbstractAtomicRule || !$this->isSimplificationAllowed()) {
+        if ($this instanceof AbstractAtomicRule || $this instanceof NotRule || $this instanceof InRule) {
             $ruleTree = new OrRule([
                 new AndRule([
                     $this
@@ -288,14 +289,6 @@ abstract class AbstractRule implements \JsonSerializable
                     $this->operands[$i] = new AndRule([$operand]);
             }
             $ruleTree = $this;
-        }
-        elseif ($this instanceof NotEqualRule && $this->getValue() === null) {
-            // Non-simplified NotRules are not supported BUT the not of NULL
-            $ruleTree = new OrRule([
-                new AndRule([
-                    $this
-                ])
-            ]);
         }
         else {
             throw new \LogicException(
