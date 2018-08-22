@@ -20,6 +20,7 @@ class FiltererTest extends \AbstractTest
             ['field_3', '=', null],
             ['field_4', '!=', null],
             ['non_existing_field', '=', 8],
+            ['field_6', '!in', [8, 9, 10]], // add != null rule to check if the field exists
         ]);
 
         $data_to_filter = [
@@ -70,6 +71,13 @@ class FiltererTest extends \AbstractTest
                 'field_1' => 2,
                 'field_2' => -12, // invalid
                 'field_4' => null,
+            ],
+            [
+                'name'    => '7: field_6 invalid',
+                'field_1' => 2,
+                'field_2' => -12, // invalid
+                'field_4' => 0,
+                'field_6' => 9,
             ],
         ];
 

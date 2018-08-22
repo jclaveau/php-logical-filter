@@ -12,6 +12,7 @@ use       JClaveau\LogicalFilter\Rule\BelowRule;
 use       JClaveau\LogicalFilter\Rule\AboveRule;
 use       JClaveau\LogicalFilter\Rule\NotEqualRule;
 use       JClaveau\LogicalFilter\Rule\InRule;
+use       JClaveau\LogicalFilter\Rule\NotInRule;
 
 /**
  */
@@ -63,6 +64,14 @@ class PhpFilterer extends Filterer
             }
             else {
                 $result = $row[$field] != $value;
+            }
+        }
+        elseif ($operator === NotInRule::operator) {
+            if (!isset($row[$field])) {
+                $result = true;
+            }
+            else {
+                $result = !in_array($row[$field], $value);
             }
         }
         else {

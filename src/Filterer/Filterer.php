@@ -10,6 +10,7 @@ use       JClaveau\LogicalFilter\Filterer\FiltererInterface;
 use       JClaveau\LogicalFilter\LogicalFilter;
 
 use       JClaveau\LogicalFilter\Rule\InRule;
+use       JClaveau\LogicalFilter\Rule\NotInRule;
 use       JClaveau\LogicalFilter\Rule\EqualRule;
 use       JClaveau\LogicalFilter\Rule\BelowRule;
 use       JClaveau\LogicalFilter\Rule\AboveRule;
@@ -197,7 +198,11 @@ abstract class Filterer implements FiltererInterface
                             $field = null;
                             $value = $rule->getOperands();
                         }
-                        elseif ($rule instanceof NotEqualRule || $rule instanceof AbstractAtomicRule || $rule instanceof InRule) {
+                        elseif ($rule instanceof NotEqualRule
+                            ||  $rule instanceof AbstractAtomicRule
+                            ||  $rule instanceof InRule
+                            ||  $rule instanceof NotInRule
+                        ) {
                             $field = $rule->getField();
                             $value = $rule->getValues();
                         }
