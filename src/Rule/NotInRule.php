@@ -42,6 +42,21 @@ class NotInRule extends NotRule
     }
 
     /**
+     */
+    public function setField($field)
+    {
+        if (!$this->getOperandAt(0)) {
+            // TODO a NotRule with no operand should be simplified as
+            //      a TrueRule
+            throw new \LogicException(
+                "Trying to get the field of a negation missing its operand"
+            );
+        }
+
+        return $this->getOperandAt(0)->getField($field);
+    }
+
+    /**
      * @return array
      */
     public function getPossibilities()
