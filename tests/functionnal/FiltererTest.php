@@ -249,6 +249,7 @@ class FiltererTest extends \AbstractTest
                         ['field', 'regexp', '/^field_4$/'],
                     ],
                     ['operator', '!=', '!='],
+                    ['operator', '!in', ['=><', '><=']],
                 ]
             ),
             $filter_to_filter->getRules()

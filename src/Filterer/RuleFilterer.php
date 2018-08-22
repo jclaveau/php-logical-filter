@@ -17,6 +17,7 @@ use       JClaveau\LogicalFilter\Rule\NotEqualRule;
 use       JClaveau\LogicalFilter\Rule\AbstractOperationRule;
 use       JClaveau\LogicalFilter\Rule\AbstractRule;
 use       JClaveau\LogicalFilter\Rule\InRule;
+use       JClaveau\LogicalFilter\Rule\NotInRule;
 use       JClaveau\LogicalFilter\Rule\RegexpRule;
 
 /**
@@ -175,6 +176,9 @@ class RuleFilterer extends Filterer
             else {
                 $out = $value != $value_to_compare;
             }
+        }
+        elseif ($operator === NotInRule::operator) {
+            $out = !in_array($value_to_compare, $value);
         }
         else {
             throw new \InvalidArgumentException(
