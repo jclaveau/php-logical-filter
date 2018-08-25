@@ -53,7 +53,7 @@ class AboveRule extends AbstractAtomicRule
      *
      * @return bool
      */
-    public function hasSolution()
+    public function hasSolution(array $simplification_options=[])
     {
         // if minimum is null, the rule is equivalent to true
         if (is_numeric( $this->minimum )) {

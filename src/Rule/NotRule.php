@@ -311,11 +311,11 @@ class NotRule extends AbstractOperationRule
     /**
      *
      */
-    public function hasSolution()
+    public function hasSolution(array $contextual_options=[])
     {
         $operand = $this->getOperandAt(0);
 
-        return $operand instanceof AbstractAtomicRule ? ! $operand->hasSolution() : true;
+        return $operand instanceof AbstractAtomicRule ? ! $operand->hasSolution($contextual_options) : true;
     }
 
     /**/

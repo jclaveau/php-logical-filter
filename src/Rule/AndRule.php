@@ -314,7 +314,7 @@ class AndRule extends AbstractOperationRule
      *
      * @return bool If the AndRule can have a solution or not
      */
-    public function hasSolution()
+    public function hasSolution(array $contextual_options=[])
     {
         if (!$this->simplicationStepReached(self::simplified)) {
             throw new \LogicException(

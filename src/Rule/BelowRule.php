@@ -38,7 +38,7 @@ class BelowRule extends AbstractAtomicRule
      *
      * @return bool
      */
-    public function hasSolution()
+    public function hasSolution(array $contextual_options=[])
     {
         // if minimum is null, the rule is equivalent to true
         if (is_numeric( $this->maximum )) {

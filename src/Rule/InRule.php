@@ -275,7 +275,7 @@ class InRule extends OrRule
     /**
      * @return bool If the InRule can have a solution or not
      */
-    public function hasSolution()
+    public function hasSolution(array $contextual_options=[])
     {
         return !empty($this->getPossibilities());
     }

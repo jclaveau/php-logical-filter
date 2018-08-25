@@ -103,7 +103,7 @@ class NotInRule extends NotRule
 
     /**
      */
-    public function hasSolution()
+    public function hasSolution(array $contextual_options=[])
     {
         return count($this->getPossibilities()) != 0;
     }

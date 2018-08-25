@@ -76,7 +76,7 @@ class BetweenRule extends AndRule
      *
      * @return bool
      */
-    public function hasSolution()
+    public function hasSolution(array $contextual_options=[])
     {
         return $this->getMaximum() > $this->getMinimum();
     }

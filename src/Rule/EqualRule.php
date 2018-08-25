@@ -42,7 +42,7 @@ class EqualRule extends AbstractAtomicRule
      *
      * @return bool
      */
-    public function hasSolution()
+    public function hasSolution(array $contextual_options=[])
     {
         return true;
     }

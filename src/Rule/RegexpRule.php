@@ -49,7 +49,7 @@ class RegexpRule extends AbstractAtomicRule
      *
      * @return bool
      */
-    public function hasSolution()
+    public function hasSolution(array $simplification_options=[])
     {
         return true;
     }

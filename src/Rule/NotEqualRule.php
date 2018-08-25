@@ -103,7 +103,7 @@ class NotEqualRule extends NotRule
      *
      * @return bool
      */
-    public function hasSolution()
+    public function hasSolution(array $simplification_options=[])
     {
         return true;
     }
