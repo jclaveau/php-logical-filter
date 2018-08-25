@@ -203,8 +203,7 @@ class OrRule extends AbstractOperationRule
                 }
                 catch (\Exception $e) {
                     VisibilityViolator::setHiddenProperty($e, 'message', $e->getMessage() . "\n" . var_export([
-                            'previous_operand' => $previous_operand,
-                            'operand'          => $operand,
+                            'operands'          => $operands,
                         ], true)
                     );
 
