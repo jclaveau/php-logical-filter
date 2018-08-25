@@ -12,8 +12,6 @@ namespace JClaveau\LogicalFilter\Rule;
  */
 class InRule extends OrRule
 {
-    use Trait_RuleWithOptions;
-
     /** @var string operator */
     const operator = 'in';
 

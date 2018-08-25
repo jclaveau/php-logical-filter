@@ -26,7 +26,7 @@ class NotRule extends AbstractOperationRule
 
     /**
      */
-    public function isNormalizationAllowed()
+    public function isNormalizationAllowed(array $current_simplification_options=[])
     {
         $operand = $this->getOperandAt(0);
 

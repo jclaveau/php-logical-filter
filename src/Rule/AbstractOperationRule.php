@@ -9,8 +9,6 @@ namespace JClaveau\LogicalFilter\Rule;
  */
 abstract class AbstractOperationRule extends AbstractRule
 {
-    use Trait_RuleWithOptions;
-
     /**
      * This property should never be null.
      *

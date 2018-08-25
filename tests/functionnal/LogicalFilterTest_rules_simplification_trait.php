@@ -353,7 +353,7 @@ trait LogicalFilterTest_rules_simplification_trait
             ],
         ]))
         ->simplify()
-        ->dump()
+        // ->dump()
         ;
 
         $this->assertEquals( ['field_5', '>', 'a'], $filter->toArray() );

@@ -3,6 +3,8 @@ namespace JClaveau\LogicalFilter\Rule;
 
 abstract class AbstractRule implements \JsonSerializable
 {
+    use Trait_RuleWithOptions;
+
     /** @var  array $ruleAliases */
     protected static $ruleAliases = [
         '!'    => 'not',
@@ -26,9 +28,6 @@ abstract class AbstractRule implements \JsonSerializable
         'string'      => null,
         'semantic_id' => null,
     ];
-
-    /** @var array $options */
-    protected $options = [];
 
     /**
      */
