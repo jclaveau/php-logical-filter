@@ -99,6 +99,24 @@ class ConverterTest extends \AbstractTest
 
     /**
      */
+    public function test_convert_empty_filter_to_mysql()
+    {
+        $filter = new LogicalFilter();
+
+        $inline_sql = (new InlineSqlMinimalConverter())->convert( $filter );
+
+        $this->assertEquals(
+            "1",
+            $inline_sql['sql']
+        );
+
+        $this->assertEmpty(
+            $inline_sql['parameters']
+        );
+    }
+
+    /**
+     */
     public function test_convert_with_elasticsearch_converter()
     {
         $filter = (new LogicalFilter(
@@ -206,6 +224,25 @@ class ConverterTest extends \AbstractTest
                             ],
                         ],
                     ],
+                ],
+            ],
+            $es_filter
+        );
+    }
+
+    /**
+     */
+    public function test_convert_empty_filter_to_elasticsearch()
+    {
+        $filter = new LogicalFilter();
+
+        $es_filter = (new ElasticSearchMinimalConverter())->convert( $filter );
+
+        $this->assertEquals(
+            [
+                'bool' => [
+                    'minimum_should_match' => 1,
+                    'should' => [],
                 ],
             ],
             $es_filter

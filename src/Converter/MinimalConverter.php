@@ -22,6 +22,10 @@ abstract class MinimalConverter implements ConverterInterface
     {
         $rootOr = $filter->simplify(['force_logical_core' => true])->getRules();
 
+        // TODO remove this once TrueRule implemented https://github.com/jclaveau/php-logical-filter/issues/59
+        if ($rootOr === null)
+            return $this;
+
         if (!$rootOr->hasSolution())
             return $this;
 

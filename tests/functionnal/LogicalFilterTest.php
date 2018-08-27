@@ -1533,6 +1533,7 @@ array(3) {
      */
     public function test_or__of_true_filter()
     {
+        // A || True <=> True
         $filter = (new LogicalFilter(
             ['field_2', '!=', 4]
         ))
@@ -1550,6 +1551,7 @@ array(3) {
      */
     public function test_and__of_true_filter()
     {
+        // A && True <=> A
         $filter = (new LogicalFilter(
             ['field_2', '!=', 4]
         ))

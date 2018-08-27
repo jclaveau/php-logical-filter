@@ -52,7 +52,9 @@ class InlineSqlMinimalConverter extends MinimalConverter
         $this->output = [];
         parent::convert($filter);
         return [
-            'sql' => '('.implode(') OR (', $this->output).')',
+            'sql' => ! $this->output
+                   ? '1' // True
+                   : '('.implode(') OR (', $this->output).')',
             'parameters' => $this->parameters,
         ];
     }
