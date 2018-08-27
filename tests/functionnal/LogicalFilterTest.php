@@ -1527,7 +1527,40 @@ array(3) {
             $filter->getRules()->getSemanticId(),
             $filter2->getRules()->getSemanticId()
         );
+    }
 
+    /**
+     */
+    public function test_or__of_true_filter()
+    {
+        $filter = (new LogicalFilter(
+            ['field_2', '!=', 4]
+        ))
+        ->or_( (new LogicalFilter)->getRules() )
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            null, // TODO replace it by TrueRule
+            $filter->getRules()
+        );
+    }
+
+    /**
+     */
+    public function test_and__of_true_filter()
+    {
+        $filter = (new LogicalFilter(
+            ['field_2', '!=', 4]
+        ))
+        ->and_( (new LogicalFilter)->getRules() )
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            ['field_2', '!=', 4],
+            $filter->toArray()
+        );
     }
 
     /**/

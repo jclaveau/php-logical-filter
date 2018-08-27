@@ -134,6 +134,27 @@ class LogicalFilter implements \JsonSerializable
      */
     protected function addRules( $operation, array $rules_description )
     {
+        if ($rules_description == [null]) {
+            // TODO this is due to the bad design of using "Null" instead of
+            // TrueRule when a Filter "has no rule". So it's the equivalent of
+            // "and true" or "or true".
+            // Remove it while fixing https://github.com/jclaveau/php-logical-filter/issues/59
+            if ($operation == AndRule::operator) {
+                // A && True <=> A
+                return $this;
+            }
+            elseif ($operation == OrRule::operator) {
+                // A || True <=> True
+                $this->rules = null;
+                return $this;
+            }
+            else {
+                throw new InvalidArgumentException(
+                    "Unhandled operation '$operation'"
+                );
+            }
+        }
+
         if (    count($rules_description) == 3
             &&  is_string($rules_description[0])
             &&  is_string($rules_description[1])
