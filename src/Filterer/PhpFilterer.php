@@ -20,58 +20,70 @@ class PhpFilterer extends Filterer
 {
     /**
      */
-    public function validateRule ($field, $operator, $value, $row, $depth, $all_operands, $options)
+    public function validateRule ($field, $operator, $value, $row, array $path, $all_operands, $options)
     {
+        if ($field === \JClaveau\LogicalFilter\value) {
+            $value_to_validate = $row;
+        }
+        elseif ($field === \JClaveau\LogicalFilter\key) {
+            $value_to_validate = array_pop($path);
+        }
+        elseif (!isset($row[$field])) {
+            $value_to_validate = null;
+        }
+        else {
+            $value_to_validate = $row[ $field ];
+        }
+
         if ($operator === EqualRule::operator) {
-            if ($value === null) {
-                $result = !isset($row[$field]);
-            }
-            elseif (!isset($row[$field])) {
-                $result = false;
+            if (!isset($value_to_validate)) {
+                 // ['field', '=', null] <=> isset($row['field'])
+                 // [row, '=', null] <=> $row !== null
+                $result = $value === null;
             }
             else {
                 // TODO support strict comparisons
-                $result = $row[$field] == $value;
+                $result = $value_to_validate == $value;
             }
         }
         elseif ($operator === InRule::operator) {
-            if (!isset($row[$field])) {
+            if (!isset($value_to_validate)) {
                 $result = false;
             }
             else {
-                $result = in_array($row[$field], $value);
+                $result = in_array($value_to_validate, $value);
             }
         }
         elseif ($operator === BelowRule::operator) {
-            if (!isset($row[$field])) {
+            if (!isset($value_to_validate)) {
                 $result = false;
             }
             else {
-                $result = $row[$field] < $value;
+                $result = $value_to_validate < $value;
             }
         }
         elseif ($operator === AboveRule::operator) {
-            if (!isset($row[$field])) {
+            if (!isset($value_to_validate)) {
                 $result = false;
             }
             else {
-                $result = $row[$field] > $value;
+                $result = $value_to_validate > $value;
             }
         }
         elseif ($operator === NotEqualRule::operator) {
             if ($value === null) {
-                $result = isset($row[$field]);
+                $result = isset($value_to_validate);
             }
             else {
-                $result = $row[$field] != $value;
+                $result = $value_to_validate != $value;
             }
         }
         elseif ($operator === NotInRule::operator) {
-            if (!isset($row[$field])) {
+            if (!isset($value_to_validate)) {
                 $result = true;
             }
             else {
-                $result = !in_array($row[$field], $value);
+                $result = !in_array($value_to_validate, $value);
             }
         }
         else {
@@ -82,8 +94,11 @@ class PhpFilterer extends Filterer
 
         // var_dump(
             // "$field, $operator, " . var_export($value, true)
-             // . ' vs ' . var_export($row, true) . ' => ' . var_export($result, true)
+             // . ' vs ' . var_export($value_to_validate, true) . ' => ' . var_export($result, true)
+             // . "\n\n"
+             // . var_export($row, true)
         // );
+        // exit;
         return $result;
     }
 

@@ -18,6 +18,9 @@ use JClaveau\LogicalFilter\Filterer\PhpFilterer;
 use JClaveau\LogicalFilter\Filterer\CustomizableFilterer;
 use JClaveau\LogicalFilter\Filterer\RuleFilterer;
 
+const value = 'value';
+const key   = 'key';
+
 /**
  * LogicalFilter describes a set of logical rules structured by
  * conjunctions and disjunctions (AND and OR).
@@ -424,6 +427,14 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     * @deprecated
+     */
+    public function matches($rules_to_match)
+    {
+        return $this->hasSolutionIf($rules_to_match);
+    }
+
+    /**
      * Checks that a filter matches another one.
      *
      * @param array|AbstractRule $rules_to_match
@@ -431,7 +442,7 @@ class LogicalFilter implements \JsonSerializable
      * @return bool Whether or not this combination of filters has
      *              potential solutions
      */
-    public function matches($rules_to_match)
+    public function hasSolutionIf($rules_to_match)
     {
         return $this
             ->copy()
@@ -540,12 +551,13 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
-     * @param  mixed $data_to_filter
-     * @return filtered data
+     * @see    https://secure.php.net/manual/en/language.oop5.magic.php#object.invoke
+     * @param  mixed $row
+     * @return bool
      */
-    public function __invoke($data_to_filter)
+    public function __invoke($row, $key=null)
     {
-        return $this->applyOn($data_to_filter);
+        return $this->validates($row, $key);
     }
 
     /**
@@ -837,6 +849,35 @@ class LogicalFilter implements \JsonSerializable
         else {
             return $filterer->apply( $this, $data_to_filter );
         }
+    }
+
+    /**
+     * Applies the current instance to a value (and its index optionnally).
+     *
+     * @param  mixed                  $value_to_check
+     * @param  scalar                 $index
+     * @param  Filterer|callable|null $filterer
+     *
+     * @return AbstractRule|false|true + False if the filter doesn't validates
+     *                                 + Null if the target has no sens (operation filtered by field for example)
+     *                                 + A rule tree containing the first matching case if there is one.
+     */
+    public function validates($value_to_check, $key_to_check=null, $filterer=null)
+    {
+        if (!$filterer) {
+            $filterer = $this->getDefaultFilterer();
+        }
+        elseif (is_callable($filterer)) {
+            $filterer = new CustomizableFilterer($filterer);
+        }
+        elseif (!$filterer instanceof Filterer) {
+            throw new \InvalidArgumentException(
+                 "The given \$filterer must be null or a callable or a instance "
+                ."of Filterer instead of: ".var_export($filterer, true)
+            );
+        }
+
+        return $filterer->hasMatchingCase( $this, $value_to_check, $key_to_check );
     }
 
     /**/

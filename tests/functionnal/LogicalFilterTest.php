@@ -14,11 +14,13 @@ use JClaveau\LogicalFilter\Rule\BelowRule;
 
 require  __DIR__ . "/LogicalFilterTest_rules_manipulation_trait.php";
 require  __DIR__ . "/LogicalFilterTest_rules_simplification_trait.php";
+require  __DIR__ . "/LogicalFilterTest_collection_integration_trait.php";
 
 class LogicalFilterTest extends \AbstractTest
 {
     use LogicalFilterTest_rules_manipulation_trait;
     use LogicalFilterTest_rules_simplification_trait;
+    use LogicalFilterTest_collection_integration_trait;
 
     /**
      */
@@ -1567,9 +1569,41 @@ array(3) {
 
     /**
      */
-    public function test_invoke_on()
+    public function test_invoke()
     {
-        $data_to_filter = [
+        $row_to_match = [
+            'field_1' => 8,
+            'field_2' => 3,
+        ];
+
+        $row_to_mismatch = [
+            'field_1' => 12,
+            'field_2' => 4,
+        ];
+
+        $filter = (new LogicalFilter(
+            ['field_2', '!=', 4]
+        ))
+        // ->dump(true)
+        ;
+
+        $this->assertTrue(
+            $filter( $row_to_match )
+                // ->dump()
+                ->hasSolution()
+        );
+
+        $this->assertFalse(
+            $filter( $row_to_mismatch )
+        );
+
+    }
+
+    /**
+     */
+    public function test_array_filter()
+    {
+        $array = [
             [
                 'field_1' => 8,
                 'field_2' => 3,
@@ -1580,12 +1614,6 @@ array(3) {
             ],
         ];
 
-        $filter = (new LogicalFilter(
-            ['field_2', '!=', 4]
-        ))
-        // ->dump(true)
-        ;
-
         $this->assertEquals(
             [
                 [
@@ -1593,7 +1621,40 @@ array(3) {
                     'field_2' => 3,
                 ],
             ],
-            $filter( $data_to_filter )
+            array_filter( $array, new LogicalFilter(
+                ['field_2', '!=', 4]
+            ))
+        );
+    }
+
+    /**
+     */
+    public function test_validates()
+    {
+        $filter = (new LogicalFilter(
+            [
+                [value, '=', 4],
+                'or',
+                [key, '=', 'index1'],
+            ]
+        ))
+        // ->dump(true)
+        ;
+
+        $this->assertTrue(
+            $filter->validates( 3, 'index1' )
+                // ->dump(!true)
+                ->hasSolution()
+        );
+
+        $this->assertTrue(
+            $filter->validates( 4, 'invalid_key' )
+                // ->dump(!true)
+                ->hasSolution()
+        );
+
+        $this->assertFalse(
+            $filter->validates( 5, 'invalid_key' )
         );
     }
 

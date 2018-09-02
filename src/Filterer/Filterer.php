@@ -119,7 +119,7 @@ abstract class Filterer implements FiltererInterface
 
     /**
      * @param LogicalFilter   $filter
-     * @param Iterable|object $tree_to_filter
+     * @param Iterable        $tree_to_filter
      * @param array           $options
      */
     public function apply( LogicalFilter $filter, $tree_to_filter, $options=[] )
@@ -151,29 +151,29 @@ abstract class Filterer implements FiltererInterface
             );
         }
 
-        return $this->applyRecursion(
+        return $this->foreachRow(
             $root_cases,
             $tree_to_filter,
-            $depth=0,
+            $path=[],
             $options
         );
     }
 
     /**
-     * @todo use array_filter
      */
-    protected function applyRecursion(array $root_cases, $tree_to_filter, $depth, $options=[])
+    protected function foreachRow(array $root_cases, $tree_to_filter, array $path, $options=[])
     {
         // Once the rules are prepared, we parse the data
         foreach ($tree_to_filter as $row_index => $row_to_filter) {
-            $operands_validation_row_cache = [];
+
+            array_push($path, $row_index);
 
             if ($options['recurse'] == 'before') {
                 if ($children = $this->getChildren($row_to_filter)) {
-                    $filtered_children = $this->applyRecursion(
+                    $filtered_children = $this->foreachRow(
                         $root_cases,
                         $children,
-                        $depth++,
+                        $path,
                         $options
                     );
 
@@ -181,84 +181,7 @@ abstract class Filterer implements FiltererInterface
                 }
             }
 
-            if (!$root_cases) {
-                $matching_case = true;
-            }
-            else {
-                $matching_case = null;
-                foreach ($root_cases as $and_case_index => $and_case) {
-
-                    if (!empty($options['debug']))
-                        var_dump("Case $and_case_index: ".$and_case);
-
-                    $case_is_good = null;
-                    foreach ($and_case->getOperands() as $i => $rule) {
-
-                        if ($rule instanceof OrRule && $rule instanceof AndRule) {
-                            $field = null;
-                            $value = $rule->getOperands();
-                        }
-                        elseif ($rule instanceof NotEqualRule
-                            ||  $rule instanceof AbstractAtomicRule
-                            ||  $rule instanceof InRule
-                            ||  $rule instanceof NotInRule
-                        ) {
-                            $field = $rule->getField();
-                            $value = $rule->getValues();
-                        }
-                        else {
-                            throw new \LogicException(
-                                "Filtering with a rule which has not been simplified: $rule"
-                            );
-                        }
-
-                        $operator = $rule::operator;
-
-                        $cache_key = $and_case_index.'~|~'.$field.'~|~'.$operator;
-
-                        if (!empty($operands_validation_row_cache[ $cache_key ])) {
-                            $is_valid = $operands_validation_row_cache[ $cache_key ];
-                        }
-                        else {
-                            $is_valid = $this->validateRule(
-                                $field,
-                                $operator,
-                                $value,
-                                $row_to_filter,
-                                $depth,
-                                $root_cases,
-                                $options
-                            );
-
-                            $operands_validation_row_cache[ $cache_key ] = $is_valid;
-                        }
-
-                        if ($is_valid === false) {
-                            // one of the rules of the and_case do not validate
-                            // so all the and_case is invalid
-                            $case_is_good = false;
-                            break;
-                        }
-                        elseif ($is_valid === true) {
-                            // one of the rules of the and_case do not validate
-                            // so all the and_case is invalid
-                            $case_is_good = true;
-                        }
-                    }
-
-                    if ($case_is_good === true) {
-                        // at least one and_case works so we can stop here
-                        $matching_case = $and_case;
-                        break;
-                    }
-                    elseif ($case_is_good === false) {
-                        $matching_case = false;
-                    }
-                    elseif ($case_is_good === null) {
-                        // row out of scope
-                    }
-                }
-            }
+            $matching_case = $this->applyOnRow($root_cases, $row_to_filter, $path, $options);
 
             if ($matching_case) {
                 $this->onRowMatches($row_to_filter, $row_index, $tree_to_filter, $matching_case, $options);
@@ -274,19 +197,142 @@ abstract class Filterer implements FiltererInterface
 
             if ($options['recurse'] == 'after') {
                 if ($children = $this->getChildren($row_to_filter)) {
-                    $filtered_children = $this->applyRecursion(
+                    $filtered_children = $this->foreachRow(
                         $root_cases,
                         $children,
-                        $depth++,
+                        $path,
                         $options
                     );
 
                     $this->setChildren($row_to_filter, $filtered_children);
                 }
             }
+
+            array_pop($path);
         }
 
         return $tree_to_filter;
+    }
+
+    /**
+     * @param LogicalFilter   $filter
+     * @param Iterable        $tree_to_filter
+     * @param array           $options
+     *
+     * @return bool
+     */
+    public function hasMatchingCase( LogicalFilter $filter, $row_to_check, $key_to_check, $options=[] )
+    {
+        $root_OrRule = $filter
+            ->simplify(['force_logical_core' => true])
+            ->getRules()
+            // ->dump(true)
+            ;
+
+        if ($root_OrRule !== null) {
+            if (!$root_OrRule->hasSolution())
+                return null;
+
+            $root_cases = $root_OrRule->getOperands();
+        }
+        else {
+            $root_cases = [];
+        }
+
+        return $this->applyOnRow(
+            $root_cases,
+            $row_to_check,
+            $path=[$key_to_check],
+            $options
+        );
+    }
+
+    /**
+     */
+    protected function applyOnRow(array $root_cases, $row_to_filter, array $path, $options=[])
+    {
+        $operands_validation_row_cache = [];
+
+        if (!$root_cases) {
+            $matching_case = true;
+        }
+        else {
+            $matching_case = null;
+            foreach ($root_cases as $and_case_index => $and_case) {
+
+                if (!empty($options['debug']))
+                    var_dump("Case $and_case_index: ".$and_case);
+
+                $case_is_good = null;
+                foreach ($and_case->getOperands() as $i => $rule) {
+
+                    if ($rule instanceof OrRule && $rule instanceof AndRule) {
+                        $field = null;
+                        $value = $rule->getOperands();
+                    }
+                    elseif ($rule instanceof NotEqualRule
+                        ||  $rule instanceof AbstractAtomicRule
+                        ||  $rule instanceof InRule
+                        ||  $rule instanceof NotInRule
+                    ) {
+                        $field = $rule->getField();
+                        $value = $rule->getValues();
+                    }
+                    else {
+                        throw new \LogicException(
+                            "Filtering with a rule which has not been simplified: $rule"
+                        );
+                    }
+
+                    $operator = $rule::operator;
+
+                    $cache_key = $and_case_index.'~|~'.$field.'~|~'.$operator;
+
+                    if (!empty($operands_validation_row_cache[ $cache_key ])) {
+                        $is_valid = $operands_validation_row_cache[ $cache_key ];
+                    }
+                    else {
+                        $is_valid = $this->validateRule(
+                            $field,
+                            $operator,
+                            $value,
+                            $row_to_filter,
+                            $path,
+                            $root_cases,
+                            $options
+                        );
+
+                        $operands_validation_row_cache[ $cache_key ] = $is_valid;
+                    }
+
+                    if ($is_valid === false) {
+                        // one of the rules of the and_case do not validate
+                        // so all the and_case is invalid
+                        $case_is_good = false;
+                        break;
+                    }
+                    elseif ($is_valid === true) {
+                        // one of the rules of the and_case do not validate
+                        // so all the and_case is invalid
+                        $case_is_good = true;
+                    }
+                }
+
+                if ($case_is_good === true) {
+                    // at least one and_case works so we can stop here
+                    $matching_case = $and_case;
+                    break;
+                }
+                elseif ($case_is_good === false) {
+                    $matching_case = false;
+                }
+                elseif ($case_is_good === null) {
+                    // row out of scope
+                }
+            }
+        }
+
+        return $matching_case;
     }
 
     /**/

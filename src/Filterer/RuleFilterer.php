@@ -69,7 +69,7 @@ class RuleFilterer extends Filterer
      *
      * @return true | false | null
      */
-    public function validateRule ($field, $operator, $value, $rule, $depth, $all_operands, $options)
+    public function validateRule ($field, $operator, $value, $rule, array $path, $all_operands, $options)
     {
         if (    !empty($options[ Filterer::leaves_only ])
             && in_array( get_class($rule), [OrRule::class, AndRule::class, NotRule::class] )

@@ -18,7 +18,7 @@ interface FiltererInterface
      */
     public function apply( LogicalFilter $filter, $tree_to_filter, $options=[] );
 
-    public function validateRule ($field, $operator, $value, $rule, $depth, $all_operands, $options);
+    public function validateRule($field, $operator, $value, $row, array $path, $all_operands, $options);
 
     /**/
 }

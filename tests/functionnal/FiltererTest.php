@@ -10,19 +10,6 @@ class FiltererTest extends \AbstractTest
      */
     public function test_filterer_php_native()
     {
-        $filter = new LogicalFilter([
-            'and',
-            ['field_1', '=', 2],
-            ['or',
-                ['field_2', '>', 4],
-                ['field_2', '<', -4],
-            ],
-            ['field_3', '=', null],
-            ['field_4', '!=', null],
-            ['non_existing_field', '=', 8],
-            ['field_6', '!in', [8, 9, 10]], // add != null rule to check if the field exists
-        ]);
-
         $data_to_filter = [
             [
                 'name'    => '1: valid row',
@@ -81,6 +68,19 @@ class FiltererTest extends \AbstractTest
             ],
         ];
 
+        $filter = new LogicalFilter([
+            'and',
+            ['field_1', '=', 2],
+            ['or',
+                ['field_2', '>', 4],
+                ['field_2', '<', -4],
+            ],
+            ['field_3', '=', null],
+            ['field_4', '!=', null],
+            ['non_existing_field', '=', 8],
+            ['field_6', '!in', [8, 9, 10]], // add != null rule to check if the field exists
+        ]);
+
         $filterer = new PhpFilterer();
 
         $filtered_data = $filterer->apply( $filter, $data_to_filter );
@@ -88,14 +88,14 @@ class FiltererTest extends \AbstractTest
         $this->assertEquals(
             [
                 0 => [
-                'name'    => '1: valid row',
+                    'name'    => '1: valid row',
                     'field_1' => 2,
                     'field_2' => 12,
                     'field_4' => 12,
                     'non_existing_field' => 8,
                 ],
                 3 => [
-                'name'    => '4: valid row',
+                    'name'    => '4: valid row',
                     'field_1' => 2,
                     'field_2' => -12,
                     'field_3' => null,
