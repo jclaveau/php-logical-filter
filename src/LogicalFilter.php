@@ -540,6 +540,15 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     * @param  mixed $data_to_filter
+     * @return filtered data
+     */
+    public function __invoke($data_to_filter)
+    {
+        return $this->applyOn($data_to_filter);
+    }
+
+    /**
      * Removes all the defined rules.
      *
      * @return $this

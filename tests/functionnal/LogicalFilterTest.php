@@ -1565,5 +1565,37 @@ array(3) {
         );
     }
 
+    /**
+     */
+    public function test_invoke_on()
+    {
+        $data_to_filter = [
+            [
+                'field_1' => 8,
+                'field_2' => 3,
+            ],
+            [
+                'field_1' => 12,
+                'field_2' => 4,
+            ],
+        ];
+
+        $filter = (new LogicalFilter(
+            ['field_2', '!=', 4]
+        ))
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            [
+                [
+                    'field_1' => 8,
+                    'field_2' => 3,
+                ],
+            ],
+            $filter( $data_to_filter )
+        );
+    }
+
     /**/
 }
