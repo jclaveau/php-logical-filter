@@ -176,7 +176,7 @@ class NotRuleTest extends \AbstractTest
     public function test_setOperandsOrReplaceByOperation()
     {
         $rule = new NotRule();
-         $rule = $rule->setOperandsOrReplaceByOperation([
+        $rule = $rule->setOperandsOrReplaceByOperation([
             new EqualRule('field', 3)
         ], []);
 
@@ -212,6 +212,36 @@ class NotRuleTest extends \AbstractTest
                 $e->getMessage()
             );
         }
+    }
+
+    /**
+     */
+    public function test_toArray()
+    {
+        $filter = (new \JClaveau\LogicalFilter\LogicalFilter(
+            ['or',
+                ['field', '=', 'lalala'],
+            ]
+        ))
+        // ->dump(true)
+        ;
+
+        $filter_2 = (new \JClaveau\LogicalFilter\LogicalFilter(
+            ['not', $filter]
+        ))
+        // ->dump(true)
+        ;
+
+        // Caching toArray produced dump with semantic ids instead of
+        // rules description
+        $this->assertEquals(
+            ['not',
+                ['or',
+                    ['field', '=', 'lalala'],
+                ],
+            ],
+            $filter_2->toArray()
+        );
     }
 
     /**/

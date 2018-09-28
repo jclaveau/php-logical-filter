@@ -217,6 +217,7 @@ class NotRule extends AbstractOperationRule
     {
         $default_options = [
             'show_instance' => false,
+            'semantic'      => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
             if (!isset($options[ $default_option ]))
@@ -231,7 +232,8 @@ class NotRule extends AbstractOperationRule
             $this->getOperandAt(0) ? $this->getOperandAt(0)->toArray($options) : false
         ];
 
-        if (!$options['show_instance'])
+        // TODO make a dedicated cache entry for semantic array?
+        if (!$options['show_instance'] && !$options['semantic'])
             return $this->cache['array'] = $array;
         else
             return $array;
