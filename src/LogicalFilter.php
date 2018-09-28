@@ -339,7 +339,10 @@ class LogicalFilter implements \JsonSerializable
             $remaining_operations = array_filter(
                 $operands_descriptions,
                 function($operand) {
-                    return !is_array($operand);
+                    return !is_array($operand)
+                        && !$operand instanceof AbstractRule
+                        && !$operand instanceof LogicalFilter
+                        ;
                 }
             );
 
@@ -359,10 +362,18 @@ class LogicalFilter implements \JsonSerializable
             }
 
             foreach ($operands_descriptions as $operands_description) {
-                $this->addCompositeRule_recursion(
-                    $operands_description,
-                    $rule
-                );
+                if ($operands_description instanceof AbstractRule) {
+                    $rule->addOperand($operands_description);
+                }
+                elseif ($operands_description instanceof LogicalFilter) {
+                    $rule->addOperand($operands_description->getRules());
+                }
+                else {
+                    $this->addCompositeRule_recursion(
+                        $operands_description,
+                        $rule
+                    );
+                }
             }
 
             $recursion_position->addOperand( $rule );

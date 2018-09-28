@@ -920,6 +920,103 @@ class LogicalFilterTest extends \AbstractTest
 
     /**
      */
+    public function test_LogicalFilter_or_AbstractRule_in_operations_descriptions()
+    {
+        $filter_to_use = (new LogicalFilter(
+            ['field_1', '=', 'azerty']
+        ));
+        $filter_to_use2 = (new LogicalFilter(
+            ['field_2', '=', 'lalala']
+        ));
+
+        // not
+        $negated_filter = (new LogicalFilter(
+            ['not', $filter_to_use]
+        ));
+
+        $this->assertEquals(
+            ['not',
+                ['field_1', '=', 'azerty'],
+            ],
+            $negated_filter
+                // ->dump()
+                ->toArray()
+        );
+
+        $negated_filter = (new LogicalFilter(
+            ['not', $filter_to_use->getRules()]
+        ));
+
+        $this->assertEquals(
+            ['not',
+                ['field_1', '=', 'azerty'],
+            ],
+            $negated_filter
+                // ->dump()
+                ->toArray()
+        );
+
+        // or
+        $negated_filter = (new LogicalFilter(
+            ['or', $filter_to_use, $filter_to_use2]
+        ));
+
+        $this->assertEquals(
+            ['or',
+                ['field_1', '=', 'azerty'],
+                ['field_2', '=', 'lalala']
+            ],
+            $negated_filter
+                // ->dump()
+                ->toArray()
+        );
+
+        $negated_filter = (new LogicalFilter(
+            ['or', $filter_to_use->getRules(), $filter_to_use2->getRules()]
+        ));
+
+        $this->assertEquals(
+            ['or',
+                ['field_1', '=', 'azerty'],
+                ['field_2', '=', 'lalala']
+            ],
+            $negated_filter
+                // ->dump()
+                ->toArray()
+        );
+
+        // and
+        $negated_filter = (new LogicalFilter(
+            ['and', $filter_to_use, $filter_to_use2]
+        ));
+
+        $this->assertEquals(
+            ['and',
+                ['field_1', '=', 'azerty'],
+                ['field_2', '=', 'lalala']
+            ],
+            $negated_filter
+                // ->dump()
+                ->toArray()
+        );
+
+        $negated_filter = (new LogicalFilter(
+            ['and', $filter_to_use->getRules(), $filter_to_use2->getRules()]
+        ));
+
+        $this->assertEquals(
+            ['and',
+                ['field_1', '=', 'azerty'],
+                ['field_2', '=', 'lalala']
+            ],
+            $negated_filter
+                // ->dump()
+                ->toArray()
+        );
+    }
+
+    /**
+     */
     public function test_add_BetweenRule()
     {
         $filter = new LogicalFilter(
