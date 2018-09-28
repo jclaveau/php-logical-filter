@@ -18,7 +18,10 @@ use JClaveau\LogicalFilter\Filterer\PhpFilterer;
 use JClaveau\LogicalFilter\Filterer\CustomizableFilterer;
 use JClaveau\LogicalFilter\Filterer\RuleFilterer;
 
-const value = 'value';
+
+// $value = new Value();
+// const value = 'value';
+// const value = rand(0,10);
 const key   = 'key';
 
 /**

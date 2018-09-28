@@ -1,5 +1,6 @@
 <?php
 namespace JClaveau\LogicalFilter\Rule;
+use       JClaveau\LogicalFilter\Value;
 
 /**
  * Atomic rules are those who cannot be simplified (so already are):
@@ -113,7 +114,14 @@ abstract class AbstractAtomicRule extends AbstractRule
 
         $stringified_value = var_export($this->getValues(), true);
 
-        return $this->cache['string'] = "['{$this->getField()}', '$operator', $stringified_value]";
+        if (($field = $this->getField()) instanceof Value)
+            $field = "$field";
+        elseif ($field instanceof \Closure)
+            throw new \Exception("Closures dump not implemented");
+        else
+            $field = "'$field'";
+
+        return $this->cache['string'] = "[$field, '$operator', $stringified_value]";
     }
 
     /**/

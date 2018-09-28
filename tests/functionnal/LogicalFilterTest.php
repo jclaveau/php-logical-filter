@@ -1937,5 +1937,40 @@ array(3) {
         );
     }
 
+    /**
+     */
+    public function test_action_on_value()
+    {
+        $filter = (new LogicalFilter(
+            [
+                [function($row, $key) {
+                    return $row['col1'] + $row['col2'];
+                }, '=', 4],
+                'or',
+                [key, '=', 'index1'],
+            ]
+        ))
+        ->dump(true)
+        ;
+
+        $array = [
+            'key1' => 'value1',
+            'key2' => 'value2',
+            // ...
+        ];
+
+        $filter = (new LogicalFilter(
+            [
+                [Key::toUpper()->sub(0, 3), '=', 'LAL'],
+                [Value::div(2)->plus(3), '=', 4],
+                // [value, '=', 4],
+                'or',
+                [key, '=', 'index1'],
+            ]
+        ))
+        ->dump(true)
+        ;
+    }
+
     /**/
 }
