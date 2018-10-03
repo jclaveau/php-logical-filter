@@ -336,6 +336,32 @@ class LogicalFilter implements \JsonSerializable
                 }
             );
 
+            $non_true_rule_descriptions = array_filter(
+                $operands_descriptions,
+                function($operand) {
+                    return $operand !== null  // no rule <=> true
+                        || $operand !== true
+                        ;
+                }
+            );
+
+            foreach ($operands_descriptions as $i => $operands_description) {
+                if ($operands_description === false) {
+                    $operands_descriptions[ $i ] = ['and']; // FalseRule hack
+                }
+                elseif ($operands_description === null || $operands_description === true) {
+                    $operands_description = ['and'];
+                    if ( ! $non_true_rule_descriptions) {
+                        throw new \LogicException(
+                            "TrueRules are not implemented. Please add "
+                            ."them to operations having other type of rules"
+                        );
+                    }
+
+                    unset($operands_descriptions[ $i ]);
+                }
+            }
+
             $remaining_operations = array_filter(
                 $operands_descriptions,
                 function($operand) {

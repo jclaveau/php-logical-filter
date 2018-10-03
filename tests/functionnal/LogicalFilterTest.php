@@ -1767,5 +1767,67 @@ array(3) {
         $this->assertNull( $filter->getRules() );
     }
 
+    /**
+     */
+    public function test_construct_with_true_false_null_descriptions()
+    {
+        $filter = (new LogicalFilter(
+                ['and',
+                    ['field', '=', 'azerty'],
+                    true,
+                ]
+            ))
+            // ->dump(true)
+            ;
+
+        $this->assertEquals(
+            ['and',
+                ['field', '=', 'azerty'],
+            ],
+            $filter
+                // ->dump()
+                ->toArray()
+        );
+
+        // null <=> no rule <=> true
+        $filter = (new LogicalFilter(
+                ['and',
+                    ['field', '=', 'azerty'],
+                    null,
+                ]
+            ))
+            // ->dump(true)
+            ;
+
+        $this->assertEquals(
+            ['and',
+                ['field', '=', 'azerty'],
+            ],
+            $filter
+                // ->dump()
+                ->toArray()
+        );
+
+        // false
+        $filter = (new LogicalFilter(
+                ['and',
+                    ['field', '=', 'azerty'],
+                    false,
+                ]
+            ))
+            // ->dump(true)
+            ;
+
+        $this->assertEquals(
+            ['and',
+                ['field', '=', 'azerty'],
+                ['and'],  // FalseRule hack
+            ],
+            $filter
+                // ->dump()
+                ->toArray()
+        );
+    }
+
     /**/
 }
