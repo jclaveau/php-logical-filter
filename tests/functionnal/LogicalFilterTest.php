@@ -1755,5 +1755,17 @@ array(3) {
         );
     }
 
+    /**
+     */
+    public function test_construct_with_null_description()
+    {
+        // null <=> no rule <=> true
+        $filter = (new LogicalFilter(null))
+            // ->dump(true)
+            ;
+
+        $this->assertNull( $filter->getRules() );
+    }
+
     /**/
 }

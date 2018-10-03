@@ -59,9 +59,9 @@ class LogicalFilter implements \JsonSerializable
         if ($rules instanceof AbstractRule) {
             $rules = $rules->copy();
         }
-        elseif (!is_array($rules)) {
+        elseif ( ! is_null($rules) && ! is_array($rules)) {
             throw new \InvalidArgumentException(
-                "\$ules must be a rules description or an AbstractRule instead of"
+                "\$rules must be a rules description or an AbstractRule instead of"
                 .var_export($rules, true)
             );
         }
