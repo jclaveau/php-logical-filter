@@ -1765,6 +1765,34 @@ array(3) {
             ;
 
         $this->assertNull( $filter->getRules() );
+
+        $filter = (new LogicalFilter())
+            ->and_(null)
+            // ->dump(true)
+            ;
+
+        $this->assertNull( $filter->getRules() );
+
+        $filter = (new LogicalFilter())
+            ->or_(null)
+            // ->dump(true)
+            ;
+
+        $this->assertNull( $filter->getRules() );
+
+        $filter = (new LogicalFilter())
+            ->and_(new LogicalFilter)
+            // ->dump(true)
+            ;
+
+        $this->assertNull( $filter->getRules() );
+
+        $filter = (new LogicalFilter())
+            ->or_(new LogicalFilter)
+            // ->dump(true)
+            ;
+
+        $this->assertNull( $filter->getRules() );
     }
 
     /**

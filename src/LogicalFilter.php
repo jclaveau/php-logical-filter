@@ -177,7 +177,9 @@ class LogicalFilter implements \JsonSerializable
         })) ) {
             // Already instanciated rules
             foreach ($rules_description as $i => $filter) {
-                $this->addRule( $filter->getRules(), $operation);
+                $rules = $filter->getRules();
+                if ($rules !== null)
+                    $this->addRule( $rules, $operation);
             }
         }
         elseif (count($rules_description) == count(array_filter($rules_description, function($arg) {
