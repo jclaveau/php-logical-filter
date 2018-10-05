@@ -1857,5 +1857,27 @@ array(3) {
         );
     }
 
+    /**
+     */
+    public function test_addRule_after_invalid_in()
+    {
+        $filter = new LogicalFilter;
+
+        $filter
+            ->and_('field', 'in', [])
+            ->and_('field2', '=', 'dfghjkl')
+            ;
+
+        $this->assertEquals(
+            ['and',
+                ['field', 'in', []],
+                ['field2', '=', 'dfghjkl'],
+            ],
+            $filter
+                // ->dump()
+                ->toArray()
+        );
+    }
+
     /**/
 }
