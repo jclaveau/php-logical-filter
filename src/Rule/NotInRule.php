@@ -23,6 +23,9 @@ class NotInRule extends NotRule
     public function isNormalizationAllowed(array $contextual_options=[])
     {
         $operand = $this->getOperandAt(0);
+        if ( ! $operand->getPossibilities())
+            return false;
+
         return $operand->isNormalizationAllowed($contextual_options);
     }
 
@@ -105,7 +108,7 @@ class NotInRule extends NotRule
      */
     public function hasSolution(array $contextual_options=[])
     {
-        return count($this->getPossibilities()) != 0;
+        return true;
     }
 
     /**

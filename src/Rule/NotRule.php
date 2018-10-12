@@ -139,26 +139,31 @@ class NotRule extends AbstractOperationRule
         }
         elseif ($operand instanceof OrRule) {
 
-            if ($operand instanceof InRule && ! $operand->isNormalizationAllowed($current_simplification_options)) {
+            // $operand->dump(true);
+            if (    $operand instanceof InRule
+                && !$operand->isNormalizationAllowed($current_simplification_options)
+            ) {
                 // ['not', ['field', 'in', [2, 3]]] <=> ['field', '!in', [2, 3]]
                 $new_rule = new NotInRule(
                     $operand->getField(),
                     $operand->getPossibilities()
                 );
+                // $new_rule->dump(true);
             }
             else {
                 // ! (A || B) : !A && !B
                 // ! (A || B || C || D) : !A && !B && !C && !D
                 $new_rule = new AndRule;
-                foreach ($operand->getOperands() as $operand) {
+                foreach ($operand->getOperands() as $sub_operand) {
                     $negation = new NotRule;
                     $negation = $negation->setOperandsOrReplaceByOperation(
-                        [$operand->copy()],
+                        [$sub_operand->copy()],
                         $current_simplification_options
                     );
                     $new_rule->addOperand( $negation );
                 }
             }
+            // $new_rule->dump(!true);
         }
         else {
             throw new \LogicException(
@@ -182,6 +187,9 @@ class NotRule extends AbstractOperationRule
      */
     public function rootifyDisjunctions($simplification_options)
     {
+        if (!$this->isNormalizationAllowed($simplification_options))
+            return $this;
+
         $this->moveSimplificationStepForward( self::rootify_disjunctions, $simplification_options );
 
         foreach ($this->operands as $id => $operand) {

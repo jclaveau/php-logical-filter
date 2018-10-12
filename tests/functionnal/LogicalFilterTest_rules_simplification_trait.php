@@ -1081,23 +1081,52 @@ trait LogicalFilterTest_rules_simplification_trait
      */
     public function test_hasSolution_saving_simplification()
     {
-        $filter = new LogicalFilter([
-            'and',
-            ['field_1', '=', 'a'],
-            ['field_1', '=', 'b'],
-        ]);
+        $filter = new LogicalFilter(
+            ['and',
+                ['field_1', '=', 'a'],
+                ['field_1', '=', 'b'],
+            ]
+        );
 
         // don't save simplifications
         $this->assertFalse( $filter->hasSolution(false) );
-        $this->assertEquals([
-            'and',
-            ['field_1', '=', 'a'],
-            ['field_1', '=', 'b'],
-        ], $filter->toArray() );
+        $this->assertEquals(
+            ['and',
+                ['field_1', '=', 'a'],
+                ['field_1', '=', 'b'],
+            ],
+            $filter->toArray()
+        );
 
         // saving simplifications
         $this->assertFalse( $filter->hasSolution() );
         $this->assertEquals( ['and'], $filter->toArray() );
+    }
+
+    /**
+     */
+    public function test_simplify_NotIn_empty()
+    {
+        $filter = (new LogicalFilter(
+            ['and',
+                ['field_1', '=', 'a'],
+                ['field_2', '!in', []],
+            ]
+        ))
+        // ->dump(true)
+        ->simplify()
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            ['and',
+                ['field_1', '=', 'a'],
+                ['field_2', '!in', []], // TODO this should be a TrueRule
+            ],
+            $filter->toArray()
+        );
+
+        $this->assertTrue( $filter->hasSolution() );
     }
 
     /**

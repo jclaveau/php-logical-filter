@@ -219,7 +219,8 @@ class AndRule extends AbstractOperationRule
         $this->moveSimplificationStepForward(self::remove_invalid_branches, $simplification_options);
 
         foreach ($this->operands as $i => $operand) {
-            if ($operand instanceof AndRule || $operand instanceof OrRule ) {
+            // if ($operand instanceof AndRule || $operand instanceof OrRule ) {
+            if ( in_array( get_class($operand), [AndRule::class, OrRule::class]) ) {
                 $this->operands[$i] = $operand->removeInvalidBranches($simplification_options);
                 if (!$this->operands[$i]->hasSolution()) {
                     $this->operands = [];
