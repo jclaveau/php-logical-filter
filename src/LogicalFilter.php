@@ -804,6 +804,29 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     * Copy the current instance into the variable given as parameter
+     * and returns the copy.
+     *
+     * @return LogicalFilter
+     */
+    public function saveAs( &$variable )
+    {
+        return $variable = $this;
+    }
+
+    /**
+     * Copy the current instance into the variable given as parameter
+     * and returns the copied instance.
+     *
+     * @return LogicalFilter
+     */
+    public function saveCopyAs( &$copied_variable )
+    {
+        $copied_variable = $this->copy();
+        return $this;
+    }
+
+    /**
      * @param bool  $exit=false
      * @param array $options    + callstack_depth=2 The level of the caller to dump
      *                          + mode='string' in 'export' | 'dump' | 'string'

@@ -412,6 +412,45 @@ class LogicalFilterTest extends \AbstractTest
 
     /**
      */
+    public function test_saveAs()
+    {
+        $filter = new LogicalFilter([
+            'or',
+            ['field_6', 'equal', 'b'],
+        ]);
+
+        $returned_filter = $filter->saveAs( $filter2 );
+
+        $this->assertSame($filter, $filter2);
+        $this->assertSame($filter, $returned_filter);
+    }
+
+    /**
+     */
+    public function test_saveCopyAs()
+    {
+        $filter = new LogicalFilter([
+            'or',
+            ['field_6', 'equal', 'b'],
+        ]);
+
+        $returned_filter = $filter->saveCopyAs( $filter2 );
+
+        $this->assertSame($filter, $returned_filter);
+
+        $this->assertNotEquals(
+            spl_object_hash($filter->getRules(false)),
+            spl_object_hash($filter2->getRules(false))
+        );
+
+        $this->assertEquals(
+            $filter->toArray(),
+            $filter2->toArray()
+        );
+    }
+
+    /**
+     */
     public function test_addRules_on_noSolution_filter()
     {
         // and root
