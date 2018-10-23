@@ -785,6 +785,30 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     */
+    public function onEachCase(callable $action)
+    {
+        $this->simplify(['force_logical_core' => true]);
+
+        if (! $this->rules)
+            return $this;
+
+        $operands = $this->rules->getOperands();
+
+        foreach ($operands as $i => &$and_case) {
+            $arguments = [
+                &$and_case
+            ];
+            call_user_func_array($action, $arguments);
+        }
+
+        // Debug::dumpJson($operands, true);
+        $this->rules = new OrRule($operands);
+
+        return $this;
+    }
+
+    /**
      * Clone the current object and its rules.
      *
      * @return LogicalFilter A copy of the current instance with a copied ruletree
