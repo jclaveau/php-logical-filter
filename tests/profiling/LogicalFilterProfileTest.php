@@ -133,7 +133,7 @@ class LogicalFilterProfileTest extends \AbstractTest
             require __DIR__ . '/LogicalFilterProfileTest_very_big_filter.php'
         ))
         ->onEachRule(
-            ['field', 'in', ['adserver_id', 'campaign_id']],
+            ['field', 'in', ['A_id', 'C_id']],
             [
                 Filterer::leaves_only => true,
                 Filterer::on_row_matches => function ($rule, $key, &$siblings) use (&$counts) {

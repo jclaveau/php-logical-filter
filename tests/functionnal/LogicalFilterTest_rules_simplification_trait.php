@@ -1488,25 +1488,25 @@ trait LogicalFilterTest_rules_simplification_trait
         $filter = (new LogicalFilter(
             [
                 "and",
-                ["adserver_type", "in", [
+                ["A_type", "in", [
                     "INTERNE",
                     "PROD",
                 ]],
-                ["adserver_id", "!in", [
+                ["A_id", "!in", [
                     0,
                 ]],
-                ["adserver_type", "in", [
+                ["A_type", "in", [
                     "DIFF",
                     "INTERNE",
                 ]],
-                ["adserver_id", "!in", [
+                ["A_id", "!in", [
                     0,
                 ]],
-                ["adserver_id", "!in", [
+                ["A_id", "!in", [
                     100,
                     101,
                 ]],
-                ["adserver_id", "!in", [
+                ["A_id", "!in", [
                     100921,
                     100923,
                 ]]
@@ -1515,8 +1515,8 @@ trait LogicalFilterTest_rules_simplification_trait
 
         $this->assertEquals(
             ['and',
-                ['adserver_type', '=', 'INTERNE'],
-                ['adserver_id', '!in', [0, 100, 101, 100921, 100923]],
+                ['A_type', '=', 'INTERNE'],
+                ['A_id', '!in', [0, 100, 101, 100921, 100923]],
             ],
             $filter
                 ->simplify()
@@ -1527,32 +1527,32 @@ trait LogicalFilterTest_rules_simplification_trait
         $this->assertEquals(
             ['or',
                 ['and',
-                    ['adserver_type', '=', 'INTERNE'],
-                    ['adserver_id',   '>',  100923],
+                    ['A_type', '=', 'INTERNE'],
+                    ['A_id',   '>',  100923],
                 ],
                 ['and',
-                    ['adserver_type', '=', 'INTERNE'],
-                    ['adserver_id',   '>', 100921],
-                    ['adserver_id',   '<', 100923],
+                    ['A_type', '=', 'INTERNE'],
+                    ['A_id',   '>', 100921],
+                    ['A_id',   '<', 100923],
                 ],
                 ['and',
-                    ['adserver_type', '=', 'INTERNE'],
-                    ['adserver_id',   '>', 101],
-                    ['adserver_id',   '<', 100921],
+                    ['A_type', '=', 'INTERNE'],
+                    ['A_id',   '>', 101],
+                    ['A_id',   '<', 100921],
                 ],
                 ['and',
-                    ['adserver_type', '=', 'INTERNE'],
-                    ['adserver_id',   '>', 100],
-                    ['adserver_id',   '<', 101],
+                    ['A_type', '=', 'INTERNE'],
+                    ['A_id',   '>', 100],
+                    ['A_id',   '<', 101],
                 ],
                 ['and',
-                    ['adserver_type', '=', 'INTERNE'],
-                    ['adserver_id',   '>', 0],
-                    ['adserver_id',   '<', 100],
+                    ['A_type', '=', 'INTERNE'],
+                    ['A_id',   '>', 0],
+                    ['A_id',   '<', 100],
                 ],
                 ['and',
-                    ['adserver_type', '=', 'INTERNE'],
-                    ['adserver_id',   '<', 0],
+                    ['A_type', '=', 'INTERNE'],
+                    ['A_id',   '<', 0],
                 ],
             ],
             $filter
@@ -1574,32 +1574,32 @@ trait LogicalFilterTest_rules_simplification_trait
         $filter = (new LogicalFilter(
             ["and",
                 [
-                    "adserver_type",
+                    "A_type",
                     "=",
                     "INTERNE"
                 ],
                 [
-                    "adserver_id",
+                    "A_id",
                     ">",
                     0
                 ],
                 [
-                    "adserver_id",
+                    "A_id",
                     ">",
                     12
                 ],
                 [
-                    "adserver_id",
+                    "A_id",
                     ">=",
                     100
                 ],
                 [
-                    "adserver_id",
+                    "A_id",
                     "<",
                     2000
                 ],
                 [
-                    "adserver_id",
+                    "A_id",
                     "=",
                     100
                 ],
@@ -1609,7 +1609,7 @@ trait LogicalFilterTest_rules_simplification_trait
                     new \DateTime('2018-07-04')
                 ],
                 [
-                    "event",
+                    "E",
                     "=",
                     "impression"
                 ],
@@ -1623,10 +1623,10 @@ trait LogicalFilterTest_rules_simplification_trait
         $this->assertEquals(
             ['or',
                 ['and',
-                    ['adserver_type', '=', 'INTERNE'],
-                    ['adserver_id', '=', 100],
+                    ['A_type', '=', 'INTERNE'],
+                    ['A_id', '=', 100],
                     ['date', '=', new \DateTime('2018-07-04')],
-                    ['event', '=', 'impression'],
+                    ['E', '=', 'impression'],
                 ],
             ],
             $filter
