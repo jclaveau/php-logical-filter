@@ -2091,9 +2091,8 @@ trait LogicalFilterTest_rules_simplification_trait
     }
 
     /**
-     * This produce a bug
      */
-    public function test_simplify_big_in_inside_or()
+    public function test_rootifyDisjunction_with_not_normalizable_in_inside_or()
     {
         $filter = (new LogicalFilter(
             ['and',

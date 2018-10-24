@@ -572,6 +572,16 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     * Returns a unique id corresponding to the set of rules of the filter
+     *
+     * @return string The unique semantic id
+     */
+    public function getSemanticId()
+    {
+        return $this->rules ? $this->rules->getSemanticId() : null;
+    }
+
+    /**
      * For implementing JsonSerializable interface.
      *
      * @see https://secure.php.net/manual/en/jsonserializable.jsonserialize.php

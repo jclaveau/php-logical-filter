@@ -1918,5 +1918,24 @@ array(3) {
         );
     }
 
+    /**
+     */
+    public function test_getSemanticId()
+    {
+        $filter = new LogicalFilter;
+
+        $filter
+            ->and_('field', 'in', [])
+            ->and_('field2', '=', 'dfghjkl')
+            ;
+
+        $this->assertEquals(
+            '460c39ed20e85bc0dcafc28b5e4e5d4d-511711247b38d5ed3ee96dee4d3bf89a',
+            $filter
+                // ->dump()
+                ->getSemanticId()
+        );
+    }
+
     /**/
 }
