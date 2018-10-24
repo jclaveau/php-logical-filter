@@ -41,7 +41,6 @@ class OrRule extends AbstractOperationRule
     /**
      * Replace all the OrRules of the RuleTree by one OrRule at its root.
      *
-     * @todo renjame as RootifyDisjunjctions?
      * @todo return $this (implements a Rule monad?)
      *
      * @return $this
@@ -59,7 +58,7 @@ class OrRule extends AbstractOperationRule
             if ($operand instanceof AbstractOperationRule)
                 $operand = $operand->rootifyDisjunctions($simplification_options);
 
-            if ($operand instanceof OrRule) {
+            if ($operand instanceof OrRule && $operand->isNormalizationAllowed($simplification_options)) {
                 foreach ($operand->getOperands() as $subOperand)
                     $upLiftedOperands[] = $subOperand;
             }

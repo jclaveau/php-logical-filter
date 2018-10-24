@@ -2090,5 +2090,37 @@ trait LogicalFilterTest_rules_simplification_trait
         );
     }
 
+    /**
+     * This produce a bug
+     */
+    public function test_simplify_big_in_inside_or()
+    {
+        $filter = (new LogicalFilter(
+            ['and',
+                ['field_1', '!in', [1, 2]],
+                ['or',
+                    ['field_2', 'in', [1, 2, 3, 4, 5, 6]],
+                    ['field_1', 'in', [8, 9]],
+                ],
+            ]
+        ))
+        // ->dump()
+        ;
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ['field_1', '!in', [1, 2]],
+                    ['field_2', 'in', [1, 2, 3, 4, 5, 6]],
+                ],
+                ['field_1', 'in', [8, 9]],
+            ],
+            $filter
+                ->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
     /**/
 }
