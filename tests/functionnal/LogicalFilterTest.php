@@ -1769,9 +1769,9 @@ array(3) {
     {
         $filter = (new LogicalFilter(
             [
-                [value, '=', 4],
+                [value(), '=', 4],
                 'or',
-                [key, '=', 'index1'],
+                [key(), '=', 'index1'],
             ]
         ))
         // ->dump(true)
@@ -1938,38 +1938,39 @@ array(3) {
     }
 
     /**
-     */
+     * /
     public function test_action_on_value()
     {
         $filter = (new LogicalFilter(
             [
-                [function($row, $key) {
-                    return $row['col1'] + $row['col2'];
-                }, '=', 4],
+                // [function($row, $key) {
+                    // return $row['col1'] + $row['col2'];
+                // }, '=', 4],
+                [value()['col_1'], '=', 'lololo'],
                 'or',
-                [key, '=', 'index1'],
+                [key(), '=', 'key1'],
             ]
         ))
-        ->dump(true)
+        // ->dump(true)
         ;
 
         $array = [
-            'key1' => 'value1',
-            'key2' => 'value2',
+            'key_0' => [
+                'col_1' => 'lelele',
+                'col_2' => 'lylyly',
+            ],
+            'key_1' => [
+                'col_1' => 'lalala',
+                'col_2' => 'lilili',
+            ],
+            'key_2' => [
+                'col_1' => 'lololo',
+                'col_2' => 'lululu',
+            ],
             // ...
         ];
 
-        $filter = (new LogicalFilter(
-            [
-                [Key::toUpper()->sub(0, 3), '=', 'LAL'],
-                [Value::div(2)->plus(3), '=', 4],
-                // [value, '=', 4],
-                'or',
-                [key, '=', 'index1'],
-            ]
-        ))
-        ->dump(true)
-        ;
+        var_dump( $filter( $array ) );
     }
 
     /**/

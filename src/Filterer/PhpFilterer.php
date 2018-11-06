@@ -13,6 +13,8 @@ use       JClaveau\LogicalFilter\Rule\AboveRule;
 use       JClaveau\LogicalFilter\Rule\NotEqualRule;
 use       JClaveau\LogicalFilter\Rule\InRule;
 use       JClaveau\LogicalFilter\Rule\NotInRule;
+use       JClaveau\LogicalFilter\FilteredKey;
+use       JClaveau\LogicalFilter\FilteredValue;
 
 /**
  */
@@ -22,13 +24,13 @@ class PhpFilterer extends Filterer
      */
     public function validateRule ($field, $operator, $value, $row, array $path, $all_operands, $options)
     {
-        if ($field === \JClaveau\LogicalFilter\value) {
-            $value_to_validate = $row;
+        if ($field instanceof FilteredValue) {
+            $value_to_validate = $field( $row );
         }
-        elseif ($field === \JClaveau\LogicalFilter\key) {
-            $value_to_validate = array_pop($path);
+        elseif ($field instanceof FilteredKey) {
+            $value_to_validate = $field( array_pop($path) );
         }
-        elseif (!isset($row[$field])) {
+        elseif (!isset($row[(string) $field])) {
             $value_to_validate = null;
         }
         else {
