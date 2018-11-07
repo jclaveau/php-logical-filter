@@ -1,6 +1,7 @@
 <?php
 namespace JClaveau\LogicalFilter\Rule;
-use       JClaveau\LogicalFilter\Value;
+use       JClaveau\LogicalFilter\FilteredValue;
+use       JClaveau\LogicalFilter\FilteredKey;
 
 /**
  * Atomic rules are those who cannot be simplified (so already are):
@@ -114,7 +115,9 @@ abstract class AbstractAtomicRule extends AbstractRule
 
         $stringified_value = var_export($this->getValues(), true);
 
-        if (($field = $this->getField()) instanceof Value)
+        $field = $this->getField();
+
+        if ($field instanceof FilteredValue || $field instanceof FilteredKey)
             $field = "$field";
         elseif ($field instanceof \Closure)
             throw new \Exception("Closures dump not implemented");

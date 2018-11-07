@@ -1497,6 +1497,8 @@ array(3) {
                 ['field_6', '=><=', [20, 30]],
                 ['field_6', '><=', [20, 30]],
                 ['date', '>', new \DateTime("2018-07-19")],
+                [key(), '=', 3],
+                [value()->lazyMethodCall(), '=', 3],
             ]
         ))
         // ->dump(true)
@@ -1529,6 +1531,8 @@ array(3) {
        'timezone_type' => 3,
        'timezone' => 'UTC',
     ))],
+    [(new JClaveau\LogicalFilter\FilteredKey), '=', 3],
+    [(new JClaveau\LogicalFilter\FilteredValue)->lazyMethodCall(), '=', 3],
 ]",
             $filter->toString(['indent_unit' => "    "])
         );
@@ -1540,7 +1544,7 @@ array(3) {
    'date' => '2018-07-19 00:00:00.000000',
    'timezone_type' => 3,
    'timezone' => 'UTC',
-))],]",
+))],[(new JClaveau\LogicalFilter\FilteredKey), '=', 3],[(new JClaveau\LogicalFilter\FilteredValue)->lazyMethodCall(), '=', 3],]",
             $filter->toString()
         );
 
@@ -1550,11 +1554,9 @@ array(3) {
    'date' => '2018-07-19 00:00:00.000000',
    'timezone_type' => 3,
    'timezone' => 'UTC',
-))],]",
+))],[(new JClaveau\LogicalFilter\FilteredKey), '=', 3],[(new JClaveau\LogicalFilter\FilteredValue)->lazyMethodCall(), '=', 3],]",
             $filter . ''
         );
-
-
     }
 
     /**
