@@ -18,9 +18,6 @@ use JClaveau\LogicalFilter\Filterer\PhpFilterer;
 use JClaveau\LogicalFilter\Filterer\CustomizableFilterer;
 use JClaveau\LogicalFilter\Filterer\RuleFilterer;
 
-const value = 'value';
-const key   = 'key';
-
 /**
  * LogicalFilter describes a set of logical rules structured by
  * conjunctions and disjunctions (AND and OR).

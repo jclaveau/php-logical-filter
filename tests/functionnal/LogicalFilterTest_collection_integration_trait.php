@@ -26,7 +26,7 @@ trait LogicalFilterTest_collection_integration_trait
         $filter = new LogicalFilter(
             ['or',
                 ['string', '!=', 'ploup'],
-                [key, '>', 1],
+                [key(), '>', 1],
             ]
         );
 

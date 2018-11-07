@@ -1497,6 +1497,8 @@ array(3) {
                 ['field_6', '=><=', [20, 30]],
                 ['field_6', '><=', [20, 30]],
                 ['date', '>', new \DateTime("2018-07-19")],
+                [key(), '=', 3],
+                [value()->lazyMethodCall(), '=', 3],
             ]
         ))
         // ->dump(true)
@@ -1529,6 +1531,8 @@ array(3) {
        'timezone_type' => 3,
        'timezone' => 'UTC',
     ))],
+    [(new JClaveau\LogicalFilter\FilteredKey), '=', 3],
+    [(new JClaveau\LogicalFilter\FilteredValue)->lazyMethodCall(), '=', 3],
 ]",
             $filter->toString(['indent_unit' => "    "])
         );
@@ -1540,7 +1544,7 @@ array(3) {
    'date' => '2018-07-19 00:00:00.000000',
    'timezone_type' => 3,
    'timezone' => 'UTC',
-))],]",
+))],[(new JClaveau\LogicalFilter\FilteredKey), '=', 3],[(new JClaveau\LogicalFilter\FilteredValue)->lazyMethodCall(), '=', 3],]",
             $filter->toString()
         );
 
@@ -1550,11 +1554,9 @@ array(3) {
    'date' => '2018-07-19 00:00:00.000000',
    'timezone_type' => 3,
    'timezone' => 'UTC',
-))],]",
+))],[(new JClaveau\LogicalFilter\FilteredKey), '=', 3],[(new JClaveau\LogicalFilter\FilteredValue)->lazyMethodCall(), '=', 3],]",
             $filter . ''
         );
-
-
     }
 
     /**
@@ -1769,9 +1771,9 @@ array(3) {
     {
         $filter = (new LogicalFilter(
             [
-                [value, '=', 4],
+                [value(), '=', 4],
                 'or',
-                [key, '=', 'index1'],
+                [key(), '=', 'index1'],
             ]
         ))
         // ->dump(true)
@@ -1935,6 +1937,42 @@ array(3) {
                 // ->dump()
                 ->getSemanticId()
         );
+    }
+
+    /**
+     * /
+    public function test_action_on_value()
+    {
+        $filter = (new LogicalFilter(
+            [
+                // [function($row, $key) {
+                    // return $row['col1'] + $row['col2'];
+                // }, '=', 4],
+                [value()['col_1'], '=', 'lololo'],
+                'or',
+                [key(), '=', 'key1'],
+            ]
+        ))
+        // ->dump(true)
+        ;
+
+        $array = [
+            'key_0' => [
+                'col_1' => 'lelele',
+                'col_2' => 'lylyly',
+            ],
+            'key_1' => [
+                'col_1' => 'lalala',
+                'col_2' => 'lilili',
+            ],
+            'key_2' => [
+                'col_1' => 'lololo',
+                'col_2' => 'lululu',
+            ],
+            // ...
+        ];
+
+        var_dump( $filter( $array ) );
     }
 
     /**/

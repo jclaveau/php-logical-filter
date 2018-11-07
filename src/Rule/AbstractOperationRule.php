@@ -479,6 +479,9 @@ abstract class AbstractOperationRule extends AbstractRule
             // Operation rules have no field but we need to keep them anyway
             $field = method_exists($operand, 'getField') ? $operand->getField() : '';
 
+            // For FilteredValue and FilteredKey
+            $field = (string) $field;
+
             if (!isset($operandsByFields[ $field ]))
                 $operandsByFields[ $field ] = [];
 
@@ -504,6 +507,9 @@ abstract class AbstractOperationRule extends AbstractRule
 
             // Operation rules have no field but we need to keep them anyway
             $field = method_exists($operand, 'getField') ? $operand->getField() : '';
+
+            // For FilteredValue and FilteredKey
+            $field = (string) $field;
 
             if (!isset($operandsByFields[ $field ]))
                 $operandsByFields[ $field ] = [];

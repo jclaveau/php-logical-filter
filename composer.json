@@ -16,7 +16,8 @@
             "JClaveau\\LogicalFilter\\" : "src"
         },
         "files": [
-              "src/functions.php"
+              "src/functions.php",
+              "src/polyfills.php"
         ]
     },
     "repositories": [
@@ -45,6 +46,7 @@
     },
     "require": {
         "jclaveau/php-visibility-violator": "dev-master",
-        "php": ">=5.6.0"
+        "php": ">=5.6.0",
+        "jclaveau/php-deferred-callchain": "^1.0"
     }
 }
