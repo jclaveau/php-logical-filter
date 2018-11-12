@@ -1940,17 +1940,14 @@ array(3) {
     }
 
     /**
-     * /
+     */
     public function test_action_on_value()
     {
         $filter = (new LogicalFilter(
             [
-                // [function($row, $key) {
-                    // return $row['col1'] + $row['col2'];
-                // }, '=', 4],
                 [value()['col_1'], '=', 'lololo'],
                 'or',
-                [key(), '=', 'key1'],
+                [key(), '=', 'key_1'],
             ]
         ))
         // ->dump(true)
@@ -1969,10 +1966,22 @@ array(3) {
                 'col_1' => 'lololo',
                 'col_2' => 'lululu',
             ],
-            // ...
         ];
 
-        var_dump( $filter( $array ) );
+        $this->assertEquals(
+            [
+                'key_1' => [
+                    'col_1' => 'lalala',
+                    'col_2' => 'lilili',
+                ],
+                'key_2' => [
+                    'col_1' => 'lololo',
+                    'col_2' => 'lululu',
+                ],
+            ],
+            $filter
+                ->applyOn($array)
+        );
     }
 
     /**/
