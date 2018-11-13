@@ -74,3 +74,5 @@ of it is named by the user as "a set of rules to apply on some property".
 
 Related
 + https://github.com/keboola/php-filter
++ https://github.com/hollodotme/FluidValidator (intersesting validators by type)
++ https://github.com/Respect/Validation (most popular?)
