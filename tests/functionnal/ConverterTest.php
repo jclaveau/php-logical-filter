@@ -77,6 +77,7 @@ class ConverterTest extends \AbstractTest
                 ['field_5', 'regexp', "/^(ab)+/i"],
                 ['field_6', 'in', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]],
                 ['field_7', '!in', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]],
+                ['field_8', '=', new \DateTime('2018-11-12')],
             ]
         ))
         // ->dump()
@@ -85,7 +86,7 @@ class ConverterTest extends \AbstractTest
         $inline_sql = (new InlineSqlMinimalConverter())->convert( $filter );
 
         $this->assertEquals(
-            '(field_1 = 2 AND field_2 > 4 AND field_3 IS NULL AND field_4 IS NOT NULL AND field_5 REGEXP :param_b30f6679 AND field_6 IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21) AND field_7 NOT IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21)) OR (field_1 = 2 AND field_2 < -4 AND field_3 IS NULL AND field_4 IS NOT NULL AND field_5 REGEXP :param_b30f6679 AND field_6 IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21) AND field_7 NOT IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21))',
+            "(field_1 = 2 AND field_2 > 4 AND field_3 IS NULL AND field_4 IS NOT NULL AND field_5 REGEXP :param_b30f6679 AND field_6 IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21) AND field_7 NOT IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21) AND field_8 = '2018-11-12 00:00:00') OR (field_1 = 2 AND field_2 < -4 AND field_3 IS NULL AND field_4 IS NOT NULL AND field_5 REGEXP :param_b30f6679 AND field_6 IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21) AND field_7 NOT IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21) AND field_8 = '2018-11-12 00:00:00')",
             $inline_sql['sql']
         );
 

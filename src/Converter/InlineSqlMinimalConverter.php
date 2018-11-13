@@ -114,7 +114,7 @@ class InlineSqlMinimalConverter extends MinimalConverter
             // TODO disable locale to handle separators
         }
         elseif ($value instanceof \DateTime) {
-            $value = $value->format('Y-m-d H:i:s');
+            $value = "'" . $value->format('Y-m-d H:i:s') . "'";
         }
         elseif (gettype($value) == 'string') {
             $value = $this->addParameter($value);
