@@ -649,8 +649,17 @@ class LogicalFilter implements \JsonSerializable
             [
                 Filterer::on_row_matches => function($rule, $key, &$rows, $matching_case) use (&$cache_flush_required) {
                     // $rule->dump();
-                    // $matching_case->dump(true);
                     unset( $rows[$key] );
+                    if ( ! $rows ) {
+                        throw new \Exception(
+                             "Removing the only rule $rule from the filter $this "
+                            ."produces a case which has no possible solution due to missing "
+                            ."implementation of TrueRule.\n"
+                            ."Please see: https://github.com/jclaveau/php-logical-filter/issues/59"
+                        );
+                    }
+
+                    // $matching_case->dump(true);
                     $cache_flush_required = true;
                 },
                 // Filterer::on_row_mismatches => function($rule, $key, &$rows, $matching_case) {

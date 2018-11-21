@@ -95,7 +95,9 @@ trait LogicalFilterTest_rules_manipulation_trait
     public function test_removeRules_simple_children()
     {
         $this->assertEquals(
-            ['and'],
+            ['and',
+                ['field_6', '=', 12],
+            ],
             (new LogicalFilter(
                 ['and',
                     ['or',
@@ -104,6 +106,7 @@ trait LogicalFilterTest_rules_manipulation_trait
                         ['field_4', '=', 12],
                         ['field_6', '=', 12],
                     ],
+                    ['field_6', '=', 12],
                 ]
             ))
             // ->dump(!true)
@@ -264,8 +267,7 @@ trait LogicalFilterTest_rules_manipulation_trait
     }
 
     /**
-     * TODO make this test work
-     * /
+     */
     public function test_removeRules_complex()
     {
         $this->assertEquals(
@@ -293,8 +295,8 @@ trait LogicalFilterTest_rules_manipulation_trait
                 ]
             ))
             ->removeRules([
-                'or',
                 ['value', '=', 'laliloulilala'],
+                'or',
                 ['and',
                     ['field', '=', 'field_5'],
                     ['operator', '=', '>'],
@@ -304,7 +306,7 @@ trait LogicalFilterTest_rules_manipulation_trait
                 // ['children', '>', 7],
                 // ['description', '=', ['field_8', '=', 8]], // TODO requires disabling negation of arrays
             ])
-            ->dump(!true)
+            // ->dump(!true)
             ->toArray()
             ,
             ['and',
@@ -318,7 +320,7 @@ trait LogicalFilterTest_rules_manipulation_trait
                         // ['field_5', '>', 'c'],
                         ['field_4', '=', 'd'],
                         // ['field_6', '>=', 'e'],
-                        ['field_3', '>', 'a'],
+                        ['field_3', '>', 'e'],
                     ],
                 ],
                 ['field_5', 'in', ['a', 'b', 'c']],
@@ -329,6 +331,35 @@ trait LogicalFilterTest_rules_manipulation_trait
                 // ],
             ]
         );
+    }
+
+    /**
+     */
+    public function test_removeRules_throwing_exception()
+    {
+        // As TrueRule is not implemented, we cannot replace a predicate
+        // by True so if the parent operation as only one operand, removing
+        // it will produce a false négative as ['and'] <=> false
+        try {
+            (new LogicalFilter(
+                ['and',
+                    ['field_3', '<', 'a'],
+                ]
+            ))
+            ->removeRules(
+                ['and',
+                    ['field', '=', 'field_3'],
+                ]
+            )
+            // ->dump()
+            ;
+        }
+        catch (\Exception $e) {
+            $this->assertEquals(
+                "Removing the only rule ['field_3', '<', 'a'] from the filter ['and',['field_3', '<', 'a'],] produces a case which has no possible solution due to missing implementation of TrueRule.\nPlease see: https://github.com/jclaveau/php-logical-filter/issues/59",
+                $e->getMessage()
+            );
+        }
     }
 
     /**
