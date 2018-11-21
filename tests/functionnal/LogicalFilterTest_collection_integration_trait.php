@@ -47,5 +47,45 @@ trait LogicalFilterTest_collection_integration_trait
         );
     }
 
+    /**
+     */
+    public function test_collection_as_in_operand()
+    {
+        $collection = Collection::from([
+            5, 6, 7, 8, 9, 10
+        ]);
+
+        $matching_rows = (new LogicalFilter(
+            ['and',
+                ['my_field', 'in', $collection],
+                ['my_field', '<', 7],
+            ]
+        ))
+        ->saveAs($filter)
+        ->applyOn([
+            ['my_field' => 7],
+            ['my_field' => 5],
+        ])
+        ;
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ['my_field', 'in', [5, 6]],
+                ],
+            ],
+            $filter
+                // ->dump( true )
+                ->toArray()
+        );
+
+        $this->assertEquals(
+            [
+                1 => ['my_field' => 5],
+            ],
+            $matching_rows
+        );
+    }
+
     /**/
 }
