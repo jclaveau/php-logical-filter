@@ -13,7 +13,7 @@ class NotInRule extends NotRule
      * @param string $field The field to apply the rule on.
      * @param array  $value The value the field can equal to.
      */
-    public function __construct( $field, array $possibilities )
+    public function __construct( $field, $possibilities )
     {
         $this->addOperand(new InRule($field, $possibilities));
     }
@@ -75,8 +75,15 @@ class NotInRule extends NotRule
     /**
      * @return $this
      */
-    public function setPossibilities(array $possibilities)
+    public function setPossibilities($possibilities)
     {
+        if (    is_object($possibilities)
+            &&  $possibilities instanceof \IteratorAggregate
+            &&  method_exists($possibilities, 'toArray')
+        ) {
+            $possibilities = $possibilities->toArray();
+        }
+
         if ($this->getOperandAt(0) instanceof EqualRule) {
             // TODO this case should occure anymore while a NotInRule
             // may not have the same class once simplified

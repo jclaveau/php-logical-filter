@@ -642,7 +642,31 @@ class AndRule extends AbstractOperationRule
 
                     unset($operandsByOperator[ AboveRule::operator ]);
                 }
+            }
 
+            // Comparison between NotInRules and > or <
+            if (!empty($operandsByOperator[ NotInRule::operator ])) {
+                $notInRule = $operandsByOperator[ NotInRule::operator ][0];
+
+                if (!empty($operandsByOperator[ BelowRule::operator ])) {
+                    $upper_limit = reset($operandsByOperator[ BelowRule::operator ])->getMaximum();
+
+                    $operandsByOperator[ NotInRule::operator ][0]->setPossibilities(
+                        array_filter( $notInRule->getPossibilities(), function ($possibility) use ($upper_limit) {
+                            return $possibility < $upper_limit;
+                        } )
+                    );
+                }
+
+                if (!empty($operandsByOperator[ AboveRule::operator ])) {
+                    $lower_limit = reset($operandsByOperator[ AboveRule::operator ])->getMinimum();
+
+                    $operandsByOperator[ NotInRule::operator ][0]->setPossibilities(
+                        array_filter( $notInRule->getPossibilities(), function ($possibility) use ($lower_limit) {
+                            return $possibility > $lower_limit;
+                        } )
+                    );
+                }
             }
         }
 
