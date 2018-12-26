@@ -32,12 +32,20 @@ class AboveOrEqualRuleTest extends \PHPUnit_Framework_TestCase
         $rule = new AboveOrEqualRule('field', 4);
 
         $this->assertEquals(
+            ['field', '>=', 4],
+            $rule
+                ->simplify()
+                // ->dump()
+                ->toArray()
+        );
+
+        $this->assertEquals(
             ['or',
                 ['field', '>', 4],
                 ['field', '=', 4],
             ],
             $rule
-                ->simplify()
+                ->simplify(['above_or_equal.normalization' => true])
                 // ->dump()
                 ->toArray()
         );
@@ -88,10 +96,10 @@ class AboveOrEqualRuleTest extends \PHPUnit_Framework_TestCase
             $this->markTestInvalid("An exception should have been thrown here");
         }
         catch (\LogicException $e) {
-            $this->assertEquals(
-                "Setting invalid operand for ['field', '>=', 4]: ['and']",
-                $e->getMessage()
-            );
+            $this->assertEquals(0, strpos(
+                $e->getMessage(),
+                "Setting invalid operand for ['field', '>=', 4]: ['and']"
+            ) );
         }
 
         try {
@@ -102,10 +110,10 @@ class AboveOrEqualRuleTest extends \PHPUnit_Framework_TestCase
             $this->markTestInvalid("An exception should have been thrown here");
         }
         catch (\LogicException $e) {
-            $this->assertEquals(
-                "Trying to set different values for ['field', '>=', 4]: array (\n  'equal' => 4,\n  'above' => 3,\n)",
-                $e->getMessage()
-            );
+            $this->assertEquals(0, strpos(
+                $e->getMessage(),
+                "Operands must be an array of two rules like (field > minimum || field = minimum) instead of:"
+            ) );
         }
 
         try {
@@ -113,10 +121,10 @@ class AboveOrEqualRuleTest extends \PHPUnit_Framework_TestCase
             $this->markTestInvalid("An exception should have been thrown here");
         }
         catch (\LogicException $e) {
-            $this->assertEquals(
-                "Trying to set null values for ['field', '>=', 4]",
-                $e->getMessage()
-            );
+            $this->assertEquals(0, strpos(
+                $e->getMessage(),
+                "Operands must be an array of two rules like (field > minimum || field = minimum) instead of:"
+            ) );
         }
 
     }

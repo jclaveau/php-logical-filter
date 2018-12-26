@@ -452,8 +452,6 @@ class AndRule extends AbstractOperationRule
     }
 
     /**
-     * + if A = 2 && A > 1 <=> A = 2
-     * + if A = 2 && A < 4 <=> A = 2
      */
     protected static function simplifyDifferentOperands(array $operandsByFields)
     {
@@ -464,7 +462,9 @@ class AndRule extends AbstractOperationRule
                     AboveRule::operator,
                     AboveRule::operator,
                     InRule::operator,
-                    NotInRule::operator
+                    NotInRule::operator,
+                    BelowOrEqualRule::operator,
+                    AboveOrEqualRule::operator,
                 ]
                 as $unifyable_operator
             ) {
@@ -482,235 +482,273 @@ class AndRule extends AbstractOperationRule
                 }
             }
 
-            // EqualRule comparisons
-            if (!empty($operandsByOperator[ EqualRule::operator ])) {
-                if (count($operandsByOperator[ EqualRule::operator ]) != 1) {
-                    // Multiple Equal rules for one field with different values has no sense
-                    continue;
-                }
+            $operandsByOperator = self::simplifyDifferentOperandsForField($field, $operandsByOperator);
+        }
 
-                $equalRule = reset( $operandsByOperator[ EqualRule::operator ] );
+        return $operandsByFields;
+    }
 
-                if (!empty($operandsByOperator[ NotEqualRule::operator ])) {
-                    foreach ($operandsByOperator[ NotEqualRule::operator ] as $i => $not_equal_rule) {
+    /**
+     * + if A = 2 && A > 1 <=> A = 2
+     * + if A = 2 && A < 4 <=> A = 2
+     */
+    protected static function simplifyDifferentOperandsForField($field, array $operandsByOperator)
+    {
+        // EqualRule comparisons
+        if (!empty($operandsByOperator[ EqualRule::operator ])) {
 
-                        if ($equalRule->getValue() !== null) {
-                            if ($not_equal_rule->getValue() === null) // means if exists <=> equals something
-                                unset($operandsByOperator[ NotEqualRule::operator ][$i]);
-                            elseif ($not_equal_rule->getValue() != $equalRule->getValue())
-                                unset($operandsByOperator[ NotEqualRule::operator ][$i]);
-                        }
-                        elseif ($equalRule->getValue() === null ) {
-                            if ($not_equal_rule->getValue() !== null)
-                                unset($operandsByOperator[ NotEqualRule::operator ][$i]);
-                            // else we let the "equal null" and the "not equal null" for the romeInvalidBranches step
-                        }
+            $equalRule = reset( $operandsByOperator[ EqualRule::operator ] );
+
+            if (!empty($operandsByOperator[ NotEqualRule::operator ])) {
+                foreach ($operandsByOperator[ NotEqualRule::operator ] as $i => $not_equal_rule) {
+
+                    if ($equalRule->getValue() !== null) {
+                        if ($not_equal_rule->getValue() === null) // means if exists <=> equals something
+                            unset($operandsByOperator[ NotEqualRule::operator ][$i]);
+                        elseif ($not_equal_rule->getValue() != $equalRule->getValue())
+                            unset($operandsByOperator[ NotEqualRule::operator ][$i]);
                     }
-                }
-
-                if (!empty($operandsByOperator[ AboveRule::operator ])) {
-
-                    $aboveRule = reset($operandsByOperator[ AboveRule::operator ]);
-                    if ($equalRule->getValue() !== null && $aboveRule->getMinimum() < $equalRule->getValue())
-                        unset($operandsByOperator[ AboveRule::operator ]);
-                }
-
-                if (!empty($operandsByOperator[ BelowRule::operator ])) {
-
-                    $belowRule = reset($operandsByOperator[ BelowRule::operator ]);
-                    if ($equalRule->getValue() !== null && $belowRule->getMaximum() > $equalRule->getValue())
-                        unset($operandsByOperator[ BelowRule::operator ]);
-                }
-
-                if (!empty($operandsByOperator[ InRule::operator ])) {
-
-                    $possibilities = reset($operandsByOperator[ InRule::operator ])->getPossibilities();
-
-                    if (in_array($equalRule->getValue(), $possibilities)) {
-                        unset($operandsByOperator[ InRule::operator ]);
-                    }
-                    else {
-                        // We flush possibilities of the InRule
-                        // TODO Replace it by a FalseRule
-                        $operandsByOperator[ InRule::operator ][0]->setPossibilities([]);
-                        // and also remove the equal rule to shorten the reste of the simplification process
-                        unset($operandsByOperator[ EqualRule::operator ]);
-                    }
-                }
-
-                if (!empty($operandsByOperator[ NotInRule::operator ])) {
-
-                    $notInRule = reset($operandsByOperator[ NotInRule::operator ]);
-                    if (in_array($equalRule->getValue(), $notInRule->getPossibilities())) {
-                        // ['field', '=', 4] && ['field', '!in', [4]...] <=> false
-                        return [];
-                    }
-                    else {
-                        unset($operandsByOperator[ NotInRule::operator ]);
-                    }
-                    // $notInRule->dump(true);
-                }
-
-                if (!empty($operandsByOperator[ BelowOrEqualRule::operator ])) {
-
-                    $belowOrEqualRule = reset($operandsByOperator[ BelowOrEqualRule::operator ]);
-                    if ($equalRule->getValue() <= $belowOrEqualRule->getMaximum()) {
-                        unset($operandsByOperator[ BelowOrEqualRule::operator ]);
-                    }
-                    else {
-                        // ['field', '=', 4] && ['field', '<=', [3]...] <=> false
-                        return [];
+                    elseif ($equalRule->getValue() === null ) {
+                        if ($not_equal_rule->getValue() !== null)
+                            unset($operandsByOperator[ NotEqualRule::operator ][$i]);
+                        // else we let the "equal null" and the "not equal null" for the romeInvalidBranches step
                     }
                 }
             }
 
-            // NotEqualRule null comparisons
+            if (!empty($operandsByOperator[ AboveRule::operator ])) {
+
+                $aboveRule = reset($operandsByOperator[ AboveRule::operator ]);
+                if ($equalRule->getValue() !== null && $aboveRule->getMinimum() < $equalRule->getValue())
+                    unset($operandsByOperator[ AboveRule::operator ]);
+            }
+
+            if (!empty($operandsByOperator[ BelowRule::operator ])) {
+
+                $belowRule = reset($operandsByOperator[ BelowRule::operator ]);
+                if ($equalRule->getValue() !== null && $belowRule->getMaximum() > $equalRule->getValue())
+                    unset($operandsByOperator[ BelowRule::operator ]);
+            }
+
+            if (!empty($operandsByOperator[ InRule::operator ])) {
+
+                $possibilities = reset($operandsByOperator[ InRule::operator ])->getPossibilities();
+
+                if (in_array($equalRule->getValue(), $possibilities)) {
+                    unset($operandsByOperator[ InRule::operator ]);
+                }
+                else {
+                    // We flush possibilities of the InRule
+                    // TODO Replace it by a FalseRule
+                    $operandsByOperator[ InRule::operator ][0]->setPossibilities([]);
+                    // and also remove the equal rule to shorten the reste of the simplification process
+                    unset($operandsByOperator[ EqualRule::operator ]);
+                }
+            }
+
+            if (!empty($operandsByOperator[ NotInRule::operator ])) {
+
+                $notInRule = reset($operandsByOperator[ NotInRule::operator ]);
+                if (in_array($equalRule->getValue(), $notInRule->getPossibilities())) {
+                    // ['field', '=', 4] && ['field', '!in', [4]...] <=> false
+                    return [];
+                }
+                else {
+                    unset($operandsByOperator[ NotInRule::operator ]);
+                }
+                // $notInRule->dump(true);
+            }
+
+            if (!empty($operandsByOperator[ BelowOrEqualRule::operator ])) {
+
+                $belowOrEqualRule = reset($operandsByOperator[ BelowOrEqualRule::operator ]);
+                if ($equalRule->getValue() <= $belowOrEqualRule->getMaximum()) {
+                    unset($operandsByOperator[ BelowOrEqualRule::operator ]);
+                }
+                else {
+                    // ['field', '=', 4] && ['field', '<=', [3]...] <=> false
+                    return [];
+                }
+            }
+
+            if (!empty($operandsByOperator[ AboveOrEqualRule::operator ])) {
+
+                $aboveOrEqualRule = reset($operandsByOperator[ AboveOrEqualRule::operator ]);
+                if ($equalRule->getValue() >= $aboveOrEqualRule->getMinimum()) {
+                    unset($operandsByOperator[ AboveOrEqualRule::operator ]);
+                }
+                else {
+                    // ['field', '=', 4] && ['field', '<=', [3]...] <=> false
+                    return [];
+                }
+            }
+        }
+
+        // NotEqualRule null comparisons
+        if (!empty($operandsByOperator[ NotEqualRule::operator ])) {
             if (!empty($operandsByOperator[ NotEqualRule::operator ])) {
-                if (!empty($operandsByOperator[ NotEqualRule::operator ])) {
-                    foreach ($operandsByOperator[ NotEqualRule::operator ] as $i => $notEqualRule) {
+                foreach ($operandsByOperator[ NotEqualRule::operator ] as $i => $notEqualRule) {
 
-                        if ($notEqualRule->getValue() === null) {
-                            if (!empty($operandsByOperator[ AboveRule::operator ])) {
-                                unset($operandsByOperator[ NotEqualRule::operator ][$i]);
-                            }
-
-                            if (!empty($operandsByOperator[ BelowRule::operator ])) {
-                                unset($operandsByOperator[ NotEqualRule::operator ][$i]);
-                            }
-
-                            if (!empty($operandsByOperator[ EqualRule::operator ])) {
-                                if (reset($operandsByOperator[ EqualRule::operator ])->getValue() !== null)
-                                    unset($operandsByOperator[ NotEqualRule::operator ][$i]);
-                            }
-                        }
-                        else {
-                            if (!empty($operandsByOperator[ AboveRule::operator ])) {
-                                if ($operandsByOperator[ AboveRule::operator ][0]->getMinimum() >= $notEqualRule->getValue())
-                                    unset($operandsByOperator[ NotEqualRule::operator ][$i]);
-                            }
-
-                            if (!empty($operandsByOperator[ BelowRule::operator ])) {
-                                if ($operandsByOperator[ BelowRule::operator ][0]->getMaximum() <= $notEqualRule->getValue())
-                                    unset($operandsByOperator[ NotEqualRule::operator ][$i]);
-                            }
-                        }
-
-                        if (!empty($operandsByOperator[ NotInRule::operator ])) {
-                            $notInRule = reset($operandsByOperator[ NotInRule::operator ]);
-                            if (!in_array($notEqualRule->getValue(), $notInRule->getPossibilities())) {
-                                // TODO Replace it by a FalseRule
-                                $operandsByFields[ $field ][ NotInRule::operator ][0]->setPossibilities(
-                                    array_merge($notInRule->getPossibilities(), [$notEqualRule->getValue()])
-                                );
-                            }
-
+                    if ($notEqualRule->getValue() === null) {
+                        if (!empty($operandsByOperator[ AboveRule::operator ])) {
                             unset($operandsByOperator[ NotEqualRule::operator ][$i]);
                         }
 
-                        if (!empty($operandsByOperator[ InRule::operator ])) {
-                            $inRule = reset($operandsByOperator[ InRule::operator ]);
+                        if (!empty($operandsByOperator[ BelowRule::operator ])) {
+                            unset($operandsByOperator[ NotEqualRule::operator ][$i]);
+                        }
 
-                            $operandsByOperator[ InRule::operator ][0]->setPossibilities(
-                                array_diff($inRule->getPossibilities(), [$notEqualRule->getValue()])
-                            );
+                        if (!empty($operandsByOperator[ EqualRule::operator ])) {
+                            if (reset($operandsByOperator[ EqualRule::operator ])->getValue() !== null)
+                                unset($operandsByOperator[ NotEqualRule::operator ][$i]);
                         }
                     }
-                }
-            }
-
-            // Comparison between InRules and NotInRules
-            // This is an optimization to avoid NotIn explosion
-            if (!empty($operandsByOperator[ InRule::operator ])) {
-                $inRule = $operandsByOperator[ InRule::operator ][0];
-
-                if (!empty($operandsByOperator[ NotInRule::operator ])) {
-                    $notInRule = reset($operandsByOperator[ NotInRule::operator ]);
-                    $operandsByOperator[ InRule::operator ][0]->setPossibilities(
-                        array_diff( $inRule->getPossibilities(), $notInRule->getPossibilities())
-                    );
-                    unset($operandsByOperator[ NotInRule::operator ]);
-                }
-
-                if (!empty($operandsByOperator[ BelowRule::operator ])) {
-                    $upper_limit = reset($operandsByOperator[ BelowRule::operator ])->getMaximum();
-
-                    $operandsByOperator[ InRule::operator ][0]->setPossibilities(
-                        array_filter( $inRule->getPossibilities(), function ($possibility) use ($upper_limit) {
-                            return $possibility < $upper_limit;
-                        } )
-                    );
-
-                    unset($operandsByOperator[ BelowRule::operator ]);
-                }
-
-                if (!empty($operandsByOperator[ AboveRule::operator ])) {
-                    $lower_limit = reset($operandsByOperator[ AboveRule::operator ])->getMinimum();
-
-                    $operandsByOperator[ InRule::operator ][0]->setPossibilities(
-                        array_filter( $inRule->getPossibilities(), function ($possibility) use ($lower_limit) {
-                            return $possibility > $lower_limit;
-                        } )
-                    );
-
-                    unset($operandsByOperator[ AboveRule::operator ]);
-                }
-            }
-
-            // Comparison between NotInRules and > or <
-            if (!empty($operandsByOperator[ NotInRule::operator ])) {
-                $notInRule = $operandsByOperator[ NotInRule::operator ][0];
-
-                if (!empty($operandsByOperator[ BelowRule::operator ])) {
-                    $upper_limit = reset($operandsByOperator[ BelowRule::operator ])->getUpperLimit();
-
-                    $operandsByOperator[ NotInRule::operator ][0]->setPossibilities(
-                        array_filter( $notInRule->getPossibilities(), function ($possibility) use ($upper_limit) {
-                            return $possibility < $upper_limit;
-                        } )
-                    );
-                }
-
-                if (!empty($operandsByOperator[ AboveRule::operator ])) {
-                    $lower_limit = reset($operandsByOperator[ AboveRule::operator ])->getMinimum();
-
-                    $operandsByOperator[ NotInRule::operator ][0]->setPossibilities(
-                        array_filter( $notInRule->getPossibilities(), function ($possibility) use ($lower_limit) {
-                            return $possibility > $lower_limit;
-                        } )
-                    );
-                }
-            }
-
-            // Comparison between <= and > or <
-            if (!empty($operandsByOperator[ BelowOrEqualRule::operator ])) {
-                $belowOrEqualRule = $operandsByOperator[ BelowOrEqualRule::operator ][0];
-
-                if (!empty($operandsByOperator[ BelowRule::operator ])) {
-                    $upper_limit = reset($operandsByOperator[ BelowRule::operator ])->getUpperLimit();
-
-                    if ($belowOrEqualRule->getMaximum() >= $upper_limit) {
-                        // [field < 3] && [field <= 3]
-                        // [field < 3] && [field <= 4]
-                        unset($operandsByOperator[ BelowOrEqualRule::operator ][0]);
-                    }
                     else {
-                        // [field < 3] && [field <= 2]
-                        unset($operandsByOperator[ BelowRule::operator ][0]);
+                        if (!empty($operandsByOperator[ AboveRule::operator ])) {
+                            if ($operandsByOperator[ AboveRule::operator ][0]->getMinimum() >= $notEqualRule->getValue())
+                                unset($operandsByOperator[ NotEqualRule::operator ][$i]);
+                        }
+
+                        if (!empty($operandsByOperator[ BelowRule::operator ])) {
+                            if ($operandsByOperator[ BelowRule::operator ][0]->getMaximum() <= $notEqualRule->getValue())
+                                unset($operandsByOperator[ NotEqualRule::operator ][$i]);
+                        }
                     }
-                }
 
-                if (!empty($operandsByOperator[ AboveRule::operator ])) {
-                    $lower_limit = reset($operandsByOperator[ AboveRule::operator ])->getLowerLimit();
+                    if (!empty($operandsByOperator[ NotInRule::operator ])) {
+                        $notInRule = reset($operandsByOperator[ NotInRule::operator ]);
+                        if (!in_array($notEqualRule->getValue(), $notInRule->getPossibilities())) {
+                            // TODO Replace it by a FalseRule
+                            $operandsByOperator[ NotInRule::operator ][0]->setPossibilities(
+                                array_merge($notInRule->getPossibilities(), [$notEqualRule->getValue()])
+                            );
+                        }
 
-                    if ($belowOrEqualRule->getMaximum() <= $lower_limit) {
-                        // [field > 3] && [field <= 2] <=> false
-                        return [];
+                        unset($operandsByOperator[ NotEqualRule::operator ][$i]);
+                    }
+
+                    if (!empty($operandsByOperator[ InRule::operator ])) {
+                        $inRule = reset($operandsByOperator[ InRule::operator ]);
+
+                        $operandsByOperator[ InRule::operator ][0]->setPossibilities(
+                            array_diff($inRule->getPossibilities(), [$notEqualRule->getValue()])
+                        );
                     }
                 }
             }
         }
 
-        return $operandsByFields;
+        // Comparison between InRules and NotInRules
+        // This is an optimization to avoid NotIn explosion
+        if (!empty($operandsByOperator[ InRule::operator ])) {
+            $inRule = $operandsByOperator[ InRule::operator ][0];
+
+            if (!empty($operandsByOperator[ NotInRule::operator ])) {
+                $notInRule = reset($operandsByOperator[ NotInRule::operator ]);
+                $operandsByOperator[ InRule::operator ][0]->setPossibilities(
+                    array_diff( $inRule->getPossibilities(), $notInRule->getPossibilities())
+                );
+                unset($operandsByOperator[ NotInRule::operator ]);
+            }
+
+            if (!empty($operandsByOperator[ BelowRule::operator ])) {
+                $upper_limit = reset($operandsByOperator[ BelowRule::operator ])->getMaximum();
+
+                $operandsByOperator[ InRule::operator ][0]->setPossibilities(
+                    array_filter( $inRule->getPossibilities(), function ($possibility) use ($upper_limit) {
+                        return $possibility < $upper_limit;
+                    } )
+                );
+
+                unset($operandsByOperator[ BelowRule::operator ]);
+            }
+
+            if (!empty($operandsByOperator[ AboveRule::operator ])) {
+                $lower_limit = reset($operandsByOperator[ AboveRule::operator ])->getMinimum();
+
+                $operandsByOperator[ InRule::operator ][0]->setPossibilities(
+                    array_filter( $inRule->getPossibilities(), function ($possibility) use ($lower_limit) {
+                        return $possibility > $lower_limit;
+                    } )
+                );
+
+                unset($operandsByOperator[ AboveRule::operator ]);
+            }
+        }
+
+        // Comparison between NotInRules and > or <
+        if (!empty($operandsByOperator[ NotInRule::operator ])) {
+            $notInRule = $operandsByOperator[ NotInRule::operator ][0];
+
+            if (!empty($operandsByOperator[ BelowRule::operator ])) {
+                $upper_limit = reset($operandsByOperator[ BelowRule::operator ])->getUpperLimit();
+
+                $operandsByOperator[ NotInRule::operator ][0]->setPossibilities(
+                    array_filter( $notInRule->getPossibilities(), function ($possibility) use ($upper_limit) {
+                        return $possibility < $upper_limit;
+                    } )
+                );
+            }
+
+            if (!empty($operandsByOperator[ AboveRule::operator ])) {
+                $lower_limit = reset($operandsByOperator[ AboveRule::operator ])->getMinimum();
+
+                $operandsByOperator[ NotInRule::operator ][0]->setPossibilities(
+                    array_filter( $notInRule->getPossibilities(), function ($possibility) use ($lower_limit) {
+                        return $possibility > $lower_limit;
+                    } )
+                );
+            }
+        }
+
+        // Comparison between <= and > or <
+        if (!empty($operandsByOperator[ BelowOrEqualRule::operator ])) {
+            $belowOrEqualRule = $operandsByOperator[ BelowOrEqualRule::operator ][0];
+
+            if (!empty($operandsByOperator[ BelowRule::operator ])) {
+                $upper_limit = reset($operandsByOperator[ BelowRule::operator ])->getUpperLimit();
+
+                if ($belowOrEqualRule->getMaximum() >= $upper_limit) {
+                    // [field < 3] && [field <= 3]
+                    // [field < 3] && [field <= 4]
+                    unset($operandsByOperator[ BelowOrEqualRule::operator ][0]);
+                }
+                else {
+                    // [field < 3] && [field <= 2]
+                    unset($operandsByOperator[ BelowRule::operator ][0]);
+                }
+            }
+
+            if (!empty($operandsByOperator[ AboveRule::operator ])) {
+                $lower_limit = reset($operandsByOperator[ AboveRule::operator ])->getLowerLimit();
+
+                if ($belowOrEqualRule->getMaximum() <= $lower_limit) {
+                    // [field > 3] && [field <= 2] <=> false
+                    return [];
+                }
+            }
+
+            if (!empty($operandsByOperator[ AboveOrEqualRule::operator ])) {
+                $minimum = reset($operandsByOperator[ AboveOrEqualRule::operator ])->getMinimum();
+
+                if ($belowOrEqualRule->getMaximum() < $minimum) {
+                    // [field <= 3] && [field >= 4] <=> false
+                    return [];
+                }
+                elseif ($belowOrEqualRule->getMaximum() == $minimum) {
+                    // [field <= 3] && [field >= 3] <=> [field = 3]
+                    unset($operandsByOperator[ BelowOrEqualRule::operator ]);
+                    unset($operandsByOperator[ AboveOrEqualRule::operator ]);
+                    $operandsByOperator[ EqualRule::operator ][] = new EqualRule($field, $minimum);
+
+                    if (count($operandsByOperator[ EqualRule::operator ]) > 1) {
+                        $operandsByOperator = self::simplifyDifferentOperandsForField($field, $operandsByOperator);
+                    }
+                }
+            }
+        }
+
+        return $operandsByOperator;
     }
 
     /**

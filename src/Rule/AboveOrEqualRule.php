@@ -6,54 +6,118 @@ namespace JClaveau\LogicalFilter\Rule;
  */
 class AboveOrEqualRule extends OrRule
 {
+    use Trait_RuleWithField;
+
     /** @var string operator */
     const operator = '>=';
 
-    protected $lower_limit;
-    protected $field;
+    /** @var mixed minimum */
+    protected $minimum;
 
     /**
-     * @param string $field       The field to apply the rule on.
-     * @param array  $lower_limit The value the field can above to.
+     * @param string $field The field to apply the rule on.
+     * @param array  $value The value the field can below to.
      */
-    public function __construct( $field, $lower_limit )
+    public function __construct($field, $minimum, array $options=[])
     {
-        $this->field = $field;
-        $this->lower_limit = $lower_limit;
+        if (!empty($options)) {
+            $this->setOptions($options);
+        }
+
+        $this->field   = $field;
+        $this->minimum = $minimum;
     }
 
     /**
-     * @deprecated getLowerLimit
+     * @return mixed The minimum for the field of this rule
      */
     public function getMinimum()
     {
-        return $this->getLowerLimit();
+        return $this->minimum;
     }
 
     /**
-     * @deprecated getLowerLimit
+     * Defines the minimum of the current rule
+     *
+     * @param  mixed $minimum
+     * @return BelowOrEqualRule $this
      */
-    public function getLowerLimit()
+    public function setMinimum($minimum)
     {
-        return $this->lower_limit;
-    }
-
-    /**
-     */
-    public function getField()
-    {
-        return $this->field;
-    }
-
-    /**
-     * @return $this
-     */
-    public function setField($field)
-    {
-        if ($this->field != $field) {
-            $this->field = $field;
-            $this->flushCache();
+        if ($minimum === null) {
+            throw new \InvalidArgumentException(
+                "The minimum of a below or equal rule cannot be null"
+            );
         }
+
+        if ($this->minimum == $minimum)
+            return $this;
+
+        $this->minimum = $minimum;
+        $this->flushCache();
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNormalizationAllowed(array $contextual_options=[])
+    {
+        return $this->getOption('above_or_equal.normalization', $contextual_options);
+    }
+
+    /**
+     * @return array $operands
+     */
+    public function getOperands()
+    {
+        if (! empty($this->cache['operands'])) {
+            return $this->cache['operands'];
+        }
+
+        $operands = [
+            new AboveRule($this->field, $this->minimum),
+            new EqualRule($this->field, $this->minimum),
+        ];
+
+        return $this->cache['operands'] = $operands;
+    }
+
+    /**
+     * Set the minimum and the field of the current instance by giving
+     * an array of opereands as parameter.
+     *
+     * @param  array            $operands
+     * @return BelowOrEqualRule $this
+     */
+    public function setOperands(array $operands)
+    {
+        foreach ($operands as $operand) {
+            if ($operand instanceof EqualRule) {
+                $equalRuleField = $operand->getField();
+                $equalRuleValue = $operand->getValue();
+            }
+            elseif ($operand instanceof AboveRule) {
+                $aboveRuleField = $operand->getField();
+                $aboveRuleValue = $operand->getLowerLimit();
+            }
+        }
+
+        if (    count($operands) != 2
+            || !isset($equalRuleValue)
+            || !isset($aboveRuleValue)
+            || $aboveRuleValue != $equalRuleValue
+            || $aboveRuleField != $equalRuleField
+        ) {
+            throw new \InvalidArgumentException(
+                "Operands must be an array of two rules like (field > minimum || field = minimum) instead of:\n"
+                .var_export($operands, true)
+            );
+        }
+
+        $this->setMinimum($aboveRuleValue);
+        $this->setField($aboveRuleField);
 
         return $this;
     }
@@ -63,65 +127,11 @@ class AboveOrEqualRule extends OrRule
      */
     public function getValues()
     {
-        return $this->getLowerLimit();
+        return $this->getMinimum();
     }
 
     /**
-     * @return array
-     */
-    public function getOperands()
-    {
-        return [
-            new AboveRule($this->field, $this->lower_limit),
-            new EqualRule($this->field, $this->lower_limit),
-        ];
-    }
-
-    /**
-     * @param  array possibilities
-     *
-     * @return InRule $this
-     */
-    public function setOperands(array $operands)
-    {
-        $equal_value = null;
-        $above_value = null;
-
-        foreach ($operands as $operand) {
-            if ($operand instanceof EqualRule && $this->field == $operand->getField()) {
-                $equal_value = $operand->getValue();
-            }
-            elseif ($operand instanceof AboveRule && $this->field == $operand->getField()) {
-                $above_value = $operand->getMinimum();
-            }
-            else {
-                throw new \LogicException(
-                    "Setting invalid operand for $this: "
-                    .($operand instanceof AbstractRule ? $operand : var_export($operand, true))
-                );
-            }
-        }
-
-        if (!isset($equal_value) || !isset($above_value)) {
-            throw new \LogicException(
-                "Trying to set null values for $this"
-            );
-        }
-
-        if ($equal_value != $above_value) {
-            throw new \LogicException(
-                "Trying to set different values for $this: "
-                .var_export(['equal' => $equal_value, 'above' => $above_value], true)
-            );
-        }
-
-        $this->lower_limit = $equal_value;
-
-        return $this;
-    }
-
-    /**
-     * @param array $options   + show_instance=false Display the operator of the rule or its instance id
+     * @param array $options + show_instance=false Display the operator of the rule or its instance id
      *
      * @return array
      */
@@ -152,20 +162,12 @@ class AboveOrEqualRule extends OrRule
      */
     public function toString(array $options=[])
     {
-        try {
-            // if (!$this->changed)
-                // return $this->cache;
+        if (isset($this->cache['string']))
+            return $this->cache['string'];
 
-            // $this->changed = false;
+        $operator = self::operator;
 
-            $operator = self::operator;
-
-            // return $this->cache = "['{$this->getField()}', '$operator', stringified_possibilities]";
-            return "['{$this->getField()}', '$operator', " . var_export($this->getValues(), true). "]";
-        }
-        catch (\LogicException $e) {
-            return parent::toString();
-        }
+        return $this->cache['string'] = "['{$this->getField()}', '$operator', " . var_export($this->getValues(), true). "]";
     }
 
     /**/

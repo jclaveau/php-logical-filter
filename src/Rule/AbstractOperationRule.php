@@ -1,5 +1,6 @@
 <?php
 namespace JClaveau\LogicalFilter\Rule;
+use       JClaveau\VisibilityViolator;
 
 /**
  * Operation rules:
@@ -321,7 +322,17 @@ abstract class AbstractOperationRule extends AbstractRule
         $unifiedOperands = [];
         foreach ($operandsByFields as $field => $operandsByOperator) {
             foreach ($operandsByOperator as $operator => $operands) {
-                $unifiedOperands = array_merge($unifiedOperands, $operands);
+                try {
+                    $unifiedOperands = array_merge($unifiedOperands, $operands);
+                }
+                catch (\Exception $e) {
+                    VisibilityViolator::setHiddenProperty(
+                        $e, 'message',
+                        $e->getMessage() . "\n" . var_export($operandsByOperator, true)
+                    );
+
+                    throw $e;
+                }
             }
         }
 

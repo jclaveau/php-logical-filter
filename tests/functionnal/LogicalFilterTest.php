@@ -737,12 +737,21 @@ class LogicalFilterTest extends \AbstractTest
         );
 
         $this->assertEquals(
-            [
-                'or',
+            ['field_1', '>=', 2],
+            $filter
+                ->simplify()
+                ->toArray()
+        );
+
+        $this->assertEquals(
+            ['or',
                 ['field_1', '>', 2],
                 ['field_1', '=', 2],
             ],
-            $filter->simplify()->toArray()
+            $filter
+                ->simplify(['above_or_equal.normalization' => true])
+                // ->dump()
+                ->toArray()
         );
     }
 
@@ -1629,7 +1638,9 @@ array(3) {
                 ],
                 ['field_7', '=', 2],
             ],
-            $filter3->toArray()
+            $filter3
+                // ->dump()
+                ->toArray()
         );
     }
 

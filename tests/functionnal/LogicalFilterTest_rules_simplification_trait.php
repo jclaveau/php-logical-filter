@@ -1572,65 +1572,37 @@ trait LogicalFilterTest_rules_simplification_trait
         // This produced a bug due to comparisons between different fields
         // and missing unset
         $filter = (new LogicalFilter(
-            ["and",
-                [
-                    "A_type",
-                    "=",
-                    "INTERNE"
-                ],
-                [
-                    "A_id",
-                    ">",
-                    0
-                ],
-                [
-                    "A_id",
-                    ">",
-                    12
-                ],
-                [
-                    "A_id",
-                    ">=",
-                    100
-                ],
-                [
-                    "A_id",
-                    "<",
-                    2000
-                ],
-                [
-                    "A_id",
-                    "=",
-                    100
-                ],
-                [
-                    "date",
-                    "=",
-                    new \DateTime('2018-07-04')
-                ],
-                [
-                    "E",
-                    "=",
-                    "impression"
-                ],
+            ['and',
+                ['A_type', '=', 'INTERNE'],
+                ['A_id', '>', 0],
+                ['A_id', '>', 12],
+                ['A_id', '>=', 100],
+                ['A_id', '<=', 100],
+                ['A_id', '<', 2000],
+                ['A_id', '=', 100],
+                ['date', '=', \DateTime::__set_state(array(
+                   'date' => '2018-07-04 00:00:00.000000',
+                   'timezone_type' => 3,
+                   'timezone' => 'UTC',
+                ))],
+                ['E', '=', 'impression'],
             ]
         ))
+        // ->dump(true)
         ->simplify([
         ])
         // ->dump(true)
         ;
 
         $this->assertEquals(
-            ['or',
-                ['and',
-                    ['A_type', '=', 'INTERNE'],
-                    ['A_id', '=', 100],
-                    ['date', '=', new \DateTime('2018-07-04')],
-                    ['E', '=', 'impression'],
-                ],
+            ['and',
+                ['A_type', '=', 'INTERNE'],
+                ['A_id', '=', 100],
+                ['date', '=', new \DateTime('2018-07-04')],
+                ['E', '=', 'impression'],
             ],
             $filter
-                // ->dump(true)
+                // ->dump(!true)
                 ->toArray()
         );
     }

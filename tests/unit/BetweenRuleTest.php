@@ -77,13 +77,28 @@ class BetweenRuleTest extends \AbstractTest
         $this->assertEquals(
             ['or',
                 ['and',
+                    ['field_1', '>=', 1],
+                    ['field_1', '<', 2],
+                ],
+            ],
+            $filter
+                ->copy()
+                ->simplify()
+                // ->dump()
+                ->toArray()
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['and',
                     ["field_1", ">", 1],
                     ["field_1", "<", 2],
                 ],
                 ["field_1", "=", 1],
             ],
             $filter
-                ->simplify()
+                ->simplify(['above_or_equal.normalization' => true])
+                // ->dump()
                 ->toArray()
         );
 
@@ -142,11 +157,32 @@ class BetweenRuleTest extends \AbstractTest
                     ["field_1", ">", 1],
                     ["field_1", "<", 2],
                 ],
-                ["field_1", "=", 2],
                 ["field_1", "=", 1],
+                ["field_1", "=", 2],
             ],
             $filter
-                ->simplify(['below_or_equal.normalization' => true])
+                ->copy()
+                ->simplify([
+                    'below_or_equal.normalization' => true,
+                    'above_or_equal.normalization' => true,
+                ])
+                // ->dump()
+                ->toArray()
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ["field_1", ">=", 1],
+                    ["field_1", "<=", 2],
+                ],
+            ],
+            $filter
+                ->copy()
+                ->simplify([
+                    'below_or_equal.normalization' => false,
+                    'above_or_equal.normalization' => false,
+                ])
                 // ->dump()
                 ->toArray()
         );
