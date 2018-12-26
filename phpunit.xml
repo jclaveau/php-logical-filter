@@ -19,10 +19,9 @@
         </testsuite>
     </testsuites>
 
-
     <filter>
         <!-- /!\ whitelist will exclude every outside class from coverage -->
-        <whitelist>
+        <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src</directory>
 <!--
             <directory suffix=".php">./tests</directory>

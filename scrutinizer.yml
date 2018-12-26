@@ -1,0 +1,9 @@
+build:
+  nodes:
+    coverage:
+      tests:
+        override:
+          - command: ./phpunit
+            coverage:
+              file: clover.xml
+              format: clover
