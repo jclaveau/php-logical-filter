@@ -116,8 +116,8 @@ class BelowOrEqualRule extends OrRule
             );
         }
 
-        $this->maximum = $belowRuleValue;
-        $this->field   = $belowRuleField;
+        $this->setMaximum($belowRuleValue);
+        $this->setField($belowRuleField);
 
         return $this;
     }
