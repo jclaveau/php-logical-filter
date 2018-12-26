@@ -34,8 +34,16 @@ class AboveRule extends AbstractAtomicRule
     }
 
     /**
+     * @deprecated getLowerLimit
      */
     public function getMinimum()
+    {
+        return $this->minimum;
+    }
+
+    /**
+     */
+    public function getLowerLimit()
     {
         return $this->minimum;
     }

@@ -550,6 +550,18 @@ class AndRule extends AbstractOperationRule
                     }
                     // $notInRule->dump(true);
                 }
+
+                if (!empty($operandsByOperator[ BelowOrEqualRule::operator ])) {
+
+                    $belowOrEqualRule = reset($operandsByOperator[ BelowOrEqualRule::operator ]);
+                    if ($equalRule->getValue() <= $belowOrEqualRule->getMaximum()) {
+                        unset($operandsByOperator[ BelowOrEqualRule::operator ]);
+                    }
+                    else {
+                        // ['field', '=', 4] && ['field', '<=', [3]...] <=> false
+                        return [];
+                    }
+                }
             }
 
             // NotEqualRule null comparisons
@@ -649,7 +661,7 @@ class AndRule extends AbstractOperationRule
                 $notInRule = $operandsByOperator[ NotInRule::operator ][0];
 
                 if (!empty($operandsByOperator[ BelowRule::operator ])) {
-                    $upper_limit = reset($operandsByOperator[ BelowRule::operator ])->getMaximum();
+                    $upper_limit = reset($operandsByOperator[ BelowRule::operator ])->getUpperLimit();
 
                     $operandsByOperator[ NotInRule::operator ][0]->setPossibilities(
                         array_filter( $notInRule->getPossibilities(), function ($possibility) use ($upper_limit) {
@@ -666,6 +678,34 @@ class AndRule extends AbstractOperationRule
                             return $possibility > $lower_limit;
                         } )
                     );
+                }
+            }
+
+            // Comparison between <= and > or <
+            if (!empty($operandsByOperator[ BelowOrEqualRule::operator ])) {
+                $belowOrEqualRule = $operandsByOperator[ BelowOrEqualRule::operator ][0];
+
+                if (!empty($operandsByOperator[ BelowRule::operator ])) {
+                    $upper_limit = reset($operandsByOperator[ BelowRule::operator ])->getUpperLimit();
+
+                    if ($belowOrEqualRule->getMaximum() >= $upper_limit) {
+                        // [field < 3] && [field <= 3]
+                        // [field < 3] && [field <= 4]
+                        unset($operandsByOperator[ BelowOrEqualRule::operator ][0]);
+                    }
+                    else {
+                        // [field < 3] && [field <= 2]
+                        unset($operandsByOperator[ BelowRule::operator ][0]);
+                    }
+                }
+
+                if (!empty($operandsByOperator[ AboveRule::operator ])) {
+                    $lower_limit = reset($operandsByOperator[ AboveRule::operator ])->getLowerLimit();
+
+                    if ($belowOrEqualRule->getMaximum() <= $lower_limit) {
+                        // [field > 3] && [field <= 2] <=> false
+                        return [];
+                    }
                 }
             }
         }

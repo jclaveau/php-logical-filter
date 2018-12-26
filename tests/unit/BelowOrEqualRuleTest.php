@@ -12,9 +12,9 @@ class BelowOrEqualRuleTest extends \AbstractTest
         $rule = new BelowOrEqualRule('field', 4);
         $operands = $rule->getOperands();
         $operands[0] = new BelowRule('field_2', 3);
-        $rule->setOperands($operands);
 
         try {
+            $rule->setOperands($operands);
             $this->assertFalse( $rule->getMaximum() );
             $this->assertTrue(
                 false,
@@ -26,23 +26,8 @@ class BelowOrEqualRuleTest extends \AbstractTest
             $this->assertTrue(true, "Exception thrown: ".$e->getMessage());
         }
 
-        try {
-            $this->assertFalse( $rule->getField() );
-            $this->assertTrue(
-                false,
-                "An exception explaining that the two operands do not target "
-                ." the same field"
-            );
-        }
-        catch (\Exception $e) {
-            $this->assertTrue(true, "Exception thrown: ".$e->getMessage());
-        }
-
         $this->assertEquals(
-            ['or',
-                ['field_2', '<', 3],
-                ['field', '=', 4],
-            ],
+            ['field', '<=', 4],
             $rule
                 // ->dump()
                 ->toArray()

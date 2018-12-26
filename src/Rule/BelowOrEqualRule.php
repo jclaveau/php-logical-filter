@@ -6,55 +6,120 @@ namespace JClaveau\LogicalFilter\Rule;
  */
 class BelowOrEqualRule extends OrRule
 {
+    use Trait_RuleWithField;
+
     /** @var string operator */
     const operator = '<=';
+
+    /** @var mixed maximum */
+    protected $maximum;
 
     /**
      * @param string $field The field to apply the rule on.
      * @param array  $value The value the field can below to.
      */
-    public function __construct( $field, $maximum )
+    public function __construct($field, $maximum, array $options=[])
     {
-        $this->operands[] = new BelowRule($field, $maximum);
-        $this->operands[] = new EqualRule($field, $maximum);
+        if (!empty($options)) {
+            $this->setOptions($options);
+        }
+
+        $this->field   = $field;
+        $this->maximum = $maximum;
     }
 
     /**
+     * @return mixed The maximum for the field of this rule
      */
     public function getMaximum()
     {
-        $maximum = $this->getOperandAt(0)->getMaximum();
-        $value   = $this->getOperandAt(1)->getValue();
-
-        if ($value != $maximum) {
-            throw new \RuntimeException(
-                "The value of the EqualRule (".var_export($value, true).") "
-                ."and the minimum of the AboveRule (".var_export($maximum, true).") "
-                ."of an ". __CLASS__ ." do not match anymore"
-            );
-        }
-
-        return $maximum;
+        return $this->maximum;
     }
 
     /**
+     * Defines the maximum of the current rule
+     *
+     * @param  mixed $maximum
+     * @return BelowOrEqualRule $this
      */
-    public function getField()
+    public function setMaximum($maximum)
     {
-        $maximumField = $this->getOperandAt(0)->getField();
-        $valueField   = $this->getOperandAt(1)->getField();
-
-        if ($maximumField != $valueField) {
-            // TODO if this case occures, the current object should be
-            // replaced by a simple OrRule
-            throw new \RuntimeException(
-                "The field of the EqualRule (".var_export($valueField, true).") "
-                ."and the field of the AboveRule (".var_export($maximumField, true).") "
-                ."of an ". __CLASS__ ." do not match anymore"
+        if ($maximum === null) {
+            throw new \InvalidArgumentException(
+                "The maximum of a below or equal rule cannot be null"
             );
         }
 
-        return $maximumField;
+        if ($this->maximum == $maximum)
+            return $this;
+
+        $this->maximum = $maximum;
+        $this->flushCache();
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNormalizationAllowed(array $contextual_options=[])
+    {
+        return $this->getOption('below_or_equal.normalization', $contextual_options);
+    }
+
+    /**
+     * @return array $operands
+     */
+    public function getOperands()
+    {
+        if (! empty($this->cache['operands'])) {
+            return $this->cache['operands'];
+        }
+
+        $operands = [
+            new BelowRule($this->field, $this->maximum),
+            new EqualRule($this->field, $this->maximum),
+        ];
+
+        return $this->cache['operands'] = $operands;
+    }
+
+    /**
+     * Set the maximum and the field of the current instance by giving
+     * an array of opereands as parameter.
+     *
+     * @param  array            $operands
+     * @return BelowOrEqualRule $this
+     */
+    public function setOperands(array $operands)
+    {
+        foreach ($operands as $operand) {
+            if ($operand instanceof EqualRule) {
+                $equalRuleField = $operand->getField();
+                $equalRuleValue = $operand->getValue();
+            }
+            elseif ($operand instanceof BelowRule) {
+                $belowRuleField = $operand->getField();
+                $belowRuleValue = $operand->getUpperLimit();
+            }
+        }
+
+        if (    count($operands) != 2
+            || !isset($equalRuleValue)
+            || !isset($belowRuleValue)
+            || $belowRuleValue != $equalRuleValue
+            || $belowRuleField != $equalRuleField
+        ) {
+            throw new \InvalidArgumentException(
+                "Operands must be an array of two rules like (field < maximum || field = maximum) instead of:\n"
+                .var_export($operands, true)
+            );
+        }
+
+        $this->maximum = $belowRuleValue;
+        $this->field   = $belowRuleField;
+
+        return $this;
     }
 
     /**
@@ -66,7 +131,7 @@ class BelowOrEqualRule extends OrRule
     }
 
     /**
-     * @param array $options   + show_instance=false Display the operator of the rule or its instance id
+     * @param array $options + show_instance=false Display the operator of the rule or its instance id
      *
      * @return array
      */
@@ -97,20 +162,12 @@ class BelowOrEqualRule extends OrRule
      */
     public function toString(array $options=[])
     {
-        try {
-            // if (!$this->changed)
-                // return $this->cache;
+        if (isset($this->cache['string']))
+            return $this->cache['string'];
 
-            // $this->changed = false;
+        $operator = self::operator;
 
-            $operator = self::operator;
-
-            // return $this->cache = "['{$this->getField()}', '$operator', stringified_possibilities]";
-            return "['{$this->getField()}', '$operator', " . var_export($this->getValues(), true). "]";
-        }
-        catch (\LogicException $e) {
-            return parent::toString();
-        }
+        return $this->cache['string'] = "['{$this->getField()}', '$operator', " . var_export($this->getValues(), true). "]";
     }
 
     /**/

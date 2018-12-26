@@ -104,7 +104,27 @@ class BetweenRuleTest extends \AbstractTest
                 ["field_1", "=", 2],
             ],
             $filter
-                ->simplify()
+                ->simplify(['below_or_equal.normalization' => true])
+                ->toArray()
+        );
+
+        // between or equal upper limit
+        $filter = (new LogicalFilter(["field_1", "><=", [1, 2]]));
+
+        $this->assertEquals(
+            ["field_1", "><=", [1, 2]],
+            $filter->toArray()
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ['field_1', '>', 1],
+                    ['field_1', '<=', 2],
+                ],
+            ],
+            $filter
+                ->simplify(['below_or_equal.normalization' => false])
                 ->toArray()
         );
 
@@ -126,7 +146,7 @@ class BetweenRuleTest extends \AbstractTest
                 ["field_1", "=", 1],
             ],
             $filter
-                ->simplify()
+                ->simplify(['below_or_equal.normalization' => true])
                 // ->dump()
                 ->toArray()
         );

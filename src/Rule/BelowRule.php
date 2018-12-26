@@ -53,8 +53,16 @@ class BelowRule extends AbstractAtomicRule
     }
 
     /**
+     * @deprecated getUpperLimit
      */
     public function getMaximum()
+    {
+        return $this->maximum;
+    }
+
+    /**
+     */
+    public function getUpperLimit()
     {
         return $this->maximum;
     }
