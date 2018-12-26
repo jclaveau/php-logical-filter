@@ -551,6 +551,12 @@ class LogicalFilterTest extends \AbstractTest
                     ],
                 ],
                 ['field_5', 'in', ['a', 'b', 'c']],
+                ['field_6', '>=', 'a'],
+                ['field_7', '<=', 'a'],
+                ['field_8', '><', ['a', 'Z']],
+                ['field_8', '=><', ['a', 'Z']],
+                ['field_8', '=><=', ['a', 'Z']],
+                ['field_8', '><=', ['a', 'Z']],
             ]
         );
 
@@ -567,6 +573,12 @@ class LogicalFilterTest extends \AbstractTest
                     ],
                 ],
                 ['field_five', 'in', ['a', 'b', 'c']],
+                ['field_6', '>=', 'a'],
+                ['field_7', '<=', 'a'],
+                ['field_8', '><', ['a', 'Z']],
+                ['field_8', '=><', ['a', 'Z']],
+                ['field_8', '=><=', ['a', 'Z']],
+                ['field_8', '><=', ['a', 'Z']],
             ],
             $filter
                 ->copy()
@@ -591,13 +603,19 @@ class LogicalFilterTest extends \AbstractTest
                     ],
                 ],
                 ['property_5', 'in', ['a', 'b', 'c']],
+                ['property_6', '>=', 'a'],
+                ['property_7', '<=', 'a'],
+                ['property_8', '><', ['a', 'Z']],
+                ['property_8', '=><', ['a', 'Z']],
+                ['property_8', '=><=', ['a', 'Z']],
+                ['property_8', '><=', ['a', 'Z']],
             ],
             $filter
                 ->copy()
                 ->renameFields(function($field) {
                     return str_replace('field_', 'property_', $field);
                 })
-                // ->dump(true)
+                // ->dump(!true)
                 ->toArray()
         );
 
