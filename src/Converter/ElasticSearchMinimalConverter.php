@@ -87,7 +87,7 @@ class ElasticSearchMinimalConverter extends MinimalConverter
             $new_rule = [
                 'range' => [
                     $field => [
-                        'lt' => $operand->getMaximum()
+                        'lt' => $operand->getUpperLimit()
                     ],
                 ]
             ];
@@ -96,7 +96,25 @@ class ElasticSearchMinimalConverter extends MinimalConverter
             $new_rule = [
                 'range' => [
                     $field => [
-                        'gt' => $operand->getMinimum()
+                        'gt' => $operand->getLowerLimit()
+                    ],
+                ]
+            ];
+        }
+        elseif ($operator == '<=') {
+            $new_rule = [
+                'range' => [
+                    $field => [
+                        'lte' => $operand->getMaximum()
+                    ],
+                ]
+            ];
+        }
+        elseif ($operator == '>=') {
+            $new_rule = [
+                'range' => [
+                    $field => [
+                        'gte' => $operand->getMinimum()
                     ],
                 ]
             ];
