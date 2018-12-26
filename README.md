@@ -76,3 +76,4 @@ Related
 + https://github.com/keboola/php-filter
 + https://github.com/hollodotme/FluidValidator (intersesting validators by type)
 + https://github.com/Respect/Validation (most popular?)
++ https://packagist.org/packages/kuria/options (same purpose?)
