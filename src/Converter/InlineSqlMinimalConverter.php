@@ -14,6 +14,8 @@ use       JClaveau\LogicalFilter\Rule\BelowRule;
 use       JClaveau\LogicalFilter\Rule\RegexpRule;
 use       JClaveau\LogicalFilter\Rule\InRule;
 use       JClaveau\LogicalFilter\Rule\NotInRule;
+use       JClaveau\LogicalFilter\Rule\AboveOrEqualRule;
+use       JClaveau\LogicalFilter\Rule\BelowOrEqualRule;
 
 /**
  * This class implements a converter for MySQL.
@@ -91,9 +93,15 @@ class InlineSqlMinimalConverter extends MinimalConverter
             $value = $rule->getPossibilities();
         }
         elseif ($rule instanceof AboveRule) {
-            $value = $rule->getMinimum();
+            $value = $rule->getLowerLimit();
         }
         elseif ($rule instanceof BelowRule) {
+            $value = $rule->getUpperLimit();
+        }
+        elseif ($rule instanceof AboveOrEqualRule) {
+            $value = $rule->getMinimum();
+        }
+        elseif ($rule instanceof BelowOrEqualRule) {
             $value = $rule->getMaximum();
         }
         elseif ($rule instanceof NotEqualRule) {
