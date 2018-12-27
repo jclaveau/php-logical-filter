@@ -2093,5 +2093,32 @@ trait LogicalFilterTest_rules_simplification_trait
         );
     }
 
+    /**
+     */
+    public function test_bug_inprod()
+    {
+        $filter = (new LogicalFilter(
+            ['and',
+                ['campaign_id', 'in', ['1353']],
+                ['not',
+                    ['or',
+                        ['campaign_id', 'in', [1352, 1353]],
+                        ['adserver_id', 'in', [100921, 100923]],
+                    ],
+                ],
+            ]
+        ))
+        // ->dump()
+        ;
+
+        $this->assertEquals(
+            ['and'],
+            $filter
+                ->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
     /**/
 }

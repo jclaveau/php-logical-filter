@@ -483,6 +483,11 @@ class AndRule extends AbstractOperationRule
             }
 
             $operandsByOperator = self::simplifyDifferentOperandsForField($field, $operandsByOperator);
+            // If tyhere is no more operands for a given field it means there
+            // is no possible solutions for it so all the current and_case
+            // is invalidated.
+            if (! $operandsByOperator)
+                return [];
         }
 
         return $operandsByFields;
