@@ -3,7 +3,8 @@ build:
     coverage:
       tests:
         override:
-          - command: ./phpunit --no-coverage
+#          - command: ./phpunit --no-coverage
+          - command: ./phpunit
             coverage:
               file: clover.xml
               format: clover
