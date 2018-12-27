@@ -87,10 +87,16 @@ class InlineSqlMinimalConverter extends MinimalConverter
         }
         elseif ($rule instanceof InRule) {
             $value = $rule->getPossibilities();
+            if (is_object($value) && method_exists('toArray', $value)) {
+                $value = $value->toArray();
+            }
         }
         elseif ($rule instanceof NotInRule) {
             $operator = 'NOT IN';
             $value = $rule->getPossibilities();
+            if (is_object($value) && method_exists('toArray', $value)) {
+                $value = $value->toArray();
+            }
         }
         elseif ($rule instanceof AboveRule) {
             $value = $rule->getLowerLimit();
