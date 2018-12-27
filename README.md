@@ -1,78 +1,68 @@
-# WIP: php-logical-filter
+# php-logical-filter
 This class provides a way to define complex filters freely and the tools to handle them easily.
+This is a POK that opens a lot of questions on how to use them and how to refactor all its core. Meanwhile, the public api gets more and more robust!
 
-This is still a prototype even if some core features are working (mainly rules contradiction checking).
-
-Quality
---------------
+## Quality
 [![Build Status](https://travis-ci.org/jclaveau/php-logical-filter.png?branch=master)](https://travis-ci.org/jclaveau/php-logical-filter)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/jclaveau/php-logical-filter/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/jclaveau/php-logical-filter/?branch=master)
 [![codecov](https://codecov.io/gh/jclaveau/php-logical-filter/branch/master/graph/badge.svg)](https://codecov.io/gh/jclaveau/php-logical-filter)
-[![Maintainability](https://api.codeclimate.com/v1/badges/eb85279bcfb224b7af1c/maintainability)](https://codeclimate.com/github/jclaveau/php-logical-filter/maintainability)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/jclaveau/php-logical-filter/issues)
 [![Viewed](http://hits.dwyl.com/jclaveau/php-logical-filter.svg)](http://hits.dwyl.com/jclaveau/php-logical-filter)
 
+## Installation
 
-Basic rules that cannot be reduced in simpler rules
-+ =
-+ >
-+ <
-+ null
-+ !null
-+ function (regex or custom function returning a bool)
+php-logical-filter will be available on composer once the public api will be stabilized by the implementation of True and False rules.
+The 0.9.x version is available by cloning this repository:
 
-Operation rules
-+ ||
-+ &&
-+ !
+```
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/jclaveau/php-logical-filter"
+            "no-api": true
+        }
+    ],
+    "require": {
+        "jclaveau/php-logical-filter": "0.9.*",
+    }
+}
+```
 
-Composite rules
-+ in
-+ >=
-+ <=
-+ !=
-+ between
+## Usage
 
------------------------------------
-Considering v a parameter, "a" and "b" two atomics rules, "A" and "B" two composite rules
+All the usages are gathered in tests/functionnal but the really essential usage is probably this one:
+```php
+$array = [
+    [
+        'field_1' => 8,
+        'field_2' => 3,
+    ],
+    [
+        'field_1' => 12,
+        'field_2' => 4,  // not matching field
+    ],
+];
+
+$filtered_array = array_filter( $array, new LogicalFilter(
+    ['field_2', '!=', 4]
+));
+
+// $filtered_array =>
+//     [
+//         [
+//             'field_1' => 8,
+//             'field_2' => 3,
+//         ],
+//     ],
+
+```
+
+A lot more to come :)
 
 
------------------------------------
-Simplification
-+ ! to leafs, then remove !
- - ! (v >  a) : v <= a : (v < a || a = v)
- - ! (v <  a) : v >= a : (v > a || a = v)
- - ! (  !  a) : a
- - ! (v =  a) : (v < a) || (v > a)
- - ! (B && A) : (!B && A) || (B && !A) || (!B && !A)
- - ! (B || A) : !B && !A
+## Related
 
-+ or to root
- - simplify the or root
-
-+ combine same atomics rules to get one of each max
- - combine every atomic rule of the same kind
-
-+ or to leafs
-
------------------------------------
-Aliases
-+ between : < and >
-+ outside : > and <
-+ in      : and (=, =, =) <=> in
-+         : > or <
-+
-
------------------------------------
-Non optimized filter contains a rule-tree which is a AndRule. Each operand
-of it is named by the user as "a set of rules to apply on some property".
-
-+ This is the equivalent of the "adformat" rule of Vuble
-
-+ Create a namable ruleSet that
-+ every rule must be namable
-+ operation operands have to be namable?
-
-Related
 + https://github.com/keboola/php-filter
 + https://github.com/hollodotme/FluidValidator (intersesting validators by type)
 + https://github.com/Respect/Validation (most popular?)
