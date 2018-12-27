@@ -2094,16 +2094,18 @@ trait LogicalFilterTest_rules_simplification_trait
     }
 
     /**
+     * Checks that when a rule is invalidated for a given field (c_id),
+     * all the "and_case" is invalidated (a_id rules too)
      */
-    public function test_bug_inprod()
+    public function test_invalidation_of_a_field_discards_all_the_case()
     {
         $filter = (new LogicalFilter(
             ['and',
-                ['campaign_id', 'in', ['1353']],
+                ['c_id', 'in', ['1353']],
                 ['not',
                     ['or',
-                        ['campaign_id', 'in', [1352, 1353]],
-                        ['adserver_id', 'in', [100921, 100923]],
+                        ['c_id', 'in', [1352, 1353]],
+                        ['a_id', 'in', [100921, 100923]],
                     ],
                 ],
             ]
