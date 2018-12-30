@@ -265,7 +265,7 @@ class AndRule extends AbstractOperationRule
                 }
 
                 if (   ! empty($operandsByOperator[ BelowRule::operator ])
-                    && $equalRule->getValue() >= reset($operandsByOperator[ BelowRule::operator ])->getMaximum()
+                    && $equalRule->getValue() >= reset($operandsByOperator[ BelowRule::operator ])->getUpperLimit()
                 ) {
                     $this->operands = [];
                     return $this;
@@ -279,7 +279,7 @@ class AndRule extends AbstractOperationRule
                 }
 
                 if (   ! empty($operandsByOperator[ AboveRule::operator ])
-                    && $equalRule->getValue() <= reset($operandsByOperator[ AboveRule::operator ])->getMinimum()
+                    && $equalRule->getValue() <= reset($operandsByOperator[ AboveRule::operator ])->getLowerLimit()
                 ) {
                     $this->operands = [];
                     return $this;
@@ -305,7 +305,7 @@ class AndRule extends AbstractOperationRule
                 $aboveRule = reset($operandsByOperator[ AboveRule::operator ]);
                 $belowRule = reset($operandsByOperator[ BelowRule::operator ]);
 
-                if ($belowRule->getMaximum() <= $aboveRule->getMinimum()) {
+                if ($belowRule->getUpperLimit() <= $aboveRule->getLowerLimit()) {
                     $this->operands = [];
                     return $this;
                 }
@@ -357,15 +357,15 @@ class AndRule extends AbstractOperationRule
                 try {
                     if (AboveRule::operator == $operator) {
                         usort($operands, function( AboveRule $a, AboveRule $b ) {
-                            if (null === $a->getMinimum()) {
+                            if (null === $a->getLowerLimit()) {
                                 return 1;
                             }
 
-                            if (null === $b->getMinimum()) {
+                            if (null === $b->getLowerLimit()) {
                                 return -1;
                             }
 
-                            if ($a->getMinimum() > $b->getMinimum()) {
+                            if ($a->getLowerLimit() > $b->getLowerLimit()) {
                                 return -1;
                             }
 
@@ -375,15 +375,15 @@ class AndRule extends AbstractOperationRule
                     }
                     elseif (BelowRule::operator == $operator) {
                         usort($operands, function( BelowRule $a, BelowRule $b ) {
-                            if (null === $a->getMaximum()) {
+                            if (null === $a->getUpperLimit()) {
                                 return 1;
                             }
 
-                            if (null === $b->getMaximum()) {
+                            if (null === $b->getUpperLimit()) {
                                 return -1;
                             }
 
-                            if ($a->getMaximum() < $b->getMaximum()) {
+                            if ($a->getUpperLimit() < $b->getUpperLimit()) {
                                 return -1;
                             }
 
@@ -541,14 +541,14 @@ class AndRule extends AbstractOperationRule
 
             if ( ! empty($operandsByOperator[ AboveRule::operator ])) {
                 $aboveRule = reset($operandsByOperator[ AboveRule::operator ]);
-                if (null !== $equalRule->getValue() && $aboveRule->getMinimum() < $equalRule->getValue()) {
+                if (null !== $equalRule->getValue() && $aboveRule->getLowerLimit() < $equalRule->getValue()) {
                     unset($operandsByOperator[ AboveRule::operator ]);
                 }
             }
 
             if ( ! empty($operandsByOperator[ BelowRule::operator ])) {
                 $belowRule = reset($operandsByOperator[ BelowRule::operator ]);
-                if (null !== $equalRule->getValue() && $belowRule->getMaximum() > $equalRule->getValue()) {
+                if (null !== $equalRule->getValue() && $belowRule->getUpperLimit() > $equalRule->getValue()) {
                     unset($operandsByOperator[ BelowRule::operator ]);
                 }
             }
@@ -624,13 +624,13 @@ class AndRule extends AbstractOperationRule
                     }
                     else {
                         if ( ! empty($operandsByOperator[ AboveRule::operator ])) {
-                            if ($operandsByOperator[ AboveRule::operator ][0]->getMinimum() >= $notEqualRule->getValue()) {
+                            if ($operandsByOperator[ AboveRule::operator ][0]->getLowerLimit() >= $notEqualRule->getValue()) {
                                 unset($operandsByOperator[ NotEqualRule::operator ][$i]);
                             }
                         }
 
                         if ( ! empty($operandsByOperator[ BelowRule::operator ])) {
-                            if ($operandsByOperator[ BelowRule::operator ][0]->getMaximum() <= $notEqualRule->getValue()) {
+                            if ($operandsByOperator[ BelowRule::operator ][0]->getUpperLimit() <= $notEqualRule->getValue()) {
                                 unset($operandsByOperator[ NotEqualRule::operator ][$i]);
                             }
                         }
@@ -673,7 +673,7 @@ class AndRule extends AbstractOperationRule
             }
 
             if ( ! empty($operandsByOperator[ BelowRule::operator ])) {
-                $upper_limit = reset($operandsByOperator[ BelowRule::operator ])->getMaximum();
+                $upper_limit = reset($operandsByOperator[ BelowRule::operator ])->getUpperLimit();
 
                 $operandsByOperator[ InRule::operator ][0]->setPossibilities(
                     array_filter( $inRule->getPossibilities(), function ($possibility) use ($upper_limit) {
@@ -685,7 +685,7 @@ class AndRule extends AbstractOperationRule
             }
 
             if ( ! empty($operandsByOperator[ AboveRule::operator ])) {
-                $lower_limit = reset($operandsByOperator[ AboveRule::operator ])->getMinimum();
+                $lower_limit = reset($operandsByOperator[ AboveRule::operator ])->getLowerLimit();
 
                 $operandsByOperator[ InRule::operator ][0]->setPossibilities(
                     array_filter( $inRule->getPossibilities(), function ($possibility) use ($lower_limit) {
@@ -712,7 +712,7 @@ class AndRule extends AbstractOperationRule
             }
 
             if ( ! empty($operandsByOperator[ AboveRule::operator ])) {
-                $lower_limit = reset($operandsByOperator[ AboveRule::operator ])->getMinimum();
+                $lower_limit = reset($operandsByOperator[ AboveRule::operator ])->getLowerLimit();
 
                 $operandsByOperator[ NotInRule::operator ][0]->setPossibilities(
                     array_filter( $notInRule->getPossibilities(), function ($possibility) use ($lower_limit) {
