@@ -53,44 +53,41 @@ class NotRule extends AbstractOperationRule
 
         if (method_exists($operand, 'getField')) {
             $field = $operand->getField();
-        }
 
-        if ($operand instanceof AboveRule) {
-            $new_rule = new OrRule([
-                new BelowRule($field, $operand->getMinimum()),
-                new EqualRule($field, $operand->getMinimum()),
-            ]);
-        }
-        elseif ($operand instanceof BelowRule) {
-            // ! (v >  a) : v <= a : (v < a || a = v)
-            $new_rule = new OrRule([
-                new AboveRule($field, $operand->getMaximum()),
-                new EqualRule($field, $operand->getMaximum()),
-            ]);
-        }
-        elseif ($operand instanceof NotRule) {
-            // ! (  !  a) : a
-            $new_rule = $operand->getOperandAt(0);
-        }
-        elseif ($operand instanceof EqualRule && null === $operand->getValue()) {
-            $new_rule = new NotEqualRule($field, null);
-        }
-        elseif ($operand instanceof EqualRule) {
-            // ! (v =  a) : (v < a) || (v > a)
-            if ($this->getOption('not_equal.normalization', $current_simplification_options)) {
+            if ($operand instanceof AboveRule) {
                 $new_rule = new OrRule([
-                    new AboveRule($field, $operand->getValue()),
-                    new BelowRule($field, $operand->getValue()),
+                    new BelowRule($field, $operand->getMinimum()),
+                    new EqualRule($field, $operand->getMinimum()),
                 ]);
             }
-            else {
-                $new_rule = new NotEqualRule( $field, $operand->getValue() );
+            elseif ($operand instanceof BelowRule) {
+                // ! (v >  a) : v <= a : (v < a || a = v)
+                $new_rule = new OrRule([
+                    new AboveRule($field, $operand->getMaximum()),
+                    new EqualRule($field, $operand->getMaximum()),
+                ]);
+            }
+            elseif ($operand instanceof EqualRule && null === $operand->getValue()) {
+                $new_rule = new NotEqualRule($field, null);
+            }
+            elseif ($operand instanceof EqualRule) {
+                // ! (v =  a) : (v < a) || (v > a)
+                if ($this->getOption('not_equal.normalization', $current_simplification_options)) {
+                    $new_rule = new OrRule([
+                        new AboveRule($field, $operand->getValue()),
+                        new BelowRule($field, $operand->getValue()),
+                    ]);
+                }
+                else {
+                    $new_rule = new NotEqualRule( $field, $operand->getValue() );
+                }
+            }
+            elseif ($operand instanceof NotEqualRule) {
+                $new_rule = new EqualRule( $field, $operand->getValue() );
             }
         }
-        elseif ($operand instanceof NotEqualRule) {
-            $new_rule = new EqualRule( $field, $operand->getValue() );
-        }
-        elseif ($operand instanceof AndRule) {
+
+        if ($operand instanceof AndRule) {
             // @see https://github.com/jclaveau/php-logical-filter/issues/40
             // ! (B && A) : (!B && A) || (B && !A) || (!B && !A)
             // ! (A && B && C) :
@@ -166,7 +163,12 @@ class NotRule extends AbstractOperationRule
             }
             // $new_rule->dump(!true);
         }
-        else {
+        elseif ($operand instanceof NotRule) {
+            // ! (  !  a) : a
+            $new_rule = $operand->getOperandAt(0);
+        }
+
+        if ( ! isset($new_rule)) {
             throw new \LogicException(
                 'Removing NotRule(' . var_export($operand, true) . ') '
                 . ' not implemented'
