@@ -79,8 +79,8 @@ class NotInRule extends NotRule
     public function setPossibilities($possibilities)
     {
         if (    is_object($possibilities)
-            &&  $possibilities instanceof \IteratorAggregate
-            &&  method_exists($possibilities, 'toArray')
+            && $possibilities instanceof \IteratorAggregate
+            && method_exists($possibilities, 'toArray')
         ) {
             $possibilities = $possibilities->toArray();
         }

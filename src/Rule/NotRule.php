@@ -100,10 +100,10 @@ class NotRule extends AbstractOperationRule
             // || (A && B && !C) || (!A && B && !C) || (A && !B && !C)
 
             // We combine all possibilities of rules and themselves negated
-            $new_rule = new OrRule;
+            $new_rule       = new OrRule;
             $child_operands = $operand->getOperands();
 
-            $current_operand = array_shift($child_operands);
+            $current_operand               = array_shift($child_operands);
             $current_operand_possibilities = new OrRule([
                 new AndRule([
                     $current_operand->copy(),

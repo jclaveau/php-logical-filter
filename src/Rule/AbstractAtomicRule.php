@@ -61,7 +61,7 @@ abstract class AbstractAtomicRule extends AbstractRule
             return $this->cache['string'];
         }
 
-        $class = get_class($this);
+        $class    = get_class($this);
         $operator = $class::operator;
 
         $stringified_value = var_export($this->getValues(), true);

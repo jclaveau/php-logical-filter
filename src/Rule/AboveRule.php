@@ -19,8 +19,8 @@ class AboveRule extends AbstractAtomicRule
     public function __construct( $field, $minimum )
     {
         if (    !is_scalar($minimum)
-            &&  !$minimum instanceof \DateTimeInterface
-            &&  null !== $minimum
+            && !$minimum instanceof \DateTimeInterface
+            && null !== $minimum
         ) {
             throw new \InvalidArgumentException(
                 "Minimum parameter must be a scalar or null "

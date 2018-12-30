@@ -25,7 +25,7 @@ class RegexpRule extends AbstractAtomicRule
      */
     public function __construct( $field, $pattern )
     {
-        $this->field = $field;
+        $this->field   = $field;
         $this->pattern = $pattern;
     }
 

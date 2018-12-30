@@ -134,7 +134,7 @@ abstract class AbstractRule implements \JsonSerializable
         }
         extract($options);
 
-        $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $callstack_depth);
+        $bt     = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $callstack_depth);
         $caller = $bt[ $callstack_depth - 2 ];
 
         echo "\n" . $caller['file'] . ':' . $caller['line'] . "\n";

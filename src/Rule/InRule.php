@@ -111,8 +111,8 @@ class InRule extends OrRule
     public function addPossibilities($possibilities)
     {
         if (    is_object($possibilities)
-            &&  $possibilities instanceof \IteratorAggregate
-            &&  method_exists($possibilities, 'toArray')
+            && $possibilities instanceof \IteratorAggregate
+            && method_exists($possibilities, 'toArray')
         ) {
             $possibilities = $possibilities->toArray();
         }
@@ -134,7 +134,7 @@ class InRule extends OrRule
 
             if (!isset($this->native_possibilities[ $id ])) {
                 $this->native_possibilities[ $id ] = $possibility;
-                $require_cache_flush = true;
+                $require_cache_flush               = true;
             }
         }
 

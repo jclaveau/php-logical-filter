@@ -286,11 +286,11 @@ abstract class AbstractOperationRule extends AbstractRule
 
             if (
                     ($operand instanceof AndRule || $operand instanceof OrRule)
-                &&  $count == 1
+                && $count == 1
             ) {
-                $sub_operands = $operand->getOperands();
+                $sub_operands       = $operand->getOperands();
                 $this->operands[$i] = reset($sub_operands);
-                $has_been_changed = true;
+                $has_been_changed   = true;
             }
         }
 
@@ -405,7 +405,7 @@ abstract class AbstractOperationRule extends AbstractRule
 
         // $instance->dump(true);
 
-        if ($step_to_stop_after  == self::remove_negations ||
+        if ($step_to_stop_after == self::remove_negations ||
             $step_to_stop_before == self::rootify_disjunctions ) {
             return $instance;
         }
@@ -417,7 +417,7 @@ abstract class AbstractOperationRule extends AbstractRule
 
         // $instance->dump(true);
 
-        if ($step_to_stop_after  == self::rootify_disjunctions ||
+        if ($step_to_stop_after == self::rootify_disjunctions ||
             $step_to_stop_before == self::unify_atomic_operands ) {
             return $instance;
         }
@@ -428,7 +428,7 @@ abstract class AbstractOperationRule extends AbstractRule
 
             // $instance->dump(true);
 
-            if ($step_to_stop_after  == self::unify_atomic_operands ||
+            if ($step_to_stop_after == self::unify_atomic_operands ||
                 $step_to_stop_before == self::remove_invalid_branches ) {
                 return $instance;
             }
