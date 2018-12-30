@@ -225,9 +225,12 @@ abstract class AbstractOperationRule extends AbstractRule
      *
      * @toopt Trigger cleaning requirement during simplification steps
      *
-     * @return $this;
+     * @param  array    $simplification_options
+     * @param  bool     $recurse
+     *
+     * @return AbstractOperationRule
      */
-    public function cleanOperations($simplification_options, $recurse=true)
+    public function cleanOperations(array $simplification_options, $recurse=true)
     {
         if ($recurse) {
             foreach ($this->operands as $i => $operand) {
