@@ -48,7 +48,7 @@ class AndRule extends AbstractOperationRule
 
         // This OrRule should contain only AndRules during its generation
         $upLiftedOr = new OrRule([
-            $firstAndOperand
+            $firstAndOperand,
         ]);
 
         // var_dump($upLiftedOperands);

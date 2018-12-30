@@ -94,7 +94,7 @@ class NotInRule extends NotRule
                 new InRule(
                     $this->getOperandAt(0)->getField(),
                     array_unique($possibilities)
-                )
+                ),
             ];
 
             $this->setOperands($operands);

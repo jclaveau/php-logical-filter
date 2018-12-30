@@ -722,7 +722,7 @@ class LogicalFilter implements \JsonSerializable
                         unset( $rows[$key] );
                     },
                     Filterer::on_row_mismatches => function($rule, $key, &$rows) {
-                    }
+                    },
                 ]
             );
 
@@ -826,7 +826,7 @@ class LogicalFilter implements \JsonSerializable
 
         foreach ($operands as $i => &$and_case) {
             $arguments = [
-                &$and_case
+                &$and_case,
             ];
             call_user_func_array($action, $arguments);
         }

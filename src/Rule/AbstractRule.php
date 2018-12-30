@@ -285,13 +285,13 @@ abstract class AbstractRule implements \JsonSerializable
         if ($this instanceof AbstractAtomicRule || $this instanceof NotRule || $this instanceof InRule) {
             $ruleTree = new OrRule([
                 new AndRule([
-                    $this
-                ])
+                    $this,
+                ]),
             ]);
         }
         elseif ($this instanceof AndRule) {
             $ruleTree = new OrRule([
-                $this
+                $this,
             ]);
         }
         elseif ($this instanceof OrRule) {

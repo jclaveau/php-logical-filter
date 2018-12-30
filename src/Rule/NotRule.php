@@ -109,8 +109,8 @@ class NotRule extends AbstractOperationRule
                     $current_operand->copy(),
                 ]),
                 new AndRule([
-                    new NotRule($current_operand->copy())
-                ])
+                    new NotRule($current_operand->copy()),
+                ]),
             ]);
 
             // for every remaining operand, we duplicate the already made
@@ -244,7 +244,7 @@ class NotRule extends AbstractOperationRule
 
         $array = [
             $options['show_instance'] ? $this->getInstanceId() : self::operator,
-            $this->getOperandAt(0) ? $this->getOperandAt(0)->toArray($options) : false
+            $this->getOperandAt(0) ? $this->getOperandAt(0)->toArray($options) : false,
         ];
 
         // TODO make a dedicated cache entry for semantic array?

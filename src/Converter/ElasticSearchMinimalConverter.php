@@ -30,7 +30,7 @@ class ElasticSearchMinimalConverter extends MinimalConverter
             'bool' => [
                 'minimum_should_match' => 1, // default
                 'should'               => $this->output,
-            ]
+            ],
         ];
     }
 
@@ -42,8 +42,8 @@ class ElasticSearchMinimalConverter extends MinimalConverter
             'bool' => [
                 "must" => [
 
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -71,52 +71,52 @@ class ElasticSearchMinimalConverter extends MinimalConverter
             else {
                 $new_rule = [
                     'term' => [
-                        $field => $operand->getValue()
-                    ]
+                        $field => $operand->getValue(),
+                    ],
                 ];
             }
         }
         elseif ($operator == 'in') {
             $new_rule = [
                 'terms' => [
-                    $field => $operand->getPossibilities()
-                ]
+                    $field => $operand->getPossibilities(),
+                ],
             ];
         }
         elseif ($operator == '<') {
             $new_rule = [
                 'range' => [
                     $field => [
-                        'lt' => $operand->getUpperLimit()
+                        'lt' => $operand->getUpperLimit(),
                     ],
-                ]
+                ],
             ];
         }
         elseif ($operator == '>') {
             $new_rule = [
                 'range' => [
                     $field => [
-                        'gt' => $operand->getLowerLimit()
+                        'gt' => $operand->getLowerLimit(),
                     ],
-                ]
+                ],
             ];
         }
         elseif ($operator == '<=') {
             $new_rule = [
                 'range' => [
                     $field => [
-                        'lte' => $operand->getMaximum()
+                        'lte' => $operand->getMaximum(),
                     ],
-                ]
+                ],
             ];
         }
         elseif ($operator == '>=') {
             $new_rule = [
                 'range' => [
                     $field => [
-                        'gte' => $operand->getMinimum()
+                        'gte' => $operand->getMinimum(),
                     ],
-                ]
+                ],
             ];
         }
         elseif ($operator == '!=' && $operand->getValue() === null) {
@@ -132,7 +132,7 @@ class ElasticSearchMinimalConverter extends MinimalConverter
             $new_rule = [
                 'regexp' => [
                      $field => [
-                        'value' => $operand->getPattern()
+                        'value' => $operand->getPattern(),
                         // 'flags' => 'INTERSECTION|COMPLEMENT|EMPTY',
                         // 'max_determinized_states' => 2000
                     ],
