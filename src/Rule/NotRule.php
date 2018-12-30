@@ -56,15 +56,15 @@ class NotRule extends AbstractOperationRule
 
             if ($operand instanceof AboveRule) {
                 $new_rule = new OrRule([
-                    new BelowRule($field, $operand->getMinimum()),
-                    new EqualRule($field, $operand->getMinimum()),
+                    new BelowRule($field, $operand->getLowerLimit()),
+                    new EqualRule($field, $operand->getLowerLimit()),
                 ]);
             }
             elseif ($operand instanceof BelowRule) {
                 // ! (v >  a) : v <= a : (v < a || a = v)
                 $new_rule = new OrRule([
-                    new AboveRule($field, $operand->getMaximum()),
-                    new EqualRule($field, $operand->getMaximum()),
+                    new AboveRule($field, $operand->getUpperLimit()),
+                    new EqualRule($field, $operand->getUpperLimit()),
                 ]);
             }
             elseif ($operand instanceof EqualRule && null === $operand->getValue()) {
