@@ -537,7 +537,7 @@ abstract class AbstractOperationRule extends AbstractRule
     /**
      * Clones the rule and its operands.
      *
-     * @return OperationRule A copy of the current instance with copied operands.
+     * @return AbstractOperationRule A copy of the current instance with copied operands.
      */
     final public function copy()
     {
