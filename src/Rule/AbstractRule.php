@@ -61,9 +61,10 @@ abstract class AbstractRule implements \JsonSerializable
      *
      * @param  string $field
      * @param  string $type
-     * @param  mixed  $value
+     * @param  mixed  $values
+     * @param  array  $options
      *
-     * @return $this
+     * @return AbstractRule
      */
     public static function generateSimpleRule($field, $type, $values, array $options=[])
     {
@@ -114,7 +115,7 @@ abstract class AbstractRule implements \JsonSerializable
     /**
      * Dumps the rule with a chained syntax.
      *
-     * @param bool  $exit=false
+     * @param bool  $exit       Default false
      * @param array $options    + callstack_depth=2 The level of the caller to dump
      *                          + mode='string' in 'export' | 'dump' | 'string' | 'xdebug'
      *
@@ -231,6 +232,16 @@ abstract class AbstractRule implements \JsonSerializable
     {
         return $this->toString();
     }
+
+    /**
+     * @return string
+     */
+    abstract public function toString();
+
+    /**
+     * @return array
+     */
+    abstract public function toArray();
 
     protected $instance_id;
 
