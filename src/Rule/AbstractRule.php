@@ -117,7 +117,7 @@ abstract class AbstractRule implements \JsonSerializable
      *
      * @return $this
      */
-    public final function dump($exit=false, array $options=[])
+    final public function dump($exit=false, array $options=[])
     {
         $default_options = [
             'callstack_depth' => 2,
@@ -244,7 +244,7 @@ abstract class AbstractRule implements \JsonSerializable
      *
      * @return string
      */
-    public final function getSemanticId()
+    final public function getSemanticId()
     {
         if (isset($this->cache['semantic_id']))
             return $this->cache['semantic_id'];

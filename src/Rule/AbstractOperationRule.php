@@ -352,7 +352,7 @@ abstract class AbstractOperationRule extends AbstractRule
      *
      * @return AbstractRule the simplified rule
      */
-    public final function simplify($options=[])
+    final public function simplify($options=[])
     {
         $step_to_stop_before = !empty($options['stop_before'])        ? $options['stop_before'] : null;
         $step_to_stop_after  = !empty($options['stop_after'])         ? $options['stop_after']  : null;
@@ -539,7 +539,7 @@ abstract class AbstractOperationRule extends AbstractRule
      *
      * @return OperationRule A copy of the current instance with copied operands.
      */
-    public final function copy()
+    final public function copy()
     {
         return clone $this;
     }

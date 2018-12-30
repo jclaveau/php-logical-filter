@@ -15,7 +15,7 @@ trait Trait_RuleWithField
     /**
      * @return string $field
      */
-    public final function getField()
+    final public function getField()
     {
         return $this->field;
     }
@@ -23,7 +23,7 @@ trait Trait_RuleWithField
     /**
      * @return string $field
      */
-    public final function setField( $field )
+    final public function setField( $field )
     {
         if (!is_scalar($field)) {
             throw new \InvalidArgumentEXception(
@@ -46,7 +46,7 @@ trait Trait_RuleWithField
      *
      * @return AbstractAtomicRule $this
      */
-    public final function renameField($renamings)
+    final public function renameField($renamings)
     {
         if (is_callable($renamings)) {
             $this->setField( call_user_func($renamings, $this->field) );

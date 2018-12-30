@@ -69,7 +69,7 @@ class InRule extends OrRule
      *
      * @return AbstractAtomicRule $this
      */
-    public final function renameFields($renamings)
+    final public function renameFields($renamings)
     {
         $old_field = $this->field;
 
