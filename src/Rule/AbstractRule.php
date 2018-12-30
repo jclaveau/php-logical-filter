@@ -236,12 +236,12 @@ abstract class AbstractRule implements \JsonSerializable
     /**
      * @return string
      */
-    abstract public function toString();
+    abstract public function toString(array $options=[]);
 
     /**
      * @return array
      */
-    abstract public function toArray();
+    abstract public function toArray(array $options=[]);
 
     protected $instance_id;
 
