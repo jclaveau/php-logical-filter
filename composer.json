@@ -42,7 +42,8 @@
         "jclaveau/phpunit-testlistener-xhprof": "1.1.*",
         "jclaveau/xhprof": "dev-master",
         "jclaveau/phpunit-profile-asserts": "^1.0",
-        "dusank/knapsack": "^10.0"
+        "dusank/knapsack": "^10.0",
+        "squizlabs/php_codesniffer": "*"
     },
     "require": {
         "jclaveau/php-visibility-violator": "dev-master",
