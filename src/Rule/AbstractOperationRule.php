@@ -100,8 +100,8 @@ abstract class AbstractOperationRule extends AbstractRule
     }
 
     /**
-     * @param  array|callable Associative array of renamings or callable
-     *                        that would rename the fields.
+     * @param  array|callable $renamings Associative array of renamings or callable
+     *                                   that would rename the fields.
      *
      * @return string $this
      */
@@ -122,6 +122,8 @@ abstract class AbstractOperationRule extends AbstractRule
 
     /**
      * @param string $step_to_go_to
+     * @param array  $simplification_options
+     * @param bool   $force
      */
     public function moveSimplificationStepForward($step_to_go_to, array $simplification_options, $force=false)
     {
@@ -132,7 +134,7 @@ abstract class AbstractOperationRule extends AbstractRule
         }
 
         // if ($this->isNormalizationAllowed($simplification_options) && !$force && $this->current_simplification_step != null) {
-        if (!$force && $this->current_simplification_step != null) {
+        if (!$force && $this->current_simplification_step !== null) {
             $steps_indices = array_flip(self::simplification_steps);
 
             $current_index = $steps_indices[ $this->current_simplification_step ];
@@ -157,7 +159,7 @@ abstract class AbstractOperationRule extends AbstractRule
     /**
      * Checks if a simplification step is reached.
      *
-     * @param  string step
+     * @param  string $step
      *
      * @return bool
      */
@@ -169,7 +171,7 @@ abstract class AbstractOperationRule extends AbstractRule
             );
         }
 
-        if ($this->current_simplification_step == null)
+        if ($this->current_simplification_step === null)
             return false;
 
         $steps_indices = array_flip(self::simplification_steps);
@@ -183,7 +185,7 @@ abstract class AbstractOperationRule extends AbstractRule
     /**
      * Replace NotRule objects by the negation of their operands.
      *
-     * @return $this|$new_rule
+     * @return AbstractOperationRule $this or a $new rule with negations removed
      */
     public function removeNegations(array $contextual_options)
     {
@@ -397,9 +399,7 @@ abstract class AbstractOperationRule extends AbstractRule
         // $instance->dump(true);
 
         $instance->cleanOperations($options);
-        if ($instance instanceof AbstractOperationRule) {
-            $instance = $instance->rootifyDisjunctions($options);
-        }
+        $instance = $instance->rootifyDisjunctions($options);
 
         // $instance->dump(true);
 
@@ -449,7 +449,7 @@ abstract class AbstractOperationRule extends AbstractRule
         if ($force_logical_core) {
             $instance = $instance->forceLogicalCore();
             // for the simplification status at
-            foreach ($operands = $instance->getOperands() as &$andOperand) {
+            foreach ($operands = $instance->getOperands() as $andOperand) {
                 if (!$andOperand instanceof AndRule) {
                     throw new \LogicException(
                         "A rule is intended to be an and case: \n"
