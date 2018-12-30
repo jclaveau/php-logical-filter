@@ -30,7 +30,7 @@ class PhpFilterer extends Filterer
         elseif ($field instanceof FilteredKey) {
             $value_to_validate = $field( array_pop($path) );
         }
-        elseif (!isset($row[(string) $field])) {
+        elseif ( ! isset($row[(string) $field])) {
             $value_to_validate = null;
         }
         else {
@@ -38,9 +38,9 @@ class PhpFilterer extends Filterer
         }
 
         if ($operator === EqualRule::operator) {
-            if (!isset($value_to_validate)) {
-                 // ['field', '=', null] <=> isset($row['field'])
-                 // [row, '=', null] <=> $row !== null
+            if ( ! isset($value_to_validate)) {
+                // ['field', '=', null] <=> isset($row['field'])
+                // [row, '=', null] <=> $row !== null
                 $result = $value === null;
             }
             else {
@@ -49,7 +49,7 @@ class PhpFilterer extends Filterer
             }
         }
         elseif ($operator === InRule::operator) {
-            if (!isset($value_to_validate)) {
+            if ( ! isset($value_to_validate)) {
                 $result = false;
             }
             else {
@@ -57,7 +57,7 @@ class PhpFilterer extends Filterer
             }
         }
         elseif ($operator === BelowRule::operator) {
-            if (!isset($value_to_validate)) {
+            if ( ! isset($value_to_validate)) {
                 $result = false;
             }
             else {
@@ -65,7 +65,7 @@ class PhpFilterer extends Filterer
             }
         }
         elseif ($operator === AboveRule::operator) {
-            if (!isset($value_to_validate)) {
+            if ( ! isset($value_to_validate)) {
                 $result = false;
             }
             else {
@@ -81,11 +81,11 @@ class PhpFilterer extends Filterer
             }
         }
         elseif ($operator === NotInRule::operator) {
-            if (!isset($value_to_validate)) {
+            if ( ! isset($value_to_validate)) {
                 $result = true;
             }
             else {
-                $result = !in_array($value_to_validate, $value);
+                $result = ! in_array($value_to_validate, $value);
             }
         }
         else {
@@ -95,10 +95,10 @@ class PhpFilterer extends Filterer
         }
 
         // var_dump(
-            // "$field, $operator, " . var_export($value, true)
-             // . ' vs ' . var_export($value_to_validate, true) . ' => ' . var_export($result, true)
-             // . "\n\n"
-             // . var_export($row, true)
+        // "$field, $operator, " . var_export($value, true)
+        // . ' vs ' . var_export($value_to_validate, true) . ' => ' . var_export($result, true)
+        // . "\n\n"
+        // . var_export($row, true)
         // );
         // exit;
         return $result;

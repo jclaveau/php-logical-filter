@@ -72,9 +72,9 @@ abstract class Filterer implements FiltererInterface
      */
     public function onRowMismatches(&$row, $key, &$rows, $matching_case, $options)
     {
-        if (    ! $this->custom_actions
-            &&  ! isset($options[self::on_row_mismatches])
-            &&  ! isset($options[self::on_row_matches])
+        if (   ! $this->custom_actions
+            && ! isset($options[self::on_row_mismatches])
+            && ! isset($options[self::on_row_matches])
         ) {
             // Unset by default ONLY if NO custom action defined
             unset($rows[$key]);
@@ -131,8 +131,9 @@ abstract class Filterer implements FiltererInterface
             ;
 
         if ($root_OrRule !== null) {
-            if (!$root_OrRule->hasSolution())
+            if ( ! $root_OrRule->hasSolution()) {
                 return null;
+            }
 
             $root_cases = $root_OrRule->getOperands();
         }
@@ -140,10 +141,10 @@ abstract class Filterer implements FiltererInterface
             $root_cases = [];
         }
 
-        if (!isset($options['recurse'])) {
+        if ( ! isset($options['recurse'])) {
             $options['recurse'] = 'before';
         }
-        elseif (!in_array($options['recurse'], ['before', 'after', null])) {
+        elseif ( ! in_array($options['recurse'], ['before', 'after', null])) {
             throw new \InvalidArgumentException(
                 "Invalid value for 'recurse' option: "
                 .var_export($options['recurse'], true)
@@ -165,7 +166,6 @@ abstract class Filterer implements FiltererInterface
     {
         // Once the rules are prepared, we parse the data
         foreach ($tree_to_filter as $row_index => $row_to_filter) {
-
             array_push($path, $row_index);
 
             if ($options['recurse'] == 'before') {
@@ -230,8 +230,9 @@ abstract class Filterer implements FiltererInterface
             ;
 
         if ($root_OrRule !== null) {
-            if (!$root_OrRule->hasSolution())
+            if ( ! $root_OrRule->hasSolution()) {
                 return null;
+            }
 
             $root_cases = $root_OrRule->getOperands();
         }
@@ -253,27 +254,26 @@ abstract class Filterer implements FiltererInterface
     {
         $operands_validation_row_cache = [];
 
-        if (!$root_cases) {
+        if ( ! $root_cases) {
             $matching_case = true;
         }
         else {
             $matching_case = null;
             foreach ($root_cases as $and_case_index => $and_case) {
-
-                if (!empty($options['debug']))
+                if ( ! empty($options['debug'])) {
                     var_dump("Case $and_case_index: ".$and_case);
+                }
 
                 $case_is_good = null;
                 foreach ($and_case->getOperands() as $i => $rule) {
-
                     if ($rule instanceof OrRule && $rule instanceof AndRule) {
                         $field = null;
                         $value = $rule->getOperands();
                     }
                     elseif ($rule instanceof NotEqualRule
-                        ||  $rule instanceof AbstractAtomicRule
-                        ||  $rule instanceof InRule
-                        ||  $rule instanceof NotInRule
+                        || $rule instanceof AbstractAtomicRule
+                        || $rule instanceof InRule
+                        || $rule instanceof NotInRule
                     ) {
                         $field = $rule->getField();
                         $value = $rule->getValues();
@@ -288,7 +288,7 @@ abstract class Filterer implements FiltererInterface
 
                     $cache_key = $and_case_index.'~|~'.$field.'~|~'.$operator;
 
-                    if (!empty($operands_validation_row_cache[ $cache_key ])) {
+                    if ( ! empty($operands_validation_row_cache[ $cache_key ])) {
                         $is_valid = $operands_validation_row_cache[ $cache_key ];
                     }
                     else {

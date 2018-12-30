@@ -32,7 +32,7 @@ use       JClaveau\LogicalFilter\Rule\RegexpRule;
  */
 class RuleFilterer extends Filterer
 {
-    const this       = 'instance';
+    const this        = 'instance';
     const field       = 'field';
     const operator    = 'operator';
     const value       = 'value';
@@ -61,8 +61,9 @@ class RuleFilterer extends Filterer
      */
     public function setChildren( &$row, $filtered_children ) // strict issue if forcing  AbstractRule with php 5.6 here
     {
-        if ($row instanceof AbstractOperationRule)
+        if ($row instanceof AbstractOperationRule) {
             return $row->setOperandsOrReplaceByOperation( $filtered_children, [] ); // no simplification options?
+        }
     }
 
     /**
@@ -71,7 +72,7 @@ class RuleFilterer extends Filterer
      */
     public function validateRule ($field, $operator, $value, $rule, array $path, $all_operands, $options)
     {
-        if (    !empty($options[ Filterer::leaves_only ])
+        if (    ! empty($options[ Filterer::leaves_only ])
             && in_array( get_class($rule), [OrRule::class, AndRule::class, NotRule::class] )
         ) {
             // return true;
@@ -79,9 +80,10 @@ class RuleFilterer extends Filterer
         }
 
         if ($field === self::field) {
-            if (!method_exists($rule, 'getField'))
-            // if (in_array( get_class($rule), [AndRule::class, OrRule::class]))
+            if ( ! method_exists($rule, 'getField')) {
+                // if (in_array( get_class($rule), [AndRule::class, OrRule::class]))
                 return null; // The filter cannot be applied to this rule
+            }
 
             try {
                 $value_to_compare = $rule->getField();
@@ -99,8 +101,8 @@ class RuleFilterer extends Filterer
             $description = $rule->toArray();
 
             if (    count($description) === 3
-                &&  is_string($description[0])
-                &&  is_string($description[1]) ) {
+                && is_string($description[0])
+                && is_string($description[1]) ) {
                 $value_to_compare = $description[2];
             }
             else {
@@ -113,15 +115,15 @@ class RuleFilterer extends Filterer
         elseif ($field === self::depth) {
             // original $depth is lost once the filter is simplified
             throw new \InvalidArgumentException('Depth rule uppport not implemented');
-            // $value_to_compare = $depth;
         }
         elseif ($field === self::path) {
             // TODO the description of its parents
             throw new \InvalidArgumentException('Path rule uppport not implemented');
         }
         elseif ($field === self::children) {
-            if (!method_exists($rule, 'getOperands'))
+            if ( ! method_exists($rule, 'getOperands')) {
                 return null; // The filter cannot be applied to this rule
+            }
             $value_to_compare = count( $rule->getOperands() );
         }
         else {
@@ -171,14 +173,14 @@ class RuleFilterer extends Filterer
         }
         elseif ($operator === NotEqualRule::operator) {
             if ($value === null) {
-                $out = !is_null($value_to_compare);
+                $out = ! is_null($value_to_compare);
             }
             else {
                 $out = $value != $value_to_compare;
             }
         }
         elseif ($operator === NotInRule::operator) {
-            $out = !in_array($value_to_compare, $value);
+            $out = ! in_array($value_to_compare, $value);
         }
         else {
             throw new \InvalidArgumentException(
@@ -186,7 +188,7 @@ class RuleFilterer extends Filterer
             );
         }
 
-        if (!empty($options['debug'])) {
+        if ( ! empty($options['debug'])) {
             var_dump(
                 "$field, $operator, " . var_export($value, true)
                  . ' ||  '. $value_to_compare . ' => ' . var_export($out, true)
@@ -206,13 +208,15 @@ class RuleFilterer extends Filterer
      */
     public function apply( LogicalFilter $filter, $ruleTree_to_filter, $options=[] )
     {
-        if (!$ruleTree_to_filter)
+        if ( ! $ruleTree_to_filter) {
             return $ruleTree_to_filter;
+        }
 
-        if ($ruleTree_to_filter instanceof AbstractRule)
+        if ($ruleTree_to_filter instanceof AbstractRule) {
             $ruleTree_to_filter = [$ruleTree_to_filter];
+        }
 
-        if (!is_array($ruleTree_to_filter)) {
+        if ( ! is_array($ruleTree_to_filter)) {
             throw new \InvalidArgumentException(
                 "\$ruleTree_to_filter must be an array or an AbstractRule "
                 ."instead of: " . var_export($ruleTree_to_filter, true)
