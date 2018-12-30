@@ -930,7 +930,7 @@ class LogicalFilterTest extends \AbstractTest
             ],
             $filter
                 ->getRules()
-                ->negateOperand(false, [])
+                ->negateOperand([])
                 // ->dump(true)
                 ->toArray()
         );

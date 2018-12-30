@@ -203,7 +203,7 @@ abstract class AbstractOperationRule extends AbstractRule
         if ($operands = $this->operands) {
             foreach ($operands as $i => $operand) {
                 if ($operand instanceof NotRule) {
-                    $operands[$i] = $operand->negateOperand(false, $contextual_options);
+                    $operands[$i] = $operand->negateOperand($contextual_options);
                 }
 
                 if ($operands[$i] instanceof AbstractOperationRule) {

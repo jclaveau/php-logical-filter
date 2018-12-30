@@ -43,7 +43,7 @@ class NotRule extends AbstractOperationRule
      *
      * @return array
      */
-    public function negateOperand($remove_generated_negations=false, array $current_simplification_options)
+    public function negateOperand(array $current_simplification_options)
     {
         if ( ! $this->isNormalizationAllowed($current_simplification_options)) {
             return $this;

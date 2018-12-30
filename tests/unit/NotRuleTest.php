@@ -13,7 +13,7 @@ class NotRuleTest extends \AbstractTest
         $rule = new NotRule(
             new AboveRule('field', 3)
         );
-        $new_rule = $rule->negateOperand(false, []);
+        $new_rule = $rule->negateOperand([]);
         $this->assertEquals(new OrRule([
             new BelowRule('field', 3),
             new EqualRule('field', 3)
@@ -24,7 +24,7 @@ class NotRuleTest extends \AbstractTest
         $rule = new NotRule(
             new BelowRule('field', 3)
         );
-        $new_rule = $rule->negateOperand(false, []);
+        $new_rule = $rule->negateOperand([]);
         $this->assertEquals(new OrRule([
             new AboveRule('field', 3),
             new EqualRule('field', 3)
@@ -35,7 +35,7 @@ class NotRuleTest extends \AbstractTest
         $rule = new NotRule(
             new NotRule(new BelowRule('field', 3))
         );
-        $new_rule = $rule->negateOperand(false, []);
+        $new_rule = $rule->negateOperand([]);
         $this->assertEquals((new BelowRule('field', 3))->toArray(), $new_rule->toArray());
 
 
@@ -43,7 +43,7 @@ class NotRuleTest extends \AbstractTest
         $rule = new NotRule(
             new EqualRule('field', 3)
         );
-        $new_rule = $rule->negateOperand(false, [
+        $new_rule = $rule->negateOperand([
             'not_equal.normalization' => true
         ]);
         $this->assertEquals(new OrRule([
@@ -55,7 +55,7 @@ class NotRuleTest extends \AbstractTest
         $rule = new NotRule(
             new EqualRule('field', 3)
         );
-        $new_rule = $rule->negateOperand(false, [
+        $new_rule = $rule->negateOperand([
             'not_equal.normalization' => false
         ])
         // ->dump(true)
@@ -66,7 +66,7 @@ class NotRuleTest extends \AbstractTest
         $rule = new NotRule(
             new EqualRule('field', null)
         );
-        $new_rule = $rule->negateOperand(false, []);
+        $new_rule = $rule->negateOperand([]);
         $this->assertEquals(
             new NotEqualRule('field', null),
             $new_rule
@@ -105,7 +105,7 @@ class NotRuleTest extends \AbstractTest
             ]))
             ->toArray(),
             $rule
-                ->negateOperand(false, [])
+                ->negateOperand([])
                 ->toArray()
         );
 
@@ -117,7 +117,7 @@ class NotRuleTest extends \AbstractTest
             ])
         );
 
-        $new_rule = $rule->negateOperand(false, [])
+        $new_rule = $rule->negateOperand([])
             // ->dump()
             ;
         $expected = new AndRule([
@@ -133,7 +133,7 @@ class NotRuleTest extends \AbstractTest
         $rule = new NotRule(
             new InRule('field', [3, 10])
         );
-        $new_rule = $rule->negateOperand(false, [
+        $new_rule = $rule->negateOperand([
             'not_equal.normalization'    => false,
             'in.normalization_threshold' => 3,
         ])
@@ -159,7 +159,7 @@ class NotRuleTest extends \AbstractTest
         VisibilityViolator::setHiddenProperty($rule, 'operands', ['dsfghjk']);
 
         try {
-            $rule->negateOperand(false, []);
+            $rule->negateOperand([]);
             $this->assertTrue(
                 false, "NotRule should have thrown an exceptrion as its "
                 . "operand is neither null either an AbstractRule"
