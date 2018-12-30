@@ -258,7 +258,7 @@ class AndRule extends AbstractOperationRule
                 $equalRule = reset($operandsByOperator[ EqualRule::operator ]);
 
                 if (   ! empty($operandsByOperator[ BelowRule::operator ])
-                    && $equalRule->getValue() === null
+                    && null === $equalRule->getValue()
                 ) {
                     $this->operands = [];
                     return $this;
@@ -272,7 +272,7 @@ class AndRule extends AbstractOperationRule
                 }
 
                 if (   ! empty($operandsByOperator[ AboveRule::operator ])
-                    && $equalRule->getValue() === null
+                    && null === $equalRule->getValue()
                 ) {
                     $this->operands = [];
                     return $this;
@@ -293,8 +293,8 @@ class AndRule extends AbstractOperationRule
                 }
 
                 if (   ! empty($operandsByOperator[ NotEqualRule::operator ])
-                    && $equalRule->getValue() === null
-                    && reset($operandsByOperator[ NotEqualRule::operator ])->getValue() === null
+                    && null === $equalRule->getValue()
+                    && null === reset($operandsByOperator[ NotEqualRule::operator ])->getValue()
                 ) {
                     $this->operands = [];
                     return $this;
@@ -355,13 +355,13 @@ class AndRule extends AbstractOperationRule
                 unset($previous_operand);
 
                 try {
-                    if ($operator == AboveRule::operator) {
+                    if (AboveRule::operator == $operator) {
                         usort($operands, function( AboveRule $a, AboveRule $b ) {
-                            if ($a->getMinimum() === null) {
+                            if (null === $a->getMinimum()) {
                                 return 1;
                             }
 
-                            if ($b->getMinimum() === null) {
+                            if (null === $b->getMinimum()) {
                                 return -1;
                             }
 
@@ -373,13 +373,13 @@ class AndRule extends AbstractOperationRule
                         });
                         $operands = [reset($operands)];
                     }
-                    elseif ($operator == BelowRule::operator) {
+                    elseif (BelowRule::operator == $operator) {
                         usort($operands, function( BelowRule $a, BelowRule $b ) {
-                            if ($a->getMaximum() === null) {
+                            if (null === $a->getMaximum()) {
                                 return 1;
                             }
 
-                            if ($b->getMaximum() === null) {
+                            if (null === $b->getMaximum()) {
                                 return -1;
                             }
 
@@ -391,7 +391,7 @@ class AndRule extends AbstractOperationRule
                         });
                         $operands = [reset($operands)];
                     }
-                    elseif ($operator == EqualRule::operator) {
+                    elseif (EqualRule::operator == $operator) {
                         // TODO add an option for the support strict comparison
                         foreach ($operands as $i => $operand) {
                             if ( ! isset($previous_operand)) {
@@ -412,7 +412,7 @@ class AndRule extends AbstractOperationRule
                             }
                         }
                     }
-                    elseif ($operator == InRule::operator) {
+                    elseif (InRule::operator == $operator) {
                         $first_in = reset($operands);
 
                         foreach ($operands as $i => $next_in) {
@@ -433,7 +433,7 @@ class AndRule extends AbstractOperationRule
                             return [];
                         }
                     }
-                    elseif ($operator == NotInRule::operator) {
+                    elseif (NotInRule::operator == $operator) {
                         $first_not_in = reset($operands);
 
                         foreach ($operands as $i => $next_not_in) {
@@ -485,7 +485,7 @@ class AndRule extends AbstractOperationRule
                 as $unifyable_operator
             ) {
                 if ( ! empty($operandsByOperator[ $unifyable_operator ])) {
-                    if (count($operandsByOperator[ $unifyable_operator ]) != 1) {
+                    if (1 != count($operandsByOperator[ $unifyable_operator ])) {
                         throw new \LogicException(
                             __METHOD__ . " MUST be called after unifyAtomicOperands() "
                             ."to have only one '$unifyable_operator' predicate istead of:\n"
@@ -522,16 +522,16 @@ class AndRule extends AbstractOperationRule
 
             if ( ! empty($operandsByOperator[ NotEqualRule::operator ])) {
                 foreach ($operandsByOperator[ NotEqualRule::operator ] as $i => $not_equal_rule) {
-                    if ($equalRule->getValue() !== null) {
-                        if ($not_equal_rule->getValue() === null) { // means if exists <=> equals something
+                    if (null !== $equalRule->getValue()) {
+                        if (null === $not_equal_rule->getValue()) { // means if exists <=> equals something
                             unset($operandsByOperator[ NotEqualRule::operator ][$i]);
                         }
                         elseif ($not_equal_rule->getValue() != $equalRule->getValue()) {
                             unset($operandsByOperator[ NotEqualRule::operator ][$i]);
                         }
                     }
-                    elseif ($equalRule->getValue() === null ) {
-                        if ($not_equal_rule->getValue() !== null) {
+                    elseif (null === $equalRule->getValue() ) {
+                        if (null !== $not_equal_rule->getValue()) {
                             unset($operandsByOperator[ NotEqualRule::operator ][$i]);
                         }
                         // else we let the "equal null" and the "not equal null" for the romeInvalidBranches step
@@ -541,14 +541,14 @@ class AndRule extends AbstractOperationRule
 
             if ( ! empty($operandsByOperator[ AboveRule::operator ])) {
                 $aboveRule = reset($operandsByOperator[ AboveRule::operator ]);
-                if ($equalRule->getValue() !== null && $aboveRule->getMinimum() < $equalRule->getValue()) {
+                if (null !== $equalRule->getValue() && $aboveRule->getMinimum() < $equalRule->getValue()) {
                     unset($operandsByOperator[ AboveRule::operator ]);
                 }
             }
 
             if ( ! empty($operandsByOperator[ BelowRule::operator ])) {
                 $belowRule = reset($operandsByOperator[ BelowRule::operator ]);
-                if ($equalRule->getValue() !== null && $belowRule->getMaximum() > $equalRule->getValue()) {
+                if (null !== $equalRule->getValue() && $belowRule->getMaximum() > $equalRule->getValue()) {
                     unset($operandsByOperator[ BelowRule::operator ]);
                 }
             }
@@ -607,7 +607,7 @@ class AndRule extends AbstractOperationRule
         if ( ! empty($operandsByOperator[ NotEqualRule::operator ])) {
             if ( ! empty($operandsByOperator[ NotEqualRule::operator ])) {
                 foreach ($operandsByOperator[ NotEqualRule::operator ] as $i => $notEqualRule) {
-                    if ($notEqualRule->getValue() === null) {
+                    if (null === $notEqualRule->getValue()) {
                         if ( ! empty($operandsByOperator[ AboveRule::operator ])) {
                             unset($operandsByOperator[ NotEqualRule::operator ][$i]);
                         }
@@ -617,7 +617,7 @@ class AndRule extends AbstractOperationRule
                         }
 
                         if ( ! empty($operandsByOperator[ EqualRule::operator ])) {
-                            if (reset($operandsByOperator[ EqualRule::operator ])->getValue() !== null) {
+                            if (null !== reset($operandsByOperator[ EqualRule::operator ])->getValue()) {
                                 unset($operandsByOperator[ NotEqualRule::operator ][$i]);
                             }
                         }

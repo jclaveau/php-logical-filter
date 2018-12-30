@@ -138,14 +138,14 @@ abstract class AbstractRule implements \JsonSerializable
         $caller = $bt[ $callstack_depth - 2 ];
 
         echo "\n" . $caller['file'] . ':' . $caller['line'] . "\n";
-        if ($mode == 'string') {
+        if ('string' == $mode) {
             if ( ! isset($options['indent_unit'])) {
                 $options['indent_unit'] = "    ";
             }
 
             echo ($this->toString($options));
         }
-        elseif ($mode == 'dump') {
+        elseif ('dump' == $mode) {
             if ($xdebug_enabled = ini_get('xdebug.overload_var_dump')) {
                 ini_set('xdebug.overload_var_dump', 0);
             }
@@ -156,7 +156,7 @@ abstract class AbstractRule implements \JsonSerializable
                 ini_set('xdebug.overload_var_dump', 1);
             }
         }
-        elseif ($mode == 'xdebug') {
+        elseif ('xdebug' == $mode) {
             if ( ! function_exists('xdebug_is_enabled')) {
                 throw new \RuntimeException("Xdebug is not installed");
             }
@@ -174,7 +174,7 @@ abstract class AbstractRule implements \JsonSerializable
                 ini_set('xdebug.overload_var_dump', 0);
             }
         }
-        elseif ($mode == 'export') {
+        elseif ('export' == $mode) {
             var_export($this->toArray($options));
         }
         else {

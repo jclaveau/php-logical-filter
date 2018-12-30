@@ -44,7 +44,7 @@ class BelowOrEqualRule extends OrRule
      */
     public function setMaximum($maximum)
     {
-        if ($maximum === null) {
+        if (null === $maximum) {
             throw new \InvalidArgumentException(
                 "The maximum of a below or equal rule cannot be null"
             );
@@ -105,7 +105,7 @@ class BelowOrEqualRule extends OrRule
             }
         }
 
-        if (    count($operands) != 2
+        if (   2 != count($operands)
             || ! isset($equalRuleValue)
             || ! isset($belowRuleValue)
             || $belowRuleValue != $equalRuleValue

@@ -163,13 +163,13 @@ class OrRule extends AbstractOperationRule
                 unset($previous_operand);
 
                 try {
-                    if ($operator == AboveRule::operator) {
+                    if (AboveRule::operator == $operator) {
                         usort($operands, function( AboveRule $a, AboveRule $b ) {
-                            if ($a->getMinimum() === null) {
+                            if (null === $a->getMinimum()) {
                                 return 1;
                             }
 
-                            if ($b->getMinimum() === null) {
+                            if (null === $b->getMinimum()) {
                                 return -1;
                             }
 
@@ -181,13 +181,13 @@ class OrRule extends AbstractOperationRule
                         });
                         $operands = [reset($operands)];
                     }
-                    elseif ($operator == BelowRule::operator) {
+                    elseif (BelowRule::operator == $operator) {
                         usort($operands, function( BelowRule $a, BelowRule $b ) {
-                            if ($a->getMaximum() === null) {
+                            if (null === $a->getMaximum()) {
                                 return 1;
                             }
 
-                            if ($b->getMaximum() === null) {
+                            if (null === $b->getMaximum()) {
                                 return -1;
                             }
 
@@ -199,7 +199,7 @@ class OrRule extends AbstractOperationRule
                         });
                         $operands = [reset($operands)];
                     }
-                    elseif ($operator == InRule::operator) {
+                    elseif (InRule::operator == $operator) {
                         $first_in = reset($operands);
 
                         foreach ($operands as $i => $next_in) {

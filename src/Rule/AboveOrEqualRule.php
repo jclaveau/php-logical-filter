@@ -44,7 +44,7 @@ class AboveOrEqualRule extends OrRule
      */
     public function setMinimum($minimum)
     {
-        if ($minimum === null) {
+        if (null === $minimum) {
             throw new \InvalidArgumentException(
                 "The minimum of a below or equal rule cannot be null"
             );
@@ -105,7 +105,7 @@ class AboveOrEqualRule extends OrRule
             }
         }
 
-        if (   count($operands) != 2
+        if (   2 != count($operands)
             || ! isset($equalRuleValue)
             || ! isset($aboveRuleValue)
             || $aboveRuleValue != $equalRuleValue

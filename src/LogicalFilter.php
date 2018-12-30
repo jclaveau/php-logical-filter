@@ -145,11 +145,11 @@ class LogicalFilter implements \JsonSerializable
             // TrueRule when a Filter "has no rule". So it's the equivalent of
             // "and true" or "or true".
             // Remove it while fixing https://github.com/jclaveau/php-logical-filter/issues/59
-            if ($operation == AndRule::operator) {
+            if (AndRule::operator == $operation) {
                 // A && True <=> A
                 return $this;
             }
-            elseif ($operation == OrRule::operator) {
+            elseif (OrRule::operator == $operation) {
                 // A || True <=> True
                 $this->rules = null;
                 return $this;
@@ -161,7 +161,7 @@ class LogicalFilter implements \JsonSerializable
             }
         }
 
-        if (   count($rules_description) == 3
+        if (   3 == count($rules_description)
             && is_string($rules_description[0])
             && is_string($rules_description[1])
         ) {
@@ -181,7 +181,7 @@ class LogicalFilter implements \JsonSerializable
             // Already instanciated rules
             foreach ($rules_description as $i => $filter) {
                 $rules = $filter->getRules();
-                if ($rules !== null) {
+                if (null !== $rules) {
                     $this->addRule( $rules, $operation);
                 }
             }
@@ -194,7 +194,7 @@ class LogicalFilter implements \JsonSerializable
                 $this->addRule( $new_rule, $operation);
             }
         }
-        elseif (count($rules_description) == 1 && is_array($rules_description[0])) {
+        elseif (1 == count($rules_description) && is_array($rules_description[0])) {
             if (count($rules_description[0]) == count(array_filter($rules_description[0], function($arg) {
                 return $arg instanceof AbstractRule;
             })) ) {
@@ -243,16 +243,16 @@ class LogicalFilter implements \JsonSerializable
             );
         }
 
-        if ($this->rules === null) {
+        if (null === $this->rules) {
             $this->rules = $rule;
         }
         elseif (($tmp_rules = $this->rules) // $this->rules::operator not supported in PHP 5.6
             && ($tmp_rules::operator != $operation)
         ) {
-            if ($operation == AndRule::operator) {
+            if (AndRule::operator == $operation) {
                 $this->rules = new AndRule([$this->rules, $rule]);
             }
-            elseif ($operation == OrRule::operator) {
+            elseif (OrRule::operator == $operation) {
                 $this->rules = new OrRule([$this->rules, $rule]);
             }
             else {
@@ -293,7 +293,7 @@ class LogicalFilter implements \JsonSerializable
                 .var_export($rules_composition, true)
             );
         }
-        elseif ( count($rules_composition) == 3
+        elseif ( 3 == count($rules_composition)
             && ! in_array( AndRule::operator, $rules_composition, true )
             && ! in_array( OrRule::operator,  $rules_composition, true )
             && ! in_array( NotRule::operator, $rules_composition, true )
@@ -313,7 +313,7 @@ class LogicalFilter implements \JsonSerializable
         }
         else {
             // operations
-            if (   $rules_composition[0] == NotRule::operator
+            if (   NotRule::operator == $rules_composition[0]
                 || $rules_composition[0] == AbstractRule::findSymbolicOperator( NotRule::operator ) ) {
                 $rule = new NotRule();
             }
@@ -344,17 +344,17 @@ class LogicalFilter implements \JsonSerializable
             $non_true_rule_descriptions = array_filter(
                 $operands_descriptions,
                 function($operand) {
-                    return $operand !== null  // no rule <=> true
-                        || $operand !== true
+                    return null !== $operand  // no rule <=> true
+                        || true !== $operand
                         ;
                 }
             );
 
             foreach ($operands_descriptions as $i => $operands_description) {
-                if ($operands_description === false) {
+                if (false === $operands_description) {
                     $operands_descriptions[ $i ] = ['and']; // FalseRule hack
                 }
-                elseif ($operands_description === null || $operands_description === true) {
+                elseif (null === $operands_description || true === $operands_description) {
                     $operands_description = ['and'];
                     if ( ! $non_true_rule_descriptions) {
                         throw new \LogicException(
@@ -385,7 +385,7 @@ class LogicalFilter implements \JsonSerializable
                 );
             }
 
-            if ($operator == NotRule::operator && count($operands_descriptions) != 1) {
+            if (NotRule::operator == $operator && 1 != count($operands_descriptions)) {
                 throw new \InvalidArgumentException(
                     "Negations can have only one operand: \n"
                     .var_export($rules_composition, true)
@@ -727,7 +727,7 @@ class LogicalFilter implements \JsonSerializable
             );
 
             // TODO replace it by a FalseRule
-            if ($this->rules === false) {
+            if (false === $this->rules) {
                 $this->rules = new AndRule;
             }
         }

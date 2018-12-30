@@ -23,7 +23,7 @@ abstract class MinimalConverter implements ConverterInterface
         $rootOr = $filter->simplify(['force_logical_core' => true])->getRules();
 
         // TODO remove this once TrueRule implemented https://github.com/jclaveau/php-logical-filter/issues/59
-        if ($rootOr === null) {
+        if (null === $rootOr) {
             return $this;
         }
 
@@ -37,7 +37,7 @@ abstract class MinimalConverter implements ConverterInterface
 
             foreach ($operandsByFields as $field => $operandsByOperator) {
                 foreach ($operandsByOperator as $operator => $operandsOfOperator) {
-                    if (count($operandsOfOperator) != 1) {
+                    if (1 != count($operandsOfOperator)) {
                         throw new \RuntimeException(
                              "Once a logical filter is simplified, there MUST be "
                             ."no more than one operand by operator instead of for '$field' / '$operator': "

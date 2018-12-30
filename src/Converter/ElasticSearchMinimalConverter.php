@@ -59,8 +59,8 @@ class ElasticSearchMinimalConverter extends MinimalConverter
      */
     public function onAndPossibility($field, $operator, $operand, array $allOperandsByField)
     {
-        if ($operator == '=') {
-            if ($operand->getValue() === null) {
+        if ('=' == $operator) {
+            if (null === $operand->getValue()) {
                 // https://www.elastic.co/guide/en/elasticsearch/guide/current/_dealing_with_null_values.html#_missing_query
                 $new_rule = [
                     'missing' => [
@@ -76,14 +76,14 @@ class ElasticSearchMinimalConverter extends MinimalConverter
                 ];
             }
         }
-        elseif ($operator == 'in') {
+        elseif ('in' == $operator) {
             $new_rule = [
                 'terms' => [
                     $field => $operand->getPossibilities(),
                 ],
             ];
         }
-        elseif ($operator == '<') {
+        elseif ('<' == $operator) {
             $new_rule = [
                 'range' => [
                     $field => [
@@ -92,7 +92,7 @@ class ElasticSearchMinimalConverter extends MinimalConverter
                 ],
             ];
         }
-        elseif ($operator == '>') {
+        elseif ('>' == $operator) {
             $new_rule = [
                 'range' => [
                     $field => [
@@ -101,7 +101,7 @@ class ElasticSearchMinimalConverter extends MinimalConverter
                 ],
             ];
         }
-        elseif ($operator == '<=') {
+        elseif ('<=' == $operator) {
             $new_rule = [
                 'range' => [
                     $field => [
@@ -110,7 +110,7 @@ class ElasticSearchMinimalConverter extends MinimalConverter
                 ],
             ];
         }
-        elseif ($operator == '>=') {
+        elseif ('>=' == $operator) {
             $new_rule = [
                 'range' => [
                     $field => [
@@ -119,7 +119,7 @@ class ElasticSearchMinimalConverter extends MinimalConverter
                 ],
             ];
         }
-        elseif ($operator == '!=' && $operand->getValue() === null) {
+        elseif ('!=' == $operator && null === $operand->getValue()) {
             // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html
             $new_rule = [
                 'exists' => [
@@ -127,7 +127,7 @@ class ElasticSearchMinimalConverter extends MinimalConverter
                 ],
             ];
         }
-        elseif ($operator == 'regexp') {
+        elseif ('regexp' == $operator) {
             // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html
             $new_rule = [
                 'regexp' => [

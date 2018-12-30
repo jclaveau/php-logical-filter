@@ -31,7 +31,7 @@ class NotRule extends AbstractOperationRule
     {
         $operand = $this->getOperandAt(0);
 
-        return $operand !== null;
+        return null !== $operand;
     }
 
     /**
@@ -72,7 +72,7 @@ class NotRule extends AbstractOperationRule
             // ! (  !  a) : a
             $new_rule = $operand->getOperandAt(0);
         }
-        elseif ($operand instanceof EqualRule && $operand->getValue() === null) {
+        elseif ($operand instanceof EqualRule && null === $operand->getValue()) {
             $new_rule = new NotEqualRule($field, null);
         }
         elseif ($operand instanceof EqualRule) {

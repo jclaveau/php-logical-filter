@@ -79,7 +79,7 @@ class RuleFilterer extends Filterer
             return null;
         }
 
-        if ($field === self::field) {
+        if (self::field === $field) {
             if ( ! method_exists($rule, 'getField')) {
                 // if (in_array( get_class($rule), [AndRule::class, OrRule::class]))
                 return null; // The filter cannot be applied to this rule
@@ -94,13 +94,13 @@ class RuleFilterer extends Filterer
                 return  null;
             }
         }
-        elseif ($field === self::operator) {
+        elseif (self::operator === $field) {
             $value_to_compare = $rule::operator;
         }
-        elseif ($field === self::value) {
+        elseif (self::value === $field) {
             $description = $rule->toArray();
 
-            if (    count($description) === 3
+            if (    3 === count($description)
                 && is_string($description[0])
                 && is_string($description[1]) ) {
                 $value_to_compare = $description[2];
@@ -109,18 +109,18 @@ class RuleFilterer extends Filterer
                 return null; // The filter cannot be applied to this rule
             }
         }
-        elseif ($field === self::description) {
+        elseif (self::description === $field) {
             $value_to_compare = $rule->toArray();
         }
-        elseif ($field === self::depth) {
+        elseif (self::depth === $field) {
             // original $depth is lost once the filter is simplified
             throw new \InvalidArgumentException('Depth rule uppport not implemented');
         }
-        elseif ($field === self::path) {
+        elseif (self::path === $field) {
             // TODO the description of its parents
             throw new \InvalidArgumentException('Path rule uppport not implemented');
         }
-        elseif ($field === self::children) {
+        elseif (self::children === $field) {
             if ( ! method_exists($rule, 'getOperands')) {
                 return null; // The filter cannot be applied to this rule
             }
@@ -142,8 +142,8 @@ class RuleFilterer extends Filterer
             );
         }
 
-        if ($operator === EqualRule::operator) {
-            if ($value === null) {
+        if (EqualRule::operator === $operator) {
+            if (null === $value) {
                 $out = is_null($value_to_compare);
             }
             else {
@@ -151,19 +151,19 @@ class RuleFilterer extends Filterer
                 $out = $value_to_compare == $value;
             }
         }
-        elseif ($operator === InRule::operator) {
+        elseif (InRule::operator === $operator) {
             $out = in_array($value_to_compare, $value);
         }
-        elseif ($operator === BelowRule::operator) {
+        elseif (BelowRule::operator === $operator) {
             $out = $value_to_compare < $value;
         }
-        elseif ($operator === AboveRule::operator) {
+        elseif (AboveRule::operator === $operator) {
             $out = $value_to_compare > $value;
         }
-        elseif ($operator === RegexpRule::operator) {
+        elseif (RegexpRule::operator === $operator) {
             // TODO support optionnal parameters
             $out = preg_match($value, $value_to_compare);
-            if ($out === false) {
+            if (false === $out) {
                 throw new \InvalidArgumentEXception(
                     "Error while calling preg_match( $value ) on: \n"
                     .var_export($value_to_compare, true)
@@ -171,15 +171,15 @@ class RuleFilterer extends Filterer
             }
             $out = (bool) $out;
         }
-        elseif ($operator === NotEqualRule::operator) {
-            if ($value === null) {
+        elseif (NotEqualRule::operator === $operator) {
+            if (null === $value) {
                 $out = ! is_null($value_to_compare);
             }
             else {
                 $out = $value != $value_to_compare;
             }
         }
-        elseif ($operator === NotInRule::operator) {
+        elseif (NotInRule::operator === $operator) {
             $out = ! in_array($value_to_compare, $value);
         }
         else {

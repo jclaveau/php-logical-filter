@@ -37,18 +37,18 @@ class PhpFilterer extends Filterer
             $value_to_validate = $row[ $field ];
         }
 
-        if ($operator === EqualRule::operator) {
+        if (EqualRule::operator === $operator) {
             if ( ! isset($value_to_validate)) {
                 // ['field', '=', null] <=> isset($row['field'])
                 // [row, '=', null] <=> $row !== null
-                $result = $value === null;
+                $result = null === $value;
             }
             else {
                 // TODO support strict comparisons
                 $result = $value_to_validate == $value;
             }
         }
-        elseif ($operator === InRule::operator) {
+        elseif (InRule::operator === $operator) {
             if ( ! isset($value_to_validate)) {
                 $result = false;
             }
@@ -56,7 +56,7 @@ class PhpFilterer extends Filterer
                 $result = in_array($value_to_validate, $value);
             }
         }
-        elseif ($operator === BelowRule::operator) {
+        elseif (BelowRule::operator === $operator) {
             if ( ! isset($value_to_validate)) {
                 $result = false;
             }
@@ -64,7 +64,7 @@ class PhpFilterer extends Filterer
                 $result = $value_to_validate < $value;
             }
         }
-        elseif ($operator === AboveRule::operator) {
+        elseif (AboveRule::operator === $operator) {
             if ( ! isset($value_to_validate)) {
                 $result = false;
             }
@@ -72,15 +72,15 @@ class PhpFilterer extends Filterer
                 $result = $value_to_validate > $value;
             }
         }
-        elseif ($operator === NotEqualRule::operator) {
-            if ($value === null) {
+        elseif (NotEqualRule::operator === $operator) {
+            if (null === $value) {
                 $result = isset($value_to_validate);
             }
             else {
                 $result = $value_to_validate != $value;
             }
         }
-        elseif ($operator === NotInRule::operator) {
+        elseif (NotInRule::operator === $operator) {
             if ( ! isset($value_to_validate)) {
                 $result = true;
             }

@@ -284,7 +284,7 @@ class InRule extends OrRule
      */
     public function isNormalizationAllowed(array $contextual_options)
     {
-        if (($threshold = $this->getOption('in.normalization_threshold', $contextual_options)) === null) {
+        if (null === ($threshold = $this->getOption('in.normalization_threshold', $contextual_options))) {
             return false;
         }
 

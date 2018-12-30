@@ -130,7 +130,7 @@ abstract class Filterer implements FiltererInterface
             // ->dump(true)
             ;
 
-        if ($root_OrRule !== null) {
+        if (null !== $root_OrRule) {
             if ( ! $root_OrRule->hasSolution()) {
                 return null;
             }
@@ -168,7 +168,7 @@ abstract class Filterer implements FiltererInterface
         foreach ($tree_to_filter as $row_index => $row_to_filter) {
             array_push($path, $row_index);
 
-            if ($options['recurse'] == 'before') {
+            if ('before' == $options['recurse']) {
                 if ($children = $this->getChildren($row_to_filter)) {
                     $filtered_children = $this->foreachRow(
                         $root_cases,
@@ -186,16 +186,16 @@ abstract class Filterer implements FiltererInterface
             if ($matching_case) {
                 $this->onRowMatches($row_to_filter, $row_index, $tree_to_filter, $matching_case, $options);
             }
-            elseif ($matching_case === false) {
+            elseif (false === $matching_case) {
                 // No case match the rule
                 $this->onRowMismatches($row_to_filter, $row_index, $tree_to_filter, $matching_case, $options);
             }
-            elseif ($matching_case === null) {
+            elseif (null === $matching_case) {
                 // We simply avoid rules
                 // row out of scope
             }
 
-            if ($options['recurse'] == 'after') {
+            if ('after' == $options['recurse']) {
                 if ($children = $this->getChildren($row_to_filter)) {
                     $filtered_children = $this->foreachRow(
                         $root_cases,
@@ -229,7 +229,7 @@ abstract class Filterer implements FiltererInterface
             // ->dump(true)
             ;
 
-        if ($root_OrRule !== null) {
+        if (null !== $root_OrRule) {
             if ( ! $root_OrRule->hasSolution()) {
                 return null;
             }
@@ -305,28 +305,28 @@ abstract class Filterer implements FiltererInterface
                         $operands_validation_row_cache[ $cache_key ] = $is_valid;
                     }
 
-                    if ($is_valid === false) {
+                    if (false === $is_valid) {
                         // one of the rules of the and_case do not validate
                         // so all the and_case is invalid
                         $case_is_good = false;
                         break;
                     }
-                    elseif ($is_valid === true) {
+                    elseif (true === $is_valid) {
                         // one of the rules of the and_case do not validate
                         // so all the and_case is invalid
                         $case_is_good = true;
                     }
                 }
 
-                if ($case_is_good === true) {
+                if (true === $case_is_good) {
                     // at least one and_case works so we can stop here
                     $matching_case = $and_case;
                     break;
                 }
-                elseif ($case_is_good === false) {
+                elseif (false === $case_is_good) {
                     $matching_case = false;
                 }
-                elseif ($case_is_good === null) {
+                elseif (null === $case_is_good) {
                     // row out of scope
                 }
             }

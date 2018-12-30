@@ -124,25 +124,25 @@ class InlineSqlMinimalConverter extends MinimalConverter
             );
         }
 
-        if (gettype($value) == 'integer') {
+        if ('integer' == gettype($value)) {
         }
-        elseif (gettype($value) == 'double') {
+        elseif ('double' == gettype($value)) {
             // TODO disable locale to handle separators
         }
         elseif ($value instanceof \DateTime) {
             $value = "'" . $value->format('Y-m-d H:i:s') . "'";
         }
-        elseif (gettype($value) == 'string') {
+        elseif ('string' == gettype($value)) {
             $value = $this->addParameter($value);
         }
-        elseif (gettype($value) == 'array') {
+        elseif ('array' == gettype($value)) {
             $sql_part = [];
             foreach ($value as $possibility) {
                 $sql_part[] = $this->addParameter($possibility);
             }
             $value = '(' . implode(', ', $sql_part) . ')';
         }
-        elseif ($value === null) {
+        elseif (null === $value) {
             $value = "NULL";
             if ($rule instanceof EqualRule) {
                 $operator = 'IS';

@@ -54,7 +54,7 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function isSimplified()
     {
-        return $this->current_simplification_step == self::simplified;
+        return self::simplified == $this->current_simplification_step;
     }
 
     /**
@@ -137,7 +137,7 @@ abstract class AbstractOperationRule extends AbstractRule
         }
 
         // if ($this->isNormalizationAllowed($simplification_options) && !$force && $this->current_simplification_step != null) {
-        if ( ! $force && $this->current_simplification_step !== null) {
+        if ( ! $force && null !== $this->current_simplification_step) {
             $steps_indices = array_flip(self::simplification_steps);
 
             $current_index = $steps_indices[ $this->current_simplification_step ];
@@ -174,7 +174,7 @@ abstract class AbstractOperationRule extends AbstractRule
             );
         }
 
-        if ($this->current_simplification_step === null) {
+        if (null === $this->current_simplification_step) {
             return false;
         }
 
@@ -286,7 +286,7 @@ abstract class AbstractOperationRule extends AbstractRule
 
             if (
                     ($operand instanceof AndRule || $operand instanceof OrRule)
-                && $count == 1
+                && 1 == $count
             ) {
                 $sub_operands       = $operand->getOperands();
                 $this->operands[$i] = reset($sub_operands);
@@ -396,7 +396,7 @@ abstract class AbstractOperationRule extends AbstractRule
 
         $cache_keys[] = $instance->getSemanticId().'-'.$options_id;
 
-        if ($step_to_stop_before == self::remove_negations) {
+        if (self::remove_negations == $step_to_stop_before) {
             return $instance;
         }
 
@@ -405,8 +405,8 @@ abstract class AbstractOperationRule extends AbstractRule
 
         // $instance->dump(true);
 
-        if ($step_to_stop_after == self::remove_negations ||
-            $step_to_stop_before == self::rootify_disjunctions ) {
+        if (self::remove_negations == $step_to_stop_after ||
+            self::rootify_disjunctions == $step_to_stop_before ) {
             return $instance;
         }
 
@@ -417,8 +417,8 @@ abstract class AbstractOperationRule extends AbstractRule
 
         // $instance->dump(true);
 
-        if ($step_to_stop_after == self::rootify_disjunctions ||
-            $step_to_stop_before == self::unify_atomic_operands ) {
+        if (self::rootify_disjunctions == $step_to_stop_after ||
+            self::unify_atomic_operands == $step_to_stop_before ) {
             return $instance;
         }
 
@@ -428,8 +428,8 @@ abstract class AbstractOperationRule extends AbstractRule
 
             // $instance->dump(true);
 
-            if ($step_to_stop_after == self::unify_atomic_operands ||
-                $step_to_stop_before == self::remove_invalid_branches ) {
+            if (self::unify_atomic_operands == $step_to_stop_after ||
+                self::remove_invalid_branches == $step_to_stop_before ) {
                 return $instance;
             }
 
@@ -456,7 +456,7 @@ abstract class AbstractOperationRule extends AbstractRule
                 // ->dump(true)
                 ->getOperands();
 
-            if (count($operands) == 1) {
+            if (1 == count($operands)) {
                 $instance = reset($operands);
             }
         }
