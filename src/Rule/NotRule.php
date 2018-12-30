@@ -284,7 +284,7 @@ class NotRule extends AbstractOperationRule
      * @param  array          $contextual_options
      * @return OrRule The current instance (of or or subclass) or a new OrRule
      */
-    public function setOperandsOrReplaceByOperation($new_operands, array $contextual_options)
+    public function setOperandsOrReplaceByOperation(array $new_operands, array $contextual_options)
     {
         if (count($new_operands) > 1) {
             foreach ($new_operands as &$new_operand) {
@@ -313,17 +313,12 @@ class NotRule extends AbstractOperationRule
             return new NotInRule( $new_operand->getField(), $new_operand->getPossibilities(), $this->options );
         }
 
-        try {
-            // Don't use addOperand here to allow inheritance for optimizations (e.g. NotInRule)
-            $out = $this->setOperands( $new_operands );
-        }
-        catch (\LogicException $e) {
-            $out = new NotRule( $new_operand );
-        }
+        // Don't use addOperand here to allow inheritance for optimizations (e.g. NotInRule)
+        $out = $this->setOperands($new_operands);
 
-        // $out->dump();
-
-        return $out;
+        return $out
+            // ->dump()
+            ;
     }
 
     /**
