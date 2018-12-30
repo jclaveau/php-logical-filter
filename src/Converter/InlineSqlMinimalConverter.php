@@ -33,13 +33,15 @@ class InlineSqlMinimalConverter extends MinimalConverter
      */
     public function addParameter($value)
     {
-        if (is_numeric($value))
+        if (is_numeric($value)) {
             return $value;
+        }
 
         $uid = 'param_'.hash('crc32b', serialize($value));
 
-        if (isset($this->parameters[$uid]))
+        if (isset($this->parameters[$uid])) {
             return ':'.$uid;
+        }
 
         $this->parameters[$uid] = $value;
 
