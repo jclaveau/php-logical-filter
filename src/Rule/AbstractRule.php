@@ -101,7 +101,7 @@ abstract class AbstractRule implements \JsonSerializable
     /**
      * Clones the rule with a chained syntax.
      *
-     * @return Rule A copy of the current instance.
+     * @return AbstractRule A copy of the current instance.
      */
     public function copy()
     {
