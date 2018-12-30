@@ -46,7 +46,7 @@
         "squizlabs/php_codesniffer": "*"
     },
     "require": {
-        "jclaveau/php-visibility-violator": "dev-master",
+        "jclaveau/php-visibility-violator": "0.1.*",
         "php": ">=5.6.0",
         "jclaveau/php-deferred-callchain": "^1.0"
     }

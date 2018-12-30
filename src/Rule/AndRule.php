@@ -25,7 +25,7 @@ class AndRule extends AbstractOperationRule
             return $this;
         }
 
-        $this->moveSimplificationStepForward( self::rootify_disjunctions, $simplification_options );
+        $this->moveSimplificationStepForward(self::rootify_disjunctions, $simplification_options);
 
         $upLiftedOperands = [];
         foreach ($this->getOperands() as $operand) {
