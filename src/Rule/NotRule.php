@@ -41,7 +41,8 @@ class NotRule extends AbstractOperationRule
      * @todo use get_class instead of instanceof to avoid order issue
      *       in the conditions.
      *
-     * @return array
+     * @param  array
+     * @return AbstractRule
      */
     public function negateOperand(array $current_simplification_options)
     {
@@ -181,12 +182,9 @@ class NotRule extends AbstractOperationRule
     }
 
     /**
-     * Replace all the OrRules of the RuleTree by one OrRule at its root.
+     * @todo   Todo remove this method while refactoring the Class tree
      *
-     * @todo rename as RootifyDisjunjctions?
-     * @todo return $this (implements a Rule monad?)
-     *
-     * @return OrRule copied operands with one OR at its root
+     * @return NotRule
      */
     public function rootifyDisjunctions($simplification_options)
     {
@@ -196,11 +194,7 @@ class NotRule extends AbstractOperationRule
 
         $this->moveSimplificationStepForward( self::rootify_disjunctions, $simplification_options );
 
-        foreach ($this->operands as $id => $operand) {
-            if ($operand instanceof AbstractOperationRule) {
-                $this->operands[$id] = $operand->rootifyDisjunctions($simplification_options);
-            }
-        }
+        // not implemented
 
         return $this;
     }
@@ -286,6 +280,8 @@ class NotRule extends AbstractOperationRule
      * This method is meant to be used during simplification that would
      * need to change the class of the current instance by a normal one.
      *
+     * @param  AbstractRule[] $new_operands
+     * @param  array          $contextual_options
      * @return OrRule The current instance (of or or subclass) or a new OrRule
      */
     public function setOperandsOrReplaceByOperation($new_operands, array $contextual_options)
