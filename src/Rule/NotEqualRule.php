@@ -16,7 +16,7 @@ class NotEqualRule extends NotRule
 
     /**
      * @param string $field The field to apply the rule on.
-     * @param array  $value The value the field can equal to.
+     * @param mixed  $value The value the field can equal to.
      */
     public function __construct( $field, $value, array $options=[] )
     {
