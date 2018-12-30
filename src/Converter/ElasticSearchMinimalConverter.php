@@ -29,7 +29,7 @@ class ElasticSearchMinimalConverter extends MinimalConverter
         return [
             'bool' => [
                 'minimum_should_match' => 1, // default
-                'should' => $this->output,
+                'should'               => $this->output,
             ]
         ];
     }
@@ -161,7 +161,7 @@ class ElasticSearchMinimalConverter extends MinimalConverter
      */
     protected function appendToLastOrOperandKey($rule)
     {
-        $last_key = $this->getLastOrOperandKey();
+        $last_key                                    = $this->getLastOrOperandKey();
         $this->output[ $last_key ]['bool']['must'][] = $rule;
     }
 

@@ -74,7 +74,7 @@ class InlineSqlMinimalConverter extends MinimalConverter
      */
     public function onCloseOr()
     {
-        $last_key = $this->getLastOrOperandKey();
+        $last_key                  = $this->getLastOrOperandKey();
         $this->output[ $last_key ] = implode(' AND ', $this->output[ $last_key ]);
     }
 
@@ -95,7 +95,7 @@ class InlineSqlMinimalConverter extends MinimalConverter
         }
         elseif ($rule instanceof NotInRule) {
             $operator = 'NOT IN';
-            $value = $rule->getPossibilities();
+            $value    = $rule->getPossibilities();
             if (is_object($value) && method_exists('toArray', $value)) {
                 $value = $value->toArray();
             }
@@ -182,7 +182,7 @@ class InlineSqlMinimalConverter extends MinimalConverter
      */
     protected function appendToLastOrOperandKey($rule)
     {
-        $last_key = $this->getLastOrOperandKey();
+        $last_key                    = $this->getLastOrOperandKey();
         $this->output[ $last_key ][] = $rule;
     }
 
