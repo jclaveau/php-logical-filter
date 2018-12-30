@@ -234,11 +234,11 @@ abstract class AbstractOperationRule extends AbstractRule
     {
         if ($recurse) {
             foreach ($this->operands as $i => $operand) {
-                if ( $operand instanceof AbstractOperationRule
-                && ! $operand instanceof InRule
-                && ! $operand instanceof NotEqualRule
-                && ! $operand instanceof NotInRule
-            ) {
+                if (     $operand instanceof AbstractOperationRule
+                    && ! $operand instanceof InRule
+                    && ! $operand instanceof NotEqualRule
+                    && ! $operand instanceof NotInRule
+                ) {
                     $this->operands[$i] = $operand->cleanOperations($simplification_options);
                 }
             }
