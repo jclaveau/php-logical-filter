@@ -356,7 +356,7 @@ class LogicalFilter implements \JsonSerializable
                 }
                 elseif (null === $operands_description || true === $operands_description) {
                     $operands_description = ['and'];
-                    if ( ! $non_true_rule_descriptions) {
+                    if (empty($non_true_rule_descriptions)) {
                         throw new \LogicException(
                             "TrueRules are not implemented. Please add "
                             ."them to operations having other type of rules"
@@ -377,7 +377,7 @@ class LogicalFilter implements \JsonSerializable
                 }
             );
 
-            if ($remaining_operations) {
+            if ( ! empty($remaining_operations)) {
                 throw new \InvalidArgumentException(
                     "Mixing different operations in the same rule level not implemented: \n["
                     . implode(', ', $remaining_operations)."]\n"
