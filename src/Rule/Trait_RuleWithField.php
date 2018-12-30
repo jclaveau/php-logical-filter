@@ -25,7 +25,7 @@ trait Trait_RuleWithField
      */
     final public function setField( $field )
     {
-        if (!is_scalar($field)) {
+        if ( ! is_scalar($field)) {
             throw new \InvalidArgumentEXception(
                 "\$field property of a logical rule must be a scalar contrary to: "
                 .var_export($field, true)

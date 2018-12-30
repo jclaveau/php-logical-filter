@@ -34,7 +34,7 @@ class NotInRule extends NotRule
      */
     public function getField()
     {
-        if (!$this->getOperandAt(0)) {
+        if ( ! $this->getOperandAt(0)) {
             // TODO a NotRule with no operand should be simplified as
             //      a TrueRule
             throw new \LogicException(
@@ -49,7 +49,7 @@ class NotInRule extends NotRule
      */
     public function setField($field)
     {
-        if (!$this->getOperandAt(0)) {
+        if ( ! $this->getOperandAt(0)) {
             // TODO a NotRule with no operand should be simplified as
             //      a TrueRule
             throw new \LogicException(
@@ -129,7 +129,7 @@ class NotInRule extends NotRule
             'show_instance' => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ])) {
+            if ( ! isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
             }
         }

@@ -66,7 +66,7 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function addOperand( AbstractRule $new_operand )
     {
-        if (!isset($this->operands[ $id = $new_operand->getSemanticId() ])) {
+        if ( ! isset($this->operands[ $id = $new_operand->getSemanticId() ])) {
             $this->operands[ $id ] = $new_operand;
 
             if ($this->current_simplification_step) {
@@ -130,14 +130,14 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function moveSimplificationStepForward($step_to_go_to, array $simplification_options, $force=false)
     {
-        if (!in_array($step_to_go_to, self::simplification_steps)) {
+        if ( ! in_array($step_to_go_to, self::simplification_steps)) {
             throw new \InvalidArgumentException(
                 "Invalid simplification step to go to: ".$step_to_go_to
             );
         }
 
         // if ($this->isNormalizationAllowed($simplification_options) && !$force && $this->current_simplification_step != null) {
-        if (!$force && $this->current_simplification_step !== null) {
+        if ( ! $force && $this->current_simplification_step !== null) {
             $steps_indices = array_flip(self::simplification_steps);
 
             $current_index = $steps_indices[ $this->current_simplification_step ];
@@ -168,7 +168,7 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function simplicationStepReached($step)
     {
-        if (!in_array($step, self::simplification_steps)) {
+        if ( ! in_array($step, self::simplification_steps)) {
             throw new \InvalidArgumentException(
                 "Invalid simplification step: ".$step
             );
@@ -193,7 +193,7 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function removeNegations(array $contextual_options)
     {
-        if (!$this->isNormalizationAllowed($contextual_options)) {
+        if ( ! $this->isNormalizationAllowed($contextual_options)) {
             return $this;
         }
 
@@ -231,10 +231,10 @@ abstract class AbstractOperationRule extends AbstractRule
     {
         if ($recurse) {
             foreach ($this->operands as $i => $operand) {
-                if (    $operand instanceof AbstractOperationRule
-                && !$operand instanceof InRule
-                && !$operand instanceof NotEqualRule
-                && !$operand instanceof NotInRule
+                if ( $operand instanceof AbstractOperationRule
+                && ! $operand instanceof InRule
+                && ! $operand instanceof NotEqualRule
+                && ! $operand instanceof NotInRule
             ) {
                     $this->operands[$i] = $operand->cleanOperations($simplification_options);
                 }
@@ -273,11 +273,11 @@ abstract class AbstractOperationRule extends AbstractRule
     public function removeMonooperandOperationsOperands(array $simplification_options)
     {
         foreach ($this->operands as $i => $operand) {
-            if (!$operand instanceof AbstractOperationRule || $operand instanceof NotRule) {
+            if ( ! $operand instanceof AbstractOperationRule || $operand instanceof NotRule) {
                 continue;
             }
 
-            if ($operand instanceof InRule && !$operand->isNormalizationAllowed($simplification_options)) {
+            if ($operand instanceof InRule && ! $operand->isNormalizationAllowed($simplification_options)) {
                 $count = count($operand->getPossibilities());
             }
             else {
@@ -294,7 +294,7 @@ abstract class AbstractOperationRule extends AbstractRule
             }
         }
 
-        return !empty($has_been_changed);
+        return ! empty($has_been_changed);
     }
 
     /**
@@ -310,7 +310,7 @@ abstract class AbstractOperationRule extends AbstractRule
 
         // $this->dump(true);
 
-        if (!$this->isNormalizationAllowed($contextual_options)) {
+        if ( ! $this->isNormalizationAllowed($contextual_options)) {
             return $this;
         }
 
@@ -367,11 +367,11 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     final public function simplify($options=[])
     {
-        $step_to_stop_before = !empty($options['stop_before'])        ? $options['stop_before'] : null;
-        $step_to_stop_after  = !empty($options['stop_after'])         ? $options['stop_after']  : null;
-        $force_logical_core  = !empty($options['force_logical_core']) ? $options['force_logical_core'] : false;
+        $step_to_stop_before = ! empty($options['stop_before'])        ? $options['stop_before'] : null;
+        $step_to_stop_after  = ! empty($options['stop_after'])         ? $options['stop_after']  : null;
+        $force_logical_core  = ! empty($options['force_logical_core']) ? $options['force_logical_core'] : false;
 
-        if ($step_to_stop_before && !in_array($step_to_stop_before, self::simplification_steps)) {
+        if ($step_to_stop_before && ! in_array($step_to_stop_before, self::simplification_steps)) {
             throw new \InvalidArgumentException(
                 "Invalid simplification step to stop at: ".$step_to_stop_before
             );
@@ -422,7 +422,7 @@ abstract class AbstractOperationRule extends AbstractRule
             return $instance;
         }
 
-        if (!$instance instanceof AbstractAtomicRule) {
+        if ( ! $instance instanceof AbstractAtomicRule) {
             $instance->cleanOperations($options);
             $instance->unifyAtomicOperands(true, $options);
 
@@ -447,7 +447,7 @@ abstract class AbstractOperationRule extends AbstractRule
         // TODO kind of monad|become|cese
         //@see https://github.com/jclaveau/php-logical-filter/issues/20
         if ($instance instanceof AndRule || $instance instanceof OrRule ) {
-            if (!$instance->getOperands()) {
+            if ( ! $instance->getOperands()) {
                 return $instance;
             }
 
@@ -466,7 +466,7 @@ abstract class AbstractOperationRule extends AbstractRule
             $instance = $instance->forceLogicalCore();
             // for the simplification status at
             foreach ($operands = $instance->getOperands() as $andOperand) {
-                if (!$andOperand instanceof AndRule) {
+                if ( ! $andOperand instanceof AndRule) {
                     throw new \LogicException(
                         "A rule is intended to be an and case: \n"
                         .$andOperand
@@ -509,11 +509,11 @@ abstract class AbstractOperationRule extends AbstractRule
             // For FilteredValue and FilteredKey
             $field = (string) $field;
 
-            if (!isset($operandsByFields[ $field ])) {
+            if ( ! isset($operandsByFields[ $field ])) {
                 $operandsByFields[ $field ] = [];
             }
 
-            if (!isset($operandsByFields[ $field ][ $operand::operator ])) {
+            if ( ! isset($operandsByFields[ $field ][ $operand::operator ])) {
                 $operandsByFields[ $field ][ $operand::operator ] = [];
             }
 
@@ -540,11 +540,11 @@ abstract class AbstractOperationRule extends AbstractRule
             // For FilteredValue and FilteredKey
             $field = (string) $field;
 
-            if (!isset($operandsByFields[ $field ])) {
+            if ( ! isset($operandsByFields[ $field ])) {
                 $operandsByFields[ $field ] = [];
             }
 
-            if (!isset($operandsByFields[ $field ][ $operand::operator ])) {
+            if ( ! isset($operandsByFields[ $field ][ $operand::operator ])) {
                 $operandsByFields[ $field ][ $operand::operator ] = [];
             }
 

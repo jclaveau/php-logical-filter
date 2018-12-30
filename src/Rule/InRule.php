@@ -34,7 +34,7 @@ class InRule extends OrRule
      */
     public function __construct( $field, $possibilities, array $options=[] )
     {
-        if (!empty($options)) {
+        if ( ! empty($options)) {
             $this->setOptions($options);
         }
 
@@ -117,7 +117,7 @@ class InRule extends OrRule
             $possibilities = $possibilities->toArray();
         }
 
-        if (!is_array($possibilities)) {
+        if ( ! is_array($possibilities)) {
             $possibilities = [$possibilities];
         }
 
@@ -132,7 +132,7 @@ class InRule extends OrRule
                 $id = hash('crc32b', serialize($possibility));
             }
 
-            if (!isset($this->native_possibilities[ $id ])) {
+            if ( ! isset($this->native_possibilities[ $id ])) {
                 $this->native_possibilities[ $id ] = $possibility;
                 $require_cache_flush               = true;
             }
@@ -188,7 +188,7 @@ class InRule extends OrRule
      */
     protected function checkOperandAndExtractValue($operand)
     {
-        if (! $operand instanceof AbstractAtomicRule) {
+        if ( ! $operand instanceof AbstractAtomicRule) {
             return $operand;
         }
 
@@ -207,7 +207,7 @@ class InRule extends OrRule
      */
     public function getOperands()
     {
-        if (!empty($this->cache['operands'])) {
+        if ( ! empty($this->cache['operands'])) {
             return $this->cache['operands'];
         }
 
@@ -238,14 +238,14 @@ class InRule extends OrRule
             'show_instance' => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ])) {
+            if ( ! isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
             }
         }
 
         $class = get_class($this);
 
-        if (!$options['show_instance'] && isset($this->cache['array'])) {
+        if ( ! $options['show_instance'] && isset($this->cache['array'])) {
             return $this->cache['array'];
         }
 
@@ -255,7 +255,7 @@ class InRule extends OrRule
             $this->getValues(),
         ];
 
-        if (!$options['show_instance']) {
+        if ( ! $options['show_instance']) {
             return $this->cache['array'] = $array;
         }
         else {
@@ -296,7 +296,7 @@ class InRule extends OrRule
      */
     public function hasSolution(array $contextual_options=[])
     {
-        return !empty($this->getPossibilities());
+        return ! empty($this->getPossibilities());
     }
 
     /**

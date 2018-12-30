@@ -91,7 +91,7 @@ abstract class AbstractRule implements \JsonSerializable
             . str_replace('_', '', ucwords($english_rule_operator, '_'))
             . 'Rule';
 
-        if (!class_exists( $rule_class)) {
+        if ( ! class_exists( $rule_class)) {
             throw new \InvalidArgumentException(
                 "The class '$rule_class' corresponding to the  operator "
                 ."'$rule_operator' / '$english_rule_operator' cannot be found."
@@ -128,7 +128,7 @@ abstract class AbstractRule implements \JsonSerializable
             // 'show_instance'   => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ])) {
+            if ( ! isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
             }
         }
@@ -296,7 +296,7 @@ abstract class AbstractRule implements \JsonSerializable
         }
         elseif ($this instanceof OrRule) {
             foreach ($this->operands as $i => $operand) {
-                if (!$operand instanceof AndRule) {
+                if ( ! $operand instanceof AndRule) {
                     $this->operands[$i] = new AndRule([$operand]);
                 }
             }

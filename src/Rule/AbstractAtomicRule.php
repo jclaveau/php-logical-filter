@@ -27,13 +27,13 @@ abstract class AbstractAtomicRule extends AbstractRule
             'show_instance' => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ])) {
+            if ( ! isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
             }
         }
 
 
-        if (!$options['show_instance'] && !empty($this->cache['array'])) {
+        if ( ! $options['show_instance'] && ! empty($this->cache['array'])) {
             return $this->cache['array'];
         }
 
@@ -45,7 +45,7 @@ abstract class AbstractAtomicRule extends AbstractRule
             $this->getValues(),
         ];
 
-        if (!$options['show_instance']) {
+        if ( ! $options['show_instance']) {
             return $this->cache['array'] = $array;
         }
         else {
@@ -57,7 +57,7 @@ abstract class AbstractAtomicRule extends AbstractRule
      */
     public function toString(array $options=[])
     {
-        if (!empty($this->cache['string'])) {
+        if ( ! empty($this->cache['string'])) {
             return $this->cache['string'];
         }
 

@@ -1,5 +1,5 @@
 <?php
-if (!function_exists('spl_object_id')) {
+if ( ! function_exists('spl_object_id')) {
     /**
      * @see https://secure.php.net/manual/en/function.spl-object-id.php
      * This method doesn't exist before PHP 7.2.0
@@ -12,7 +12,7 @@ if (!function_exists('spl_object_id')) {
     }
 }
 
-if (!function_exists('is_iterable')) {
+if ( ! function_exists('is_iterable')) {
     /**
      * @see https://github.com/symfony/polyfill-php71/commit/36004d119352f4506398032259a08e4ca9607285
      * This method doesn't exist before PHP 7.1.0

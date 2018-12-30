@@ -18,8 +18,8 @@ class AboveRule extends AbstractAtomicRule
      */
     public function __construct( $field, $minimum )
     {
-        if (    !is_scalar($minimum)
-            && !$minimum instanceof \DateTimeInterface
+        if (   ! is_scalar($minimum)
+            && ! $minimum instanceof \DateTimeInterface
             && null !== $minimum
         ) {
             throw new \InvalidArgumentException(

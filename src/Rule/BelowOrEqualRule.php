@@ -20,7 +20,7 @@ class BelowOrEqualRule extends OrRule
      */
     public function __construct($field, $maximum, array $options=[])
     {
-        if (!empty($options)) {
+        if ( ! empty($options)) {
             $this->setOptions($options);
         }
 
@@ -73,7 +73,7 @@ class BelowOrEqualRule extends OrRule
      */
     public function getOperands()
     {
-        if (! empty($this->cache['operands'])) {
+        if ( ! empty($this->cache['operands'])) {
             return $this->cache['operands'];
         }
 
@@ -106,8 +106,8 @@ class BelowOrEqualRule extends OrRule
         }
 
         if (    count($operands) != 2
-            || !isset($equalRuleValue)
-            || !isset($belowRuleValue)
+            || ! isset($equalRuleValue)
+            || ! isset($belowRuleValue)
             || $belowRuleValue != $equalRuleValue
             || $belowRuleField != $equalRuleField
         ) {
@@ -142,7 +142,7 @@ class BelowOrEqualRule extends OrRule
             'show_instance' => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ])) {
+            if ( ! isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
             }
         }

@@ -64,12 +64,12 @@ class NotEqualRule extends NotRule
             'show_instance' => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ])) {
+            if ( ! isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
             }
         }
 
-        if (!$options['show_instance'] && isset($this->cache['array'])) {
+        if ( ! $options['show_instance'] && isset($this->cache['array'])) {
             return $this->cache['array'];
         }
 
@@ -79,7 +79,7 @@ class NotEqualRule extends NotRule
             $this->getValue(),
         ];
 
-        if (!$options['show_instance']) {
+        if ( ! $options['show_instance']) {
             return $this->cache['array'] = $array;
         }
         else {
@@ -91,7 +91,7 @@ class NotEqualRule extends NotRule
      */
     public function toString(array $options=[])
     {
-        if (!empty($this->cache['string'])) {
+        if ( ! empty($this->cache['string'])) {
             return $this->cache['string'];
         }
 

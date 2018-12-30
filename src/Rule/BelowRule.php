@@ -18,8 +18,8 @@ class BelowRule extends AbstractAtomicRule
      */
     public function __construct( $field, $maximum )
     {
-        if (    !is_scalar($maximum)
-            && !$maximum instanceof \DateTimeInterface
+        if (   ! is_scalar($maximum)
+            && ! $maximum instanceof \DateTimeInterface
             && null !== $maximum
         ) {
             throw new \InvalidArgumentException(

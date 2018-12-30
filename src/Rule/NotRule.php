@@ -14,7 +14,7 @@ class NotRule extends AbstractOperationRule
      */
     public function __construct( AbstractRule $operand=null, array $options=[] )
     {
-        if (!empty($options)) {
+        if ( ! empty($options)) {
             $this->setOptions($options);
         }
 
@@ -142,8 +142,8 @@ class NotRule extends AbstractOperationRule
         elseif ($operand instanceof OrRule) {
 
             // $operand->dump(true);
-            if (    $operand instanceof InRule
-                && !$operand->isNormalizationAllowed($current_simplification_options)
+            if (     $operand instanceof InRule
+                && ! $operand->isNormalizationAllowed($current_simplification_options)
             ) {
                 // ['not', ['field', 'in', [2, 3]]] <=> ['field', '!in', [2, 3]]
                 $new_rule = new NotInRule(
@@ -188,7 +188,7 @@ class NotRule extends AbstractOperationRule
      */
     public function rootifyDisjunctions($simplification_options)
     {
-        if (!$this->isNormalizationAllowed($simplification_options)) {
+        if ( ! $this->isNormalizationAllowed($simplification_options)) {
             return $this;
         }
 
@@ -210,7 +210,7 @@ class NotRule extends AbstractOperationRule
      */
     public function unifyAtomicOperands($simplification_strategy_step = false, array $contextual_options)
     {
-        if (!$this->isNormalizationAllowed($contextual_options)) {
+        if ( ! $this->isNormalizationAllowed($contextual_options)) {
             return $this;
         }
 
@@ -233,12 +233,12 @@ class NotRule extends AbstractOperationRule
             'semantic'      => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ])) {
+            if ( ! isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
             }
         }
 
-        if (!$options['show_instance'] && isset($this->cache['array'])) {
+        if ( ! $options['show_instance'] && isset($this->cache['array'])) {
             return $this->cache['array'];
         }
 
@@ -248,7 +248,7 @@ class NotRule extends AbstractOperationRule
         ];
 
         // TODO make a dedicated cache entry for semantic array?
-        if (!$options['show_instance'] && !$options['semantic']) {
+        if ( ! $options['show_instance'] && ! $options['semantic']) {
             return $this->cache['array'] = $array;
         }
         else {
@@ -261,7 +261,7 @@ class NotRule extends AbstractOperationRule
     public function toString(array $options=[])
     {
         $operator = self::operator;
-        if (!$this->operands) {
+        if ( ! $this->operands) {
             return "['{$operator}']";
         }
 

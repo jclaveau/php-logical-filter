@@ -63,22 +63,26 @@ class LogicalFilter implements \JsonSerializable
             );
         }
 
-        if ($default_filterer)
+        if ($default_filterer) {
             $this->default_filterer = $default_filterer;
+        }
 
-        if ($options)
+        if ($options) {
             $this->options = $options;
+        }
 
-        if ($rules)
+        if ($rules) {
             $this->and_( $rules );
+        }
     }
 
     /**
      */
     protected function getDefaultFilterer()
     {
-        if (!$this->default_filterer)
+        if ( ! $this->default_filterer) {
             $this->default_filterer = new PhpFilterer();
+        }
 
         return $this->default_filterer;
     }
@@ -87,8 +91,9 @@ class LogicalFilter implements \JsonSerializable
      */
     public static function setDefaultOptions(array $options)
     {
-        foreach ($options as $name => $default_value)
+        foreach ($options as $name => $default_value) {
             self::$default_options[$name] = $default_value;
+        }
 
         AbstractRule::flushStaticCache();
     }
@@ -107,8 +112,9 @@ class LogicalFilter implements \JsonSerializable
     public function getOptions()
     {
         $options = self::$default_options;
-        foreach ($this->options as $name => $value)
+        foreach ($this->options as $name => $value) {
             $options[$name] = $value;
+        }
 
         return $options;
     }
@@ -155,9 +161,9 @@ class LogicalFilter implements \JsonSerializable
             }
         }
 
-        if (    count($rules_description) == 3
-            &&  is_string($rules_description[0])
-            &&  is_string($rules_description[1])
+        if (   count($rules_description) == 3
+            && is_string($rules_description[0])
+            && is_string($rules_description[1])
         ) {
             // Atomic rules
             $new_rule = AbstractRule::generateSimpleRule(
@@ -175,8 +181,9 @@ class LogicalFilter implements \JsonSerializable
             // Already instanciated rules
             foreach ($rules_description as $i => $filter) {
                 $rules = $filter->getRules();
-                if ($rules !== null)
+                if ($rules !== null) {
                     $this->addRule( $rules, $operation);
+                }
             }
         }
         elseif (count($rules_description) == count(array_filter($rules_description, function($arg) {
@@ -188,7 +195,6 @@ class LogicalFilter implements \JsonSerializable
             }
         }
         elseif (count($rules_description) == 1 && is_array($rules_description[0])) {
-
             if (count($rules_description[0]) == count(array_filter($rules_description[0], function($arg) {
                 return $arg instanceof AbstractRule;
             })) ) {
@@ -229,7 +235,7 @@ class LogicalFilter implements \JsonSerializable
     protected function addRule( AbstractRule $rule, $operation=AndRule::operator )
     {
         if ( $this->rules && in_array( get_class($this->rules), [AndRule::class, OrRule::class] )
-            && !$this->rules->getOperands() ) {
+            && ! $this->rules->getOperands() ) {
             throw new \LogicException(
                  "You are trying to add rules to a LogicalFilter which had "
                 ."only contradictory rules that have already been simplified: "
@@ -241,8 +247,8 @@ class LogicalFilter implements \JsonSerializable
             $this->rules = $rule;
         }
         elseif (($tmp_rules = $this->rules) // $this->rules::operator not supported in PHP 5.6
-            &&  ($tmp_rules::operator != $operation)) {
-
+            && ($tmp_rules::operator != $operation)
+        ) {
             if ($operation == AndRule::operator) {
                 $this->rules = new AndRule([$this->rules, $rule]);
             }
@@ -278,7 +284,7 @@ class LogicalFilter implements \JsonSerializable
         array $rules_composition,
         AbstractOperationRule $recursion_position
     ) {
-        if (!array_filter($rules_composition, function ($rule_composition_part) {
+        if ( ! array_filter($rules_composition, function ($rule_composition_part) {
             return is_string($rule_composition_part);
         })) {
             // at least one operator is required for operation rules
@@ -287,13 +293,13 @@ class LogicalFilter implements \JsonSerializable
                 .var_export($rules_composition, true)
             );
         }
-        elseif (    count($rules_composition) == 3
-            &&  !in_array( AndRule::operator, $rules_composition, true )
-            &&  !in_array( OrRule::operator,  $rules_composition, true )
-            &&  !in_array( NotRule::operator, $rules_composition, true )
-            &&  !in_array( AbstractRule::findSymbolicOperator( AndRule::operator ), $rules_composition, true )
-            &&  !in_array( AbstractRule::findSymbolicOperator( OrRule::operator ),  $rules_composition, true )
-            &&  !in_array( AbstractRule::findSymbolicOperator( NotRule::operator ), $rules_composition, true )
+        elseif ( count($rules_composition) == 3
+            && ! in_array( AndRule::operator, $rules_composition, true )
+            && ! in_array( OrRule::operator,  $rules_composition, true )
+            && ! in_array( NotRule::operator, $rules_composition, true )
+            && ! in_array( AbstractRule::findSymbolicOperator( AndRule::operator ), $rules_composition, true )
+            && ! in_array( AbstractRule::findSymbolicOperator( OrRule::operator ),  $rules_composition, true )
+            && ! in_array( AbstractRule::findSymbolicOperator( NotRule::operator ), $rules_composition, true )
         ) {
             // atomic or composit rules
             $operand_left  = $rules_composition[0];
@@ -307,16 +313,16 @@ class LogicalFilter implements \JsonSerializable
         }
         else {
             // operations
-            if (    $rules_composition[0] == NotRule::operator
-                ||  $rules_composition[0] == AbstractRule::findSymbolicOperator( NotRule::operator ) ) {
+            if (   $rules_composition[0] == NotRule::operator
+                || $rules_composition[0] == AbstractRule::findSymbolicOperator( NotRule::operator ) ) {
                 $rule = new NotRule();
             }
             elseif (in_array( AndRule::operator, $rules_composition )
-                ||  in_array( AbstractRule::findSymbolicOperator( AndRule::operator ), $rules_composition )) {
+                || in_array( AbstractRule::findSymbolicOperator( AndRule::operator ), $rules_composition )) {
                 $rule = new AndRule();
             }
             elseif (in_array( OrRule::operator, $rules_composition )
-                ||  in_array( AbstractRule::findSymbolicOperator( OrRule::operator ), $rules_composition ) ) {
+                || in_array( AbstractRule::findSymbolicOperator( OrRule::operator ), $rules_composition ) ) {
                 $rule = new OrRule();
             }
             else {
@@ -331,7 +337,7 @@ class LogicalFilter implements \JsonSerializable
             $operands_descriptions = array_filter(
                 $rules_composition,
                 function ($operand) use ($operator) {
-                    return !in_array($operand, [$operator, AbstractRule::findSymbolicOperator( $operator )]);
+                    return ! in_array($operand, [$operator, AbstractRule::findSymbolicOperator( $operator )]);
                 }
             );
 
@@ -364,9 +370,9 @@ class LogicalFilter implements \JsonSerializable
             $remaining_operations = array_filter(
                 $operands_descriptions,
                 function($operand) {
-                    return !is_array($operand)
-                        && !$operand instanceof AbstractRule
-                        && !$operand instanceof LogicalFilter
+                    return ! is_array($operand)
+                        && ! $operand instanceof AbstractRule
+                        && ! $operand instanceof LogicalFilter
                         ;
                 }
             );
@@ -533,8 +539,9 @@ class LogicalFilter implements \JsonSerializable
      */
     public function hasSolution($save_simplification=true)
     {
-        if (!$this->rules)
+        if ( ! $this->rules) {
             return true;
+        }
 
         if ($save_simplification) {
             $this->simplify();
@@ -625,10 +632,12 @@ class LogicalFilter implements \JsonSerializable
      */
     public function renameFields($renamings)
     {
-        if (method_exists($this->rules, 'renameField'))
+        if (method_exists($this->rules, 'renameField')) {
             $this->rules->renameField($renamings);
-        elseif ($this->rules)
+        }
+        elseif ($this->rules) {
             $this->rules->renameFields($renamings);
+        }
 
         return $this;
     }
@@ -669,8 +678,9 @@ class LogicalFilter implements \JsonSerializable
             ]
         );
 
-        if ($cache_flush_required)
+        if ($cache_flush_required) {
             $this->rules->flushCache();
+        }
 
         return $this;
     }
@@ -687,7 +697,7 @@ class LogicalFilter implements \JsonSerializable
      */
     public function keepLeafRulesMatching($filter=[], array $options=[])
     {
-        $clean_empty_branches = !isset($options['clean_empty_branches']) || $options['clean_empty_branches'];
+        $clean_empty_branches = ! isset($options['clean_empty_branches']) || $options['clean_empty_branches'];
 
         $filter = (new LogicalFilter($filter, new RuleFilterer))
         // ->dump()
@@ -717,8 +727,9 @@ class LogicalFilter implements \JsonSerializable
             );
 
             // TODO replace it by a FalseRule
-            if ($this->rules === false)
+            if ($this->rules === false) {
                 $this->rules = new AndRule;
+            }
         }
 
         return $this;
@@ -739,8 +750,9 @@ class LogicalFilter implements \JsonSerializable
         // ->dump()
         ;
 
-        if (!$this->rules)
+        if ( ! $this->rules) {
             return [];
+        }
 
         $out = [];
         (new RuleFilterer)->apply(
@@ -752,10 +764,9 @@ class LogicalFilter implements \JsonSerializable
                     $key,
                     array $siblings
                 ) use (&$out) {
-
-                    if (    !$matching_rule instanceof AndRule
-                        &&  !$matching_rule instanceof OrRule
-                        &&  !$matching_rule instanceof NotRule
+                    if (   ! $matching_rule instanceof AndRule
+                        && ! $matching_rule instanceof OrRule
+                        && ! $matching_rule instanceof NotRule
                     ) {
                         $out[] = $matching_rule;
                     }
@@ -782,8 +793,9 @@ class LogicalFilter implements \JsonSerializable
         // ->dump()
         ;
 
-        if (!$this->rules)
+        if ( ! $this->rules) {
             return [];
+        }
 
         if (is_callable($options)) {
             $options = [
@@ -806,8 +818,9 @@ class LogicalFilter implements \JsonSerializable
     {
         $this->simplify(['force_logical_core' => true]);
 
-        if (! $this->rules)
+        if ( ! $this->rules) {
             return $this;
+        }
 
         $operands = $this->rules->getOperands();
 
@@ -839,8 +852,9 @@ class LogicalFilter implements \JsonSerializable
      */
     public function __clone()
     {
-        if ($this->rules)
+        if ($this->rules) {
             $this->rules = $this->rules->copy();
+        }
     }
 
     /**
@@ -880,8 +894,9 @@ class LogicalFilter implements \JsonSerializable
             'mode'            => 'string',
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ]))
+            if ( ! isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
+            }
         }
         extract($options);
 
@@ -890,15 +905,17 @@ class LogicalFilter implements \JsonSerializable
         }
         else {
             // TODO dump a TrueRule
-            $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $callstack_depth);
+            $bt     = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $callstack_depth);
             $caller = $bt[ $callstack_depth - 2 ];
 
             // get line and file from the previous level of the caller
             // TODO go deeper if this case exist?
-            if (!isset($caller['file']))
+            if ( ! isset($caller['file'])) {
                 $caller['file'] = $bt[ $callstack_depth - 3 ]['file'];
-            if (!isset($caller['line']))
+            }
+            if ( ! isset($caller['line'])) {
                 $caller['line'] = $bt[ $callstack_depth - 3 ]['line'];
+            }
 
             try {
                 echo "\n" . $caller['file'] . ':' . $caller['line'] . "\n";
@@ -914,8 +931,9 @@ class LogicalFilter implements \JsonSerializable
             }
             echo "\n\n";
 
-            if ($exit)
+            if ($exit) {
                 exit;
+            }
         }
 
         return $this;
@@ -931,13 +949,13 @@ class LogicalFilter implements \JsonSerializable
      */
     public function applyOn($data_to_filter, $action_on_matches=null, $filterer=null)
     {
-        if (!$filterer) {
+        if ( ! $filterer) {
             $filterer = $this->getDefaultFilterer();
         }
         elseif (is_callable($filterer)) {
             $filterer = new CustomizableFilterer($filterer);
         }
-        elseif (!$filterer instanceof Filterer) {
+        elseif ( ! $filterer instanceof Filterer) {
             throw new \InvalidArgumentException(
                  "The given \$filterer must be null or a callable or a instance "
                 ."of Filterer instead of: ".var_export($filterer, true)
@@ -966,13 +984,13 @@ class LogicalFilter implements \JsonSerializable
      */
     public function validates($value_to_check, $key_to_check=null, $filterer=null)
     {
-        if (!$filterer) {
+        if ( ! $filterer) {
             $filterer = $this->getDefaultFilterer();
         }
         elseif (is_callable($filterer)) {
             $filterer = new CustomizableFilterer($filterer);
         }
-        elseif (!$filterer instanceof Filterer) {
+        elseif ( ! $filterer instanceof Filterer) {
             throw new \InvalidArgumentException(
                  "The given \$filterer must be null or a callable or a instance "
                 ."of Filterer instead of: ".var_export($filterer, true)

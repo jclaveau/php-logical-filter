@@ -23,7 +23,7 @@ class OrRule extends AbstractOperationRule
                 continue;
             }
 
-            if ( !$operand->isNormalizationAllowed($simplification_options) ) {
+            if ( ! $operand->isNormalizationAllowed($simplification_options) ) {
                 continue;
             }
 
@@ -37,7 +37,7 @@ class OrRule extends AbstractOperationRule
             $has_been_changed = true;
         }
 
-        return !empty($has_been_changed);
+        return ! empty($has_been_changed);
     }
 
     /**
@@ -49,7 +49,7 @@ class OrRule extends AbstractOperationRule
      */
     public function rootifyDisjunctions($simplification_options)
     {
-        if (!$this->isNormalizationAllowed($simplification_options)) {
+        if ( ! $this->isNormalizationAllowed($simplification_options)) {
             return $this->copy();
         }
 
@@ -88,12 +88,12 @@ class OrRule extends AbstractOperationRule
             'semantic'      => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ])) {
+            if ( ! isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
             }
         }
 
-        if (!$options['show_instance'] && !empty($this->cache['array'])) {
+        if ( ! $options['show_instance'] && ! empty($this->cache['array'])) {
             return $this->cache['array'];
         }
 
@@ -117,7 +117,7 @@ class OrRule extends AbstractOperationRule
                 $operands_as_array[] = $operand->toArray($options);
             }
 
-            if (!$options['show_instance']) {
+            if ( ! $options['show_instance']) {
                 return $this->cache['array'] = $operands_as_array;
             }
             else {
@@ -131,7 +131,7 @@ class OrRule extends AbstractOperationRule
     public function toString(array $options=[])
     {
         $operator = self::operator;
-        if (!$this->operands) {
+        if ( ! $this->operands) {
             return $this->cache['string'] = "['{$operator}']";
         }
 
@@ -241,7 +241,7 @@ class OrRule extends AbstractOperationRule
      */
     public function removeInvalidBranches(array $simplification_options)
     {
-        if (!$this->isNormalizationAllowed($simplification_options)) {
+        if ( ! $this->isNormalizationAllowed($simplification_options)) {
             return $this;
         }
 
@@ -250,13 +250,13 @@ class OrRule extends AbstractOperationRule
         foreach ($this->operands as $i => $operand) {
             if ($operand instanceof AndRule || $operand instanceof OrRule) {
                 $this->operands[$i] = $operand->removeInvalidBranches($simplification_options);
-                if (!$this->operands[$i]->getOperands()) {
+                if ( ! $this->operands[$i]->getOperands()) {
                     unset($this->operands[$i]);
                     continue;
                 }
             }
             else {
-                if (!$this->operands[$i]->hasSolution()) {
+                if ( ! $this->operands[$i]->hasSolution()) {
                     unset($this->operands[$i]);
                 }
             }
@@ -273,11 +273,11 @@ class OrRule extends AbstractOperationRule
      */
     public function hasSolution(array $simplification_options=[])
     {
-        if (!$this->isNormalizationAllowed($simplification_options)) {
+        if ( ! $this->isNormalizationAllowed($simplification_options)) {
             return true;
         }
 
-        if (!$this->simplicationStepReached(self::simplified)) {
+        if ( ! $this->simplicationStepReached(self::simplified)) {
             throw new \LogicException(
                 "hasSolution has no sens if the rule is not simplified instead of being at: "
                 .var_export($this->current_simplification_step, true)
@@ -286,7 +286,7 @@ class OrRule extends AbstractOperationRule
 
         // If there is no remaining operand in an OrRule, it means it has
         // no solution.
-        return !empty($this->getOperands());
+        return ! empty($this->getOperands());
     }
 
     /**

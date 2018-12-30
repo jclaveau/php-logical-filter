@@ -27,7 +27,7 @@ abstract class MinimalConverter implements ConverterInterface
             return $this;
         }
 
-        if (!$rootOr->hasSolution()) {
+        if ( ! $rootOr->hasSolution()) {
             return $this;
         }
 

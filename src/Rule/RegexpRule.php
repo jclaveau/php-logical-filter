@@ -68,7 +68,7 @@ class RegexpRule extends AbstractAtomicRule
         $delimiter        = substr($php_regexp, 0, 1);
         $quoted_delimiter = preg_quote($delimiter, '#');
 
-        if (!preg_match("#^$quoted_delimiter(.*)$quoted_delimiter([^$quoted_delimiter]*)$#", $php_regexp, $matches)) {
+        if ( ! preg_match("#^$quoted_delimiter(.*)$quoted_delimiter([^$quoted_delimiter]*)$#", $php_regexp, $matches)) {
             throw new \InvalidArgumentException(
                 "The provided PCRE regular expression (with the delimiter '$delimiter') cannot be parsed: "
                 .var_export($php_regexp, true)
