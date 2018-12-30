@@ -42,11 +42,13 @@ class BelowRule extends AbstractAtomicRule
     {
         // if minimum is null, the rule is equivalent to true
         if (is_numeric( $this->maximum )) {
-            if (is_nan( $this->maximum ))
+            if (is_nan( $this->maximum )) {
                 return false;
+            }
 
-            if (is_infinite( $this->maximum ) && $this->maximum < 0)
+            if (is_infinite( $this->maximum ) && $this->maximum < 0) {
                 return false;
+            }
         }
 
         return true;

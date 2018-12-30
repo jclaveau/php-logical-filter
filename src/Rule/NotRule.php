@@ -20,8 +20,9 @@ class NotRule extends AbstractOperationRule
 
         // Negation has only one operand. If more is required, group them
         // into an AndRule
-        if ($operand)
+        if ($operand) {
             $this->addOperand($operand);
+        }
     }
 
     /**
@@ -44,13 +45,15 @@ class NotRule extends AbstractOperationRule
      */
     public function negateOperand($remove_generated_negations=false, array $current_simplification_options)
     {
-        if ( ! $this->isNormalizationAllowed($current_simplification_options))
+        if ( ! $this->isNormalizationAllowed($current_simplification_options)) {
             return $this;
+        }
 
         $operand = $this->getOperandAt(0);
 
-        if (method_exists($operand, 'getField'))
+        if (method_exists($operand, 'getField')) {
             $field = $operand->getField();
+        }
 
         if ($operand instanceof AboveRule) {
             $new_rule = new OrRule([
@@ -114,7 +117,6 @@ class NotRule extends AbstractOperationRule
             // combinations and add on half of them !$next_operand
             // and $next_operand on the other half
             while ($next_operand = array_shift($child_operands)) {
-
                 $next_operand_possibilities = $current_operand_possibilities->copy();
 
                 $tmp = [];
@@ -148,7 +150,6 @@ class NotRule extends AbstractOperationRule
                     $operand->getField(),
                     $operand->getPossibilities()
                 );
-                // $new_rule->dump(true);
             }
             else {
                 // ! (A || B) : !A && !B
@@ -187,14 +188,16 @@ class NotRule extends AbstractOperationRule
      */
     public function rootifyDisjunctions($simplification_options)
     {
-        if (!$this->isNormalizationAllowed($simplification_options))
+        if (!$this->isNormalizationAllowed($simplification_options)) {
             return $this;
+        }
 
         $this->moveSimplificationStepForward( self::rootify_disjunctions, $simplification_options );
 
         foreach ($this->operands as $id => $operand) {
-            if ($operand instanceof AbstractOperationRule)
+            if ($operand instanceof AbstractOperationRule) {
                 $this->operands[$id] = $operand->rootifyDisjunctions($simplification_options);
+            }
         }
 
         return $this;
@@ -207,11 +210,13 @@ class NotRule extends AbstractOperationRule
      */
     public function unifyAtomicOperands($simplification_strategy_step = false, array $contextual_options)
     {
-        if (!$this->isNormalizationAllowed($contextual_options))
+        if (!$this->isNormalizationAllowed($contextual_options)) {
             return $this;
+        }
 
-        if ($simplification_strategy_step)
+        if ($simplification_strategy_step) {
             $this->moveSimplificationStepForward( self::unify_atomic_operands, $contextual_options );
+        }
 
         return $this;
     }
@@ -228,12 +233,14 @@ class NotRule extends AbstractOperationRule
             'semantic'      => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ]))
+            if (!isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
+            }
         }
 
-        if (!$options['show_instance'] && isset($this->cache['array']))
+        if (!$options['show_instance'] && isset($this->cache['array'])) {
             return $this->cache['array'];
+        }
 
         $array = [
             $options['show_instance'] ? $this->getInstanceId() : self::operator,
@@ -241,10 +248,12 @@ class NotRule extends AbstractOperationRule
         ];
 
         // TODO make a dedicated cache entry for semantic array?
-        if (!$options['show_instance'] && !$options['semantic'])
+        if (!$options['show_instance'] && !$options['semantic']) {
             return $this->cache['array'] = $array;
-        else
+        }
+        else {
             return $array;
+        }
     }
 
     /**
@@ -281,8 +290,9 @@ class NotRule extends AbstractOperationRule
     {
         if (count($new_operands) > 1) {
             foreach ($new_operands as &$new_operand) {
-                if ($new_operand instanceof AbstractRule)
+                if ($new_operand instanceof AbstractRule) {
                     $new_operand = $new_operand->toString();
+                }
             }
 
             throw new \InvalidArgumentException(

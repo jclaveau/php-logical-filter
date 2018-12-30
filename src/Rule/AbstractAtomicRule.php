@@ -27,13 +27,15 @@ abstract class AbstractAtomicRule extends AbstractRule
             'show_instance' => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ]))
+            if (!isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
+            }
         }
 
 
-        if (!$options['show_instance'] && !empty($this->cache['array']))
+        if (!$options['show_instance'] && !empty($this->cache['array'])) {
             return $this->cache['array'];
+        }
 
         $class = get_class($this);
 
@@ -43,18 +45,21 @@ abstract class AbstractAtomicRule extends AbstractRule
             $this->getValues(),
         ];
 
-        if (!$options['show_instance'])
+        if (!$options['show_instance']) {
             return $this->cache['array'] = $array;
-        else
+        }
+        else {
             return $array;
+        }
     }
 
     /**
      */
     public function toString(array $options=[])
     {
-        if (!empty($this->cache['string']))
+        if (!empty($this->cache['string'])) {
             return $this->cache['string'];
+        }
 
         $class = get_class($this);
         $operator = $class::operator;
@@ -63,12 +68,15 @@ abstract class AbstractAtomicRule extends AbstractRule
 
         $field = $this->getField();
 
-        if ($field instanceof FilteredValue || $field instanceof FilteredKey)
+        if ($field instanceof FilteredValue || $field instanceof FilteredKey) {
             $field = "$field";
-        elseif ($field instanceof \Closure)
+        }
+        elseif ($field instanceof \Closure) {
             throw new \Exception("Closures dump not implemented");
-        else
+        }
+        else {
             $field = "'$field'";
+        }
 
         return $this->cache['string'] = "[$field, '$operator', $stringified_value]";
     }

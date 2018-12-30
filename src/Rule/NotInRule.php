@@ -23,8 +23,9 @@ class NotInRule extends NotRule
     public function isNormalizationAllowed(array $contextual_options=[])
     {
         $operand = $this->getOperandAt(0);
-        if ( ! $operand->getPossibilities())
+        if ( ! $operand->getPossibilities()) {
             return false;
+        }
 
         return $operand->isNormalizationAllowed($contextual_options);
     }
@@ -101,7 +102,6 @@ class NotInRule extends NotRule
         elseif ($this->getOperandAt(0) instanceof InRule) {
             return $this->getOperandAt(0)->setPossibilities($possibilities);
         }
-
     }
 
     /**
@@ -129,8 +129,9 @@ class NotInRule extends NotRule
             'show_instance' => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ]))
+            if (!isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
+            }
         }
 
         try {
@@ -146,22 +147,17 @@ class NotInRule extends NotRule
     }
 
     /**
+     * @todo cache support
      */
     public function toString(array $options=[])
     {
         try {
-            // if (!$this->changed)
-                // return $this->cache;
-
-            // $this->changed = false;
-
             $operator = self::operator;
 
             $stringified_possibilities = '[' . implode(', ', array_map(function($possibility) {
                 return var_export($possibility, true);
             }, $this->getPossibilities()) ) .']';
 
-            // return $this->cache = "['{$this->getField()}', '$operator', stringified_possibilities]";
             return "['{$this->getField()}', '$operator', $stringified_possibilities]";
         }
         catch (\LogicException $e) {

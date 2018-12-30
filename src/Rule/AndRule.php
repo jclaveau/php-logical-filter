@@ -21,16 +21,18 @@ class AndRule extends AbstractOperationRule
      */
     public function rootifyDisjunctions(array $simplification_options)
     {
-        if (!$this->isNormalizationAllowed($simplification_options))
+        if (!$this->isNormalizationAllowed($simplification_options)) {
             return $this;
+        }
 
         $this->moveSimplificationStepForward( self::rootify_disjunctions, $simplification_options );
 
         $upLiftedOperands = [];
         foreach ($this->getOperands() as $operand) {
             $operand = $operand->copy();
-            if ($operand instanceof AbstractOperationRule)
+            if ($operand instanceof AbstractOperationRule) {
                 $operand = $operand->rootifyDisjunctions($simplification_options);
+            }
 
             $upLiftedOperands[] = $operand;
         }
@@ -53,7 +55,6 @@ class AndRule extends AbstractOperationRule
         // $this->dump(true);
 
         foreach ($upLiftedOperands as $i => $operand) {
-
             if ($operand instanceof NotRule) {
                 if (    ($operand instanceof NotEqualRule || $operand instanceof NotInRule)
                     && ! $operand->isNormalizationAllowed($simplification_options)
@@ -82,8 +83,9 @@ class AndRule extends AbstractOperationRule
                     foreach ($upLiftedOr->getOperands() as $upLiftedOrSubOperand) {
                         $newUpLiftedOrSubOperand = $upLiftedOrSubOperand->copy();
                         $newUpLiftedOrSubOperand->addOperand( $subOperand->copy() );
-                        if ($newUpLiftedOrSubOperand->simplify($simplification_options)->hasSolution($simplification_options))
+                        if ($newUpLiftedOrSubOperand->simplify($simplification_options)->hasSolution($simplification_options)) {
                             $newUpLiftedOr->addOperand( $newUpLiftedOrSubOperand );
+                        }
                     }
                 }
 
@@ -122,12 +124,14 @@ class AndRule extends AbstractOperationRule
             'semantic'      => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ]))
+            if (!isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
+            }
         }
 
-        if (!$options['show_instance'] && !empty($this->cache['array']))
+        if (!$options['show_instance'] && !empty($this->cache['array'])) {
             return $this->cache['array'];
+        }
 
         $operands_as_array = [
             $options['show_instance'] ? $this->getInstanceId() : self::operator,
@@ -145,13 +149,16 @@ class AndRule extends AbstractOperationRule
             );
         }
         else {
-            foreach ($operands as $operand)
+            foreach ($operands as $operand) {
                 $operands_as_array[] = $operand->toArray($options);
+            }
 
-            if (!$options['show_instance'])
+            if (!$options['show_instance']) {
                 return $this->cache['array'] = $operands_as_array;
-            else
+            }
+            else {
                 return $operands_as_array;
+            }
         }
     }
 
@@ -186,11 +193,13 @@ class AndRule extends AbstractOperationRule
     public function removeSameOperationOperands()
     {
         foreach ($this->operands as $i => $operand) {
-            if ( ! is_a($operand, AndRule::class))
+            if ( ! is_a($operand, AndRule::class)) {
                 continue;
+            }
 
-            if ( ! $operands = $operand->getOperands())
+            if ( ! $operands = $operand->getOperands()) {
                 continue;
+            }
 
             // Id AND is an operand on AND they can be merge (and the same with OR)
             foreach ($operands as $sub_operand) {
@@ -213,8 +222,9 @@ class AndRule extends AbstractOperationRule
      */
     public function removeInvalidBranches(array $simplification_options)
     {
-        if (!$this->isNormalizationAllowed($simplification_options))
+        if (!$this->isNormalizationAllowed($simplification_options)) {
             return $this;
+        }
 
         $this->moveSimplificationStepForward(self::remove_invalid_branches, $simplification_options);
 
@@ -234,9 +244,7 @@ class AndRule extends AbstractOperationRule
         // $this->dump(true);
 
         foreach ($operandsByFields as $field => $operandsByOperator) {
-
             if (!empty($operandsByOperator[ EqualRule::operator ])) {
-
                 foreach ($operandsByOperator[ EqualRule::operator ] as $equalRule) {
                     // Multiple equal rules without the same value is invalid
                     if (isset($previousEqualRule) && $previousEqualRule->getValue() != $equalRule->getValue()) {
@@ -326,8 +334,9 @@ class AndRule extends AbstractOperationRule
 
         // atomic rules
         foreach ($this->getOperands() as $operand) {
-            if (method_exists($operand, 'hasSolution') && !$operand->hasSolution())
+            if (method_exists($operand, 'hasSolution') && !$operand->hasSolution()) {
                 return false;
+            }
         }
 
         return !empty($this->getOperands());
@@ -342,21 +351,23 @@ class AndRule extends AbstractOperationRule
     {
         // unifying same operands
         foreach ($operandsByFields as $field => $operandsByOperator) {
-
             foreach ($operandsByOperator as $operator => $operands) {
                 unset($previous_operand);
 
                 try {
                     if ($operator == AboveRule::operator) {
                         usort($operands, function( AboveRule $a, AboveRule $b ) {
-                            if ($a->getMinimum() === null)
+                            if ($a->getMinimum() === null) {
                                 return 1;
+                            }
 
-                            if ($b->getMinimum() === null)
+                            if ($b->getMinimum() === null) {
                                 return -1;
+                            }
 
-                            if ($a->getMinimum() > $b->getMinimum())
+                            if ($a->getMinimum() > $b->getMinimum()) {
                                 return -1;
+                            }
 
                             return 1;
                         });
@@ -364,14 +375,17 @@ class AndRule extends AbstractOperationRule
                     }
                     elseif ($operator == BelowRule::operator) {
                         usort($operands, function( BelowRule $a, BelowRule $b ) {
-                            if ($a->getMaximum() === null)
+                            if ($a->getMaximum() === null) {
                                 return 1;
+                            }
 
-                            if ($b->getMaximum() === null)
+                            if ($b->getMaximum() === null) {
                                 return -1;
+                            }
 
-                            if ($a->getMaximum() < $b->getMaximum())
+                            if ($a->getMaximum() < $b->getMaximum()) {
                                 return -1;
+                            }
 
                             return 1;
                         });
@@ -402,8 +416,9 @@ class AndRule extends AbstractOperationRule
                         $first_in = reset($operands);
 
                         foreach ($operands as $i => $next_in) {
-                            if ($first_in === $next_in)
+                            if ($first_in === $next_in) {
                                 continue;
+                            }
 
                             $first_in->setPossibilities( array_intersect(
                                 $first_in->getPossibilities(),
@@ -414,15 +429,17 @@ class AndRule extends AbstractOperationRule
                         }
 
                         // [field in []] <=> false
-                        if (!$first_in->getPossibilities())
+                        if (!$first_in->getPossibilities()) {
                             return [];
+                        }
                     }
                     elseif ($operator == NotInRule::operator) {
                         $first_not_in = reset($operands);
 
                         foreach ($operands as $i => $next_not_in) {
-                            if ($first_not_in === $next_not_in)
+                            if ($first_not_in === $next_not_in) {
                                 continue;
+                            }
 
                             $first_not_in->setPossibilities( array_merge(
                                 $first_not_in->getPossibilities(),
@@ -456,7 +473,6 @@ class AndRule extends AbstractOperationRule
     protected static function simplifyDifferentOperands(array $operandsByFields)
     {
         foreach ($operandsByFields as $field => &$operandsByOperator) {
-
             foreach ([
                     EqualRule::operator,
                     AboveRule::operator,
@@ -474,8 +490,8 @@ class AndRule extends AbstractOperationRule
                             __METHOD__ . " MUST be called after unifyAtomicOperands() "
                             ."to have only one '$unifyable_operator' predicate istead of:\n"
                             ."[\n".implode( ",\n", array_map(function ($rule) {
-                                    return $rule->toString();
-                                }, $operandsByOperator[ $unifyable_operator ])
+                                return $rule->toString();
+                            }, $operandsByOperator[ $unifyable_operator ])
                             )."\n]"
                         );
                     }
@@ -486,8 +502,9 @@ class AndRule extends AbstractOperationRule
             // If tyhere is no more operands for a given field it means there
             // is no possible solutions for it so all the current and_case
             // is invalidated.
-            if (! $operandsByOperator)
+            if (! $operandsByOperator) {
                 return [];
+            }
         }
 
         return $operandsByFields;
@@ -501,42 +518,42 @@ class AndRule extends AbstractOperationRule
     {
         // EqualRule comparisons
         if (!empty($operandsByOperator[ EqualRule::operator ])) {
-
             $equalRule = reset( $operandsByOperator[ EqualRule::operator ] );
 
             if (!empty($operandsByOperator[ NotEqualRule::operator ])) {
                 foreach ($operandsByOperator[ NotEqualRule::operator ] as $i => $not_equal_rule) {
-
                     if ($equalRule->getValue() !== null) {
-                        if ($not_equal_rule->getValue() === null) // means if exists <=> equals something
+                        if ($not_equal_rule->getValue() === null) { // means if exists <=> equals something
                             unset($operandsByOperator[ NotEqualRule::operator ][$i]);
-                        elseif ($not_equal_rule->getValue() != $equalRule->getValue())
+                        }
+                        elseif ($not_equal_rule->getValue() != $equalRule->getValue()) {
                             unset($operandsByOperator[ NotEqualRule::operator ][$i]);
+                        }
                     }
                     elseif ($equalRule->getValue() === null ) {
-                        if ($not_equal_rule->getValue() !== null)
+                        if ($not_equal_rule->getValue() !== null) {
                             unset($operandsByOperator[ NotEqualRule::operator ][$i]);
+                        }
                         // else we let the "equal null" and the "not equal null" for the romeInvalidBranches step
                     }
                 }
             }
 
             if (!empty($operandsByOperator[ AboveRule::operator ])) {
-
                 $aboveRule = reset($operandsByOperator[ AboveRule::operator ]);
-                if ($equalRule->getValue() !== null && $aboveRule->getMinimum() < $equalRule->getValue())
+                if ($equalRule->getValue() !== null && $aboveRule->getMinimum() < $equalRule->getValue()) {
                     unset($operandsByOperator[ AboveRule::operator ]);
+                }
             }
 
             if (!empty($operandsByOperator[ BelowRule::operator ])) {
-
                 $belowRule = reset($operandsByOperator[ BelowRule::operator ]);
-                if ($equalRule->getValue() !== null && $belowRule->getMaximum() > $equalRule->getValue())
+                if ($equalRule->getValue() !== null && $belowRule->getMaximum() > $equalRule->getValue()) {
                     unset($operandsByOperator[ BelowRule::operator ]);
+                }
             }
 
             if (!empty($operandsByOperator[ InRule::operator ])) {
-
                 $possibilities = reset($operandsByOperator[ InRule::operator ])->getPossibilities();
 
                 if (in_array($equalRule->getValue(), $possibilities)) {
@@ -552,7 +569,6 @@ class AndRule extends AbstractOperationRule
             }
 
             if (!empty($operandsByOperator[ NotInRule::operator ])) {
-
                 $notInRule = reset($operandsByOperator[ NotInRule::operator ]);
                 if (in_array($equalRule->getValue(), $notInRule->getPossibilities())) {
                     // ['field', '=', 4] && ['field', '!in', [4]...] <=> false
@@ -565,7 +581,6 @@ class AndRule extends AbstractOperationRule
             }
 
             if (!empty($operandsByOperator[ BelowOrEqualRule::operator ])) {
-
                 $belowOrEqualRule = reset($operandsByOperator[ BelowOrEqualRule::operator ]);
                 if ($equalRule->getValue() <= $belowOrEqualRule->getMaximum()) {
                     unset($operandsByOperator[ BelowOrEqualRule::operator ]);
@@ -577,7 +592,6 @@ class AndRule extends AbstractOperationRule
             }
 
             if (!empty($operandsByOperator[ AboveOrEqualRule::operator ])) {
-
                 $aboveOrEqualRule = reset($operandsByOperator[ AboveOrEqualRule::operator ]);
                 if ($equalRule->getValue() >= $aboveOrEqualRule->getMinimum()) {
                     unset($operandsByOperator[ AboveOrEqualRule::operator ]);
@@ -593,7 +607,6 @@ class AndRule extends AbstractOperationRule
         if (!empty($operandsByOperator[ NotEqualRule::operator ])) {
             if (!empty($operandsByOperator[ NotEqualRule::operator ])) {
                 foreach ($operandsByOperator[ NotEqualRule::operator ] as $i => $notEqualRule) {
-
                     if ($notEqualRule->getValue() === null) {
                         if (!empty($operandsByOperator[ AboveRule::operator ])) {
                             unset($operandsByOperator[ NotEqualRule::operator ][$i]);
@@ -604,19 +617,22 @@ class AndRule extends AbstractOperationRule
                         }
 
                         if (!empty($operandsByOperator[ EqualRule::operator ])) {
-                            if (reset($operandsByOperator[ EqualRule::operator ])->getValue() !== null)
+                            if (reset($operandsByOperator[ EqualRule::operator ])->getValue() !== null) {
                                 unset($operandsByOperator[ NotEqualRule::operator ][$i]);
+                            }
                         }
                     }
                     else {
                         if (!empty($operandsByOperator[ AboveRule::operator ])) {
-                            if ($operandsByOperator[ AboveRule::operator ][0]->getMinimum() >= $notEqualRule->getValue())
+                            if ($operandsByOperator[ AboveRule::operator ][0]->getMinimum() >= $notEqualRule->getValue()) {
                                 unset($operandsByOperator[ NotEqualRule::operator ][$i]);
+                            }
                         }
 
                         if (!empty($operandsByOperator[ BelowRule::operator ])) {
-                            if ($operandsByOperator[ BelowRule::operator ][0]->getMaximum() <= $notEqualRule->getValue())
+                            if ($operandsByOperator[ BelowRule::operator ][0]->getMaximum() <= $notEqualRule->getValue()) {
                                 unset($operandsByOperator[ NotEqualRule::operator ][$i]);
+                            }
                         }
                     }
 

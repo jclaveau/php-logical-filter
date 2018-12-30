@@ -23,8 +23,9 @@ trait Trait_RuleWithOptions
      */
     public function setOptions(array $options)
     {
-        foreach ($options as $name => $value)
+        foreach ($options as $name => $value) {
             $this->options[$name] = $value;
+        }
     }
 
     /**
@@ -45,11 +46,13 @@ trait Trait_RuleWithOptions
 
         $options = $default_options;
 
-        foreach ($this->options as $name => $value)
+        foreach ($this->options as $name => $value) {
             $options[$name] = $value;
+        }
 
-        foreach ($contextual_options as $name => $value)
+        foreach ($contextual_options as $name => $value) {
             $options[$name] = $value;
+        }
 
         return $options;
     }

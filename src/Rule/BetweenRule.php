@@ -53,8 +53,9 @@ class BetweenRule extends AndRule
     {
         $field1 = $this->getOperandAt(0)->getField();
 
-        if (!$this->getOperandAt(1))
+        if (!$this->getOperandAt(1)) {
             return $field1;
+        }
 
         $field2 = $this->getOperandAt(1)->getField();
 
@@ -92,22 +93,18 @@ class BetweenRule extends AndRule
             'show_instance' => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ]))
+            if (!isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
+            }
         }
 
         $class = get_class($this);
 
-        // try {
-            return [
-                $this->getField(),
-                $options['show_instance'] ? $this->getInstanceId() : $class::operator,
-                $this->getValues(),
-            ];
-        // }
-        // catch (\RuntimeException $e) {
-            // return parent::toArray();
-        // }
+        return [
+            $this->getField(),
+            $options['show_instance'] ? $this->getInstanceId() : $class::operator,
+            $this->getValues(),
+        ];
     }
 
     /**

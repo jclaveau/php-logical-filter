@@ -77,8 +77,9 @@ class InRule extends OrRule
             $this->field = call_user_func($renamings, $this->field);
         }
         elseif (is_array($renamings)) {
-            if (isset($renamings[$this->field]))
+            if (isset($renamings[$this->field])) {
                 $this->field = $renamings[$this->field];
+            }
         }
         else {
             throw new \InvalidArgumentException(
@@ -87,8 +88,9 @@ class InRule extends OrRule
             );
         }
 
-        if ($old_field != $this->field)
+        if ($old_field != $this->field) {
             $this->flushCache();
+        }
 
         return $this;
     }
@@ -115,18 +117,20 @@ class InRule extends OrRule
             $possibilities = $possibilities->toArray();
         }
 
-        if (!is_array($possibilities))
+        if (!is_array($possibilities)) {
             $possibilities = [$possibilities];
+        }
 
         $possibilities = array_map([$this, 'checkOperandAndExtractValue'], $possibilities);
 
         // unique possibilities
         foreach ($possibilities as &$possibility) {
-
-            if (is_scalar($possibility))
+            if (is_scalar($possibility)) {
                 $id = hash('crc32b', $possibility);
-            else
+            }
+            else {
                 $id = hash('crc32b', serialize($possibility));
+            }
 
             if (!isset($this->native_possibilities[ $id ])) {
                 $this->native_possibilities[ $id ] = $possibility;
@@ -134,8 +138,9 @@ class InRule extends OrRule
             }
         }
 
-        if (isset($require_cache_flush))
+        if (isset($require_cache_flush)) {
             $this->flushCache();
+        }
 
         return $this;
     }
@@ -183,8 +188,9 @@ class InRule extends OrRule
      */
     protected function checkOperandAndExtractValue($operand)
     {
-        if (! $operand instanceof AbstractAtomicRule)
+        if (! $operand instanceof AbstractAtomicRule) {
             return $operand;
+        }
 
         if ( ! ($operand instanceof EqualRule && $operand->getField() == $this->field) ) {
             throw new \InvalidArgumentException(
@@ -206,8 +212,9 @@ class InRule extends OrRule
         }
 
         $operands = [];
-        foreach ($this->native_possibilities as $value)
+        foreach ($this->native_possibilities as $value) {
             $operands[] = new EqualRule($this->field, $value);
+        }
 
         return $this->cache['operands'] = $operands;
     }
@@ -231,14 +238,16 @@ class InRule extends OrRule
             'show_instance' => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ]))
+            if (!isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
+            }
         }
 
         $class = get_class($this);
 
-        if (!$options['show_instance'] && isset($this->cache['array']))
+        if (!$options['show_instance'] && isset($this->cache['array'])) {
             return $this->cache['array'];
+        }
 
         $array = [
             $this->getField(),
@@ -246,18 +255,21 @@ class InRule extends OrRule
             $this->getValues(),
         ];
 
-        if (!$options['show_instance'])
+        if (!$options['show_instance']) {
             return $this->cache['array'] = $array;
-        else
+        }
+        else {
             return $array;
+        }
     }
 
     /**
      */
     public function toString(array $options=[])
     {
-        if (isset($this->cache['string']))
+        if (isset($this->cache['string'])) {
             return $this->cache['string'];
+        }
 
         $operator = self::operator;
 

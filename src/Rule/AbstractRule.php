@@ -34,8 +34,9 @@ abstract class AbstractRule implements \JsonSerializable
     public static function findSymbolicOperator($english_operator)
     {
         $association = array_flip( self::$ruleAliases );
-        if (isset($association[ $english_operator ]))
+        if (isset($association[ $english_operator ])) {
             return $association[ $english_operator ];
+        }
 
         return $english_operator;
     }
@@ -45,8 +46,9 @@ abstract class AbstractRule implements \JsonSerializable
     public static function findEnglishOperator($symbolic_operator)
     {
         $association = self::$ruleAliases;
-        if (isset($association[ $symbolic_operator ]))
+        if (isset($association[ $symbolic_operator ])) {
             return $association[ $symbolic_operator ];
+        }
 
         return $symbolic_operator;
     }
@@ -66,8 +68,9 @@ abstract class AbstractRule implements \JsonSerializable
     public static function generateSimpleRule($field, $type, $values, array $options=[])
     {
         $cache_key = hash('md4', serialize( func_get_args()) );
-        if (isset(self::$static_cache['rules_generation'][$cache_key]))
+        if (isset(self::$static_cache['rules_generation'][$cache_key])) {
             return self::$static_cache['rules_generation'][$cache_key]->copy();
+        }
 
         $ruleClass = self::getRuleClass($type);
 
@@ -125,8 +128,9 @@ abstract class AbstractRule implements \JsonSerializable
             // 'show_instance'   => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ]))
+            if (!isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
+            }
         }
         extract($options);
 
@@ -135,19 +139,22 @@ abstract class AbstractRule implements \JsonSerializable
 
         echo "\n" . $caller['file'] . ':' . $caller['line'] . "\n";
         if ($mode == 'string') {
-            if ( ! isset($options['indent_unit']))
+            if ( ! isset($options['indent_unit'])) {
                 $options['indent_unit'] = "    ";
+            }
 
             echo ($this->toString($options));
         }
         elseif ($mode == 'dump') {
-            if ($xdebug_enabled = ini_get('xdebug.overload_var_dump'))
+            if ($xdebug_enabled = ini_get('xdebug.overload_var_dump')) {
                 ini_set('xdebug.overload_var_dump', 0);
+            }
 
             var_dump($this->toArray($options));
 
-            if ($xdebug_enabled)
+            if ($xdebug_enabled) {
                 ini_set('xdebug.overload_var_dump', 1);
+            }
         }
         elseif ($mode == 'xdebug') {
             if ( ! function_exists('xdebug_is_enabled')) {
@@ -157,13 +164,15 @@ abstract class AbstractRule implements \JsonSerializable
                 throw new \RuntimeException("Xdebug is disabled");
             }
 
-            if ($xdebug_enabled = ini_get('xdebug.overload_var_dump'))
+            if ($xdebug_enabled = ini_get('xdebug.overload_var_dump')) {
                 ini_set('xdebug.overload_var_dump', 1);
+            }
 
             var_dump($this->toArray($options));
 
-            if ($xdebug_enabled)
+            if ($xdebug_enabled) {
                 ini_set('xdebug.overload_var_dump', 0);
+            }
         }
         elseif ($mode == 'export') {
             var_export($this->toArray($options));
@@ -176,8 +185,9 @@ abstract class AbstractRule implements \JsonSerializable
         }
         echo "\n\n";
 
-        if ($exit)
+        if ($exit) {
             exit;
+        }
 
         return $this;
     }
@@ -233,8 +243,9 @@ abstract class AbstractRule implements \JsonSerializable
      */
     public function getInstanceId()
     {
-        if ($this->instance_id)
+        if ($this->instance_id) {
             return $this->instance_id;
+        }
 
         return $this->instance_id = get_class($this).':'.spl_object_id($this);
     }
@@ -246,8 +257,9 @@ abstract class AbstractRule implements \JsonSerializable
      */
     final public function getSemanticId()
     {
-        if (isset($this->cache['semantic_id']))
+        if (isset($this->cache['semantic_id'])) {
             return $this->cache['semantic_id'];
+        }
 
         // return hash('crc32b', serialize( $this->toArray() ));
         return hash('md4', serialize( $this->toArray(['semantic' => true]) ))  // faster but longer
@@ -284,8 +296,9 @@ abstract class AbstractRule implements \JsonSerializable
         }
         elseif ($this instanceof OrRule) {
             foreach ($this->operands as $i => $operand) {
-                if (!$operand instanceof AndRule)
+                if (!$operand instanceof AndRule) {
                     $this->operands[$i] = new AndRule([$operand]);
+                }
             }
             $ruleTree = $this;
         }

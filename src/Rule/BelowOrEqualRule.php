@@ -50,8 +50,9 @@ class BelowOrEqualRule extends OrRule
             );
         }
 
-        if ($this->maximum == $maximum)
+        if ($this->maximum == $maximum) {
             return $this;
+        }
 
         $this->maximum = $maximum;
         $this->flushCache();
@@ -141,8 +142,9 @@ class BelowOrEqualRule extends OrRule
             'show_instance' => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ]))
+            if (!isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
+            }
         }
 
         try {
@@ -162,8 +164,9 @@ class BelowOrEqualRule extends OrRule
      */
     public function toString(array $options=[])
     {
-        if (isset($this->cache['string']))
+        if (isset($this->cache['string'])) {
             return $this->cache['string'];
+        }
 
         $operator = self::operator;
 

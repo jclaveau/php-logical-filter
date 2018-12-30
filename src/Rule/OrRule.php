@@ -19,11 +19,13 @@ class OrRule extends AbstractOperationRule
     public function removeSameOperationOperands(array $simplification_options)
     {
         foreach ($this->operands as $i => &$operand) {
-            if ( ! is_a($operand, OrRule::class))
+            if ( ! is_a($operand, OrRule::class)) {
                 continue;
+            }
 
-            if ( !$operand->isNormalizationAllowed($simplification_options) )
+            if ( !$operand->isNormalizationAllowed($simplification_options) ) {
                 continue;
+            }
 
             // Id AND is an operand on AND they can be merge (and the same with OR)
             foreach ($operand->getOperands() as $sub_operand) {
@@ -47,20 +49,23 @@ class OrRule extends AbstractOperationRule
      */
     public function rootifyDisjunctions($simplification_options)
     {
-        if (!$this->isNormalizationAllowed($simplification_options))
+        if (!$this->isNormalizationAllowed($simplification_options)) {
             return $this->copy();
+        }
 
         $this->moveSimplificationStepForward( self::rootify_disjunctions, $simplification_options );
 
         $upLiftedOperands = [];
         foreach ($this->getOperands() as $operand) {
             $operand = $operand->copy();
-            if ($operand instanceof AbstractOperationRule)
+            if ($operand instanceof AbstractOperationRule) {
                 $operand = $operand->rootifyDisjunctions($simplification_options);
+            }
 
             if ($operand instanceof OrRule && $operand->isNormalizationAllowed($simplification_options)) {
-                foreach ($operand->getOperands() as $subOperand)
+                foreach ($operand->getOperands() as $subOperand) {
                     $upLiftedOperands[] = $subOperand;
+                }
             }
             else {
                 $upLiftedOperands[] = $operand;
@@ -83,12 +88,14 @@ class OrRule extends AbstractOperationRule
             'semantic'      => false,
         ];
         foreach ($default_options as $default_option => &$default_value) {
-            if (!isset($options[ $default_option ]))
+            if (!isset($options[ $default_option ])) {
                 $options[ $default_option ] = $default_value;
+            }
         }
 
-        if (!$options['show_instance'] && !empty($this->cache['array']))
+        if (!$options['show_instance'] && !empty($this->cache['array'])) {
             return $this->cache['array'];
+        }
 
         $operands_as_array = [
             $options['show_instance'] ? $this->getInstanceId() : self::operator,
@@ -106,13 +113,16 @@ class OrRule extends AbstractOperationRule
             );
         }
         else {
-            foreach ($operands as $operand)
+            foreach ($operands as $operand) {
                 $operands_as_array[] = $operand->toArray($options);
+            }
 
-            if (!$options['show_instance'])
+            if (!$options['show_instance']) {
                 return $this->cache['array'] = $operands_as_array;
-            else
+            }
+            else {
                 return $operands_as_array;
+            }
         }
     }
 
@@ -149,21 +159,23 @@ class OrRule extends AbstractOperationRule
     {
         // unifying same operands
         foreach ($operandsByFields as $field => $operandsByOperator) {
-
             foreach ($operandsByOperator as $operator => $operands) {
                 unset($previous_operand);
 
                 try {
                     if ($operator == AboveRule::operator) {
                         usort($operands, function( AboveRule $a, AboveRule $b ) {
-                            if ($a->getMinimum() === null)
+                            if ($a->getMinimum() === null) {
                                 return 1;
+                            }
 
-                            if ($b->getMinimum() === null)
+                            if ($b->getMinimum() === null) {
                                 return -1;
+                            }
 
-                            if ($a->getMinimum() < $b->getMinimum())
+                            if ($a->getMinimum() < $b->getMinimum()) {
                                 return -1;
+                            }
 
                             return 1;
                         });
@@ -171,14 +183,17 @@ class OrRule extends AbstractOperationRule
                     }
                     elseif ($operator == BelowRule::operator) {
                         usort($operands, function( BelowRule $a, BelowRule $b ) {
-                            if ($a->getMaximum() === null)
+                            if ($a->getMaximum() === null) {
                                 return 1;
+                            }
 
-                            if ($b->getMaximum() === null)
+                            if ($b->getMaximum() === null) {
                                 return -1;
+                            }
 
-                            if ($a->getMaximum() > $b->getMaximum())
+                            if ($a->getMaximum() > $b->getMaximum()) {
                                 return -1;
+                            }
 
                             return 1;
                         });
@@ -188,8 +203,9 @@ class OrRule extends AbstractOperationRule
                         $first_in = reset($operands);
 
                         foreach ($operands as $i => $next_in) {
-                            if ($first_in === $next_in)
+                            if ($first_in === $next_in) {
                                 continue;
+                            }
 
                             $first_in->setPossibilities( array_merge(
                                 $first_in->getPossibilities(),
@@ -225,13 +241,13 @@ class OrRule extends AbstractOperationRule
      */
     public function removeInvalidBranches(array $simplification_options)
     {
-        if (!$this->isNormalizationAllowed($simplification_options))
+        if (!$this->isNormalizationAllowed($simplification_options)) {
             return $this;
+        }
 
         $this->moveSimplificationStepForward(self::remove_invalid_branches, $simplification_options);
 
         foreach ($this->operands as $i => $operand) {
-
             if ($operand instanceof AndRule || $operand instanceof OrRule) {
                 $this->operands[$i] = $operand->removeInvalidBranches($simplification_options);
                 if (!$this->operands[$i]->getOperands()) {
@@ -240,8 +256,9 @@ class OrRule extends AbstractOperationRule
                 }
             }
             else {
-                if (!$this->operands[$i]->hasSolution())
+                if (!$this->operands[$i]->hasSolution()) {
                     unset($this->operands[$i]);
+                }
             }
         }
 
@@ -256,8 +273,9 @@ class OrRule extends AbstractOperationRule
      */
     public function hasSolution(array $simplification_options=[])
     {
-        if (!$this->isNormalizationAllowed($simplification_options))
+        if (!$this->isNormalizationAllowed($simplification_options)) {
             return true;
+        }
 
         if (!$this->simplicationStepReached(self::simplified)) {
             throw new \LogicException(

@@ -52,8 +52,9 @@ trait Trait_RuleWithField
             $this->setField( call_user_func($renamings, $this->field) );
         }
         elseif (is_array($renamings)) {
-            if (isset($renamings[$this->field]))
+            if (isset($renamings[$this->field])) {
                 $this->setField( $renamings[$this->field] );
+            }
         }
         else {
             throw new \InvalidArgumentException(

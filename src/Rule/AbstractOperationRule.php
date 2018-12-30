@@ -69,8 +69,9 @@ abstract class AbstractOperationRule extends AbstractRule
         if (!isset($this->operands[ $id = $new_operand->getSemanticId() ])) {
             $this->operands[ $id ] = $new_operand;
 
-            if ($this->current_simplification_step)
+            if ($this->current_simplification_step) {
                 $this->current_simplification_step = null;
+            }
 
             $this->flushCache();
         }
@@ -108,10 +109,12 @@ abstract class AbstractOperationRule extends AbstractRule
     public function renameFields($renamings)
     {
         foreach ($this->operands as $operand) {
-            if (method_exists($operand, 'renameField'))
+            if (method_exists($operand, 'renameField')) {
                 $operand->renameField($renamings);
-            else
+            }
+            else {
                 $operand->renameFields($renamings);
+            }
         }
 
         // TODO flush cache only in case of change?
@@ -171,8 +174,9 @@ abstract class AbstractOperationRule extends AbstractRule
             );
         }
 
-        if ($this->current_simplification_step === null)
+        if ($this->current_simplification_step === null) {
             return false;
+        }
 
         $steps_indices = array_flip(self::simplification_steps);
 
@@ -189,16 +193,15 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function removeNegations(array $contextual_options)
     {
-        if (!$this->isNormalizationAllowed($contextual_options))
+        if (!$this->isNormalizationAllowed($contextual_options)) {
             return $this;
+        }
 
         $this->moveSimplificationStepForward(self::remove_negations, $contextual_options);
 
         $new_rule = $this;
         if ($operands = $this->operands) {
-
             foreach ($operands as $i => $operand) {
-
                 if ($operand instanceof NotRule) {
                     $operands[$i] = $operand->negateOperand(false, $contextual_options);
                 }
@@ -226,28 +229,33 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function cleanOperations($simplification_options, $recurse=true)
     {
-        if ($recurse) foreach ($this->operands as $i => $operand) {
-            if (    $operand instanceof AbstractOperationRule
+        if ($recurse) {
+            foreach ($this->operands as $i => $operand) {
+                if (    $operand instanceof AbstractOperationRule
                 && !$operand instanceof InRule
                 && !$operand instanceof NotEqualRule
                 && !$operand instanceof NotInRule
             ) {
-                $this->operands[$i] = $operand->cleanOperations($simplification_options);
+                    $this->operands[$i] = $operand->cleanOperations($simplification_options);
+                }
             }
         }
 
-        if ($this instanceof NotRule)
+        if ($this instanceof NotRule) {
             return $this;
+        }
 
         $is_modified = true;
         while ($is_modified) {
             $is_modified = false;
 
-            if ($this->removeMonooperandOperationsOperands($simplification_options))
+            if ($this->removeMonooperandOperationsOperands($simplification_options)) {
                 $is_modified = true;
+            }
 
-            if ($this->removeSameOperationOperands($simplification_options))
+            if ($this->removeSameOperationOperands($simplification_options)) {
                 $is_modified = true;
+            }
         }
 
         return $this;
@@ -265,8 +273,9 @@ abstract class AbstractOperationRule extends AbstractRule
     public function removeMonooperandOperationsOperands(array $simplification_options)
     {
         foreach ($this->operands as $i => $operand) {
-            if (!$operand instanceof AbstractOperationRule || $operand instanceof NotRule)
+            if (!$operand instanceof AbstractOperationRule || $operand instanceof NotRule) {
                 continue;
+            }
 
             if ($operand instanceof InRule && !$operand->isNormalizationAllowed($simplification_options)) {
                 $count = count($operand->getPossibilities());
@@ -295,13 +304,15 @@ abstract class AbstractOperationRule extends AbstractRule
      */
     public function unifyAtomicOperands($simplification_strategy_step = false, array $contextual_options)
     {
-        if ($simplification_strategy_step)
+        if ($simplification_strategy_step) {
             $this->moveSimplificationStepForward( self::unify_atomic_operands, $contextual_options );
+        }
 
         // $this->dump(true);
 
-        if (!$this->isNormalizationAllowed($contextual_options))
+        if (!$this->isNormalizationAllowed($contextual_options)) {
             return $this;
+        }
 
         $operands = $this->getOperands();
         foreach ($operands as &$operand) {
@@ -370,8 +381,9 @@ abstract class AbstractOperationRule extends AbstractRule
         $options_id = hash('md4', serialize($options));
 
         $id = $this->getSemanticId().'-'.$options_id;
-        if (isset(self::$simplification_cache[$id]))
+        if (isset(self::$simplification_cache[$id])) {
             return self::$simplification_cache[$id]->copy();
+        }
 
         $this->flushCache();
 
@@ -384,8 +396,9 @@ abstract class AbstractOperationRule extends AbstractRule
 
         $cache_keys[] = $instance->getSemanticId().'-'.$options_id;
 
-        if ($step_to_stop_before == self::remove_negations)
+        if ($step_to_stop_before == self::remove_negations) {
             return $instance;
+        }
 
         // $this->dump(!true);
         $instance = $instance->removeNegations($options);
@@ -393,8 +406,9 @@ abstract class AbstractOperationRule extends AbstractRule
         // $instance->dump(true);
 
         if ($step_to_stop_after  == self::remove_negations ||
-            $step_to_stop_before == self::rootify_disjunctions )
+            $step_to_stop_before == self::rootify_disjunctions ) {
             return $instance;
+        }
 
         // $instance->dump(true);
 
@@ -404,19 +418,20 @@ abstract class AbstractOperationRule extends AbstractRule
         // $instance->dump(true);
 
         if ($step_to_stop_after  == self::rootify_disjunctions ||
-            $step_to_stop_before == self::unify_atomic_operands )
+            $step_to_stop_before == self::unify_atomic_operands ) {
             return $instance;
+        }
 
         if (!$instance instanceof AbstractAtomicRule) {
-
             $instance->cleanOperations($options);
             $instance->unifyAtomicOperands(true, $options);
 
             // $instance->dump(true);
 
             if ($step_to_stop_after  == self::unify_atomic_operands ||
-                $step_to_stop_before == self::remove_invalid_branches )
+                $step_to_stop_before == self::remove_invalid_branches ) {
                 return $instance;
+            }
 
             $instance->cleanOperations($options);
             if (method_exists($instance, 'removeInvalidBranches')) {
@@ -432,17 +447,18 @@ abstract class AbstractOperationRule extends AbstractRule
         // TODO kind of monad|become|cese
         //@see https://github.com/jclaveau/php-logical-filter/issues/20
         if ($instance instanceof AndRule || $instance instanceof OrRule ) {
-
-            if (!$instance->getOperands())
+            if (!$instance->getOperands()) {
                 return $instance;
+            }
 
             $operands = (new AndRule([$instance]))
                 ->cleanOperations($options, false)
                 // ->dump(true)
                 ->getOperands();
 
-            if (count($operands) == 1)
+            if (count($operands) == 1) {
                 $instance = reset($operands);
+            }
         }
 
 
@@ -493,11 +509,13 @@ abstract class AbstractOperationRule extends AbstractRule
             // For FilteredValue and FilteredKey
             $field = (string) $field;
 
-            if (!isset($operandsByFields[ $field ]))
+            if (!isset($operandsByFields[ $field ])) {
                 $operandsByFields[ $field ] = [];
+            }
 
-            if (!isset($operandsByFields[ $field ][ $operand::operator ]))
+            if (!isset($operandsByFields[ $field ][ $operand::operator ])) {
                 $operandsByFields[ $field ][ $operand::operator ] = [];
+            }
 
             $operandsByFields[ $field ][ $operand::operator ][] = $operand;
         }
@@ -522,11 +540,13 @@ abstract class AbstractOperationRule extends AbstractRule
             // For FilteredValue and FilteredKey
             $field = (string) $field;
 
-            if (!isset($operandsByFields[ $field ]))
+            if (!isset($operandsByFields[ $field ])) {
                 $operandsByFields[ $field ] = [];
+            }
 
-            if (!isset($operandsByFields[ $field ][ $operand::operator ]))
+            if (!isset($operandsByFields[ $field ][ $operand::operator ])) {
                 $operandsByFields[ $field ][ $operand::operator ] = [];
+            }
 
             $operandsByFields[ $field ][ $operand::operator ][] = $operand;
         }
@@ -569,8 +589,9 @@ abstract class AbstractOperationRule extends AbstractRule
     protected function getOperandAt($index=0)
     {
         $operands = array_values($this->operands);
-        if (isset($operands[$index]))
+        if (isset($operands[$index])) {
             return $operands[$index];
+        }
     }
 
     /**/
