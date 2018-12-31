@@ -28,43 +28,54 @@ return PhpCsFixer\Config::create()
         'phpdoc_to_comment' => true, // not_operator_with_successor_space
         'align_multiline_comment' => true,
         // 'multiline_comment_opening_closing' => true, // bugs with /**/ https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/4179
-        'no_closing_tag' => true,
         'no_short_echo_tag' => true,
         'trailing_comma_in_multiline_array' => true,
         'whitespace_after_comma_in_array' => true,
-        'visibility_required' => true,
 
         'yoda_style' => true,
         // 'no_empty_comment' => true, // removes the /**/
         // 'blank_line_before_return' => false,
-        // 'no_spaces_inside_parenthesis' => true,
         'no_extra_blank_lines' => true,
         // 'no_empty_statement' => true, // ???
         // 'no_alternative_syntax' => true, // ???
         // 'combine_consecutive_unsets' => false,
-        'no_spaces_after_function_name' => true,
         'object_operator_without_whitespace' => true,
         'no_mixed_echo_print' => true,
         'no_short_bool_cast' => true,
         'no_singleline_whitespace_before_semicolons' => true,
-        'no_trailing_whitespace' => true,
         'normalize_index_brace' => true,
         'no_useless_return' => true,
 
+        'method_chaining_indentation' => true,
+        'no_spaces_around_offset' => [
+            'positions' => [
+                'outside', // inside spaces allowed for $var1[ $var2 ]
+            ],
+        ],
+
+        // psr2
+        'no_trailing_whitespace_in_comment' => true, // psr-2
+        'no_trailing_whitespace' => true, // psr-2
         'blank_line_after_namespace' => true, // psr-2
         'single_line_after_imports' => true, // psr-2
         'single_import_per_statement' => true, // psr-2
         'single_blank_line_at_eof' => true, // psr-2
         'lowercase_constants' => true, // psr-2
         'lowercase_keywords' => true, // psr-2
+        'no_break_comment' => true, // psr-2
         'method_argument_space' => true, // psr-2, remove multiple spaces between args => break vertical alignment
+        'no_closing_tag' => true, // psr-2
+        'no_spaces_after_function_name' => true, // psr-2
+        // 'no_spaces_inside_parenthesis' => true, // psr-2
+        'single_class_element_per_statement' => true, // psr-2
+        'switch_case_semicolon_to_colon' => true, // psr-2
+        'switch_case_space' => true, // psr-2
+        'visibility_required' => true, // psr-2
     ])
     ->setFinder($finder)
 ;
 
 // 'blank_line_after_opening_tag' => true,
-// 'blank_line_after_namespace' => true,
-// no_empty_statement
 // no_blank_lines_after_class_opening
 // date_time_immutable
 // no_useless_else
