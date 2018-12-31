@@ -17,7 +17,8 @@ class AndRule extends AbstractOperationRule
      * @todo rename as RootifyDisjunjctions?
      * @todo return $this (implements a Rule monad?)
      *
-     * @return OrRule copied operands with one OR at its root
+     * @param  array $simplification_options
+     * @return AndRule|OrRule The copied operands with one OR at its root
      */
     public function rootifyDisjunctions(array $simplification_options)
     {
@@ -341,7 +342,6 @@ class AndRule extends AbstractOperationRule
 
         return ! empty($this->getOperands());
     }
-
 
     /**
      * + if A > 2 && A > 1 <=> A > 2

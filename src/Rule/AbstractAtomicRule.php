@@ -32,7 +32,6 @@ abstract class AbstractAtomicRule extends AbstractRule
             }
         }
 
-
         if ( ! $options['show_instance'] && ! empty($this->cache['array'])) {
             return $this->cache['array'];
         }

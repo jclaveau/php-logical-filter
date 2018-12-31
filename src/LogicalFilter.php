@@ -708,7 +708,6 @@ class LogicalFilter implements \JsonSerializable
         $this->rules = (new RuleFilterer)->apply($filter, $this->rules, $options);
         // $this->rules->dump(true);
 
-
         // clean the remaining branches
         if ($clean_empty_branches) {
             $this->rules = (new RuleFilterer)->apply(

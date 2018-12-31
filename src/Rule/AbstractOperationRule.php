@@ -264,7 +264,6 @@ abstract class AbstractOperationRule extends AbstractRule
         return $this;
     }
 
-
     /**
      * If a child is an OrRule or an AndRule and has only one child,
      * replace it by its child.
@@ -463,7 +462,6 @@ abstract class AbstractOperationRule extends AbstractRule
                 $instance = reset($operands);
             }
         }
-
 
         if ($force_logical_core) {
             $instance = $instance->forceLogicalCore();
