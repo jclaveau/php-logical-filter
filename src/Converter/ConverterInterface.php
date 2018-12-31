@@ -7,6 +7,7 @@
  * @version 0.1.0 (29/05/2018)
  */
 namespace JClaveau\LogicalFilter\Converter;
+
 use       JClaveau\LogicalFilter\LogicalFilter;
 
 /**

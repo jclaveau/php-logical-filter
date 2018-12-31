@@ -6,6 +6,7 @@
  * @author  Jean Claveau
  */
 namespace JClaveau\LogicalFilter\Filterer;
+
 use       JClaveau\LogicalFilter\LogicalFilter;
 use       JClaveau\LogicalFilter\Rule\EqualRule;
 use       JClaveau\LogicalFilter\Rule\BelowRule;

@@ -30,6 +30,7 @@ abstract class AbstractRule implements \JsonSerializable
     ];
 
     /**
+     * @param string $english_operator
      */
     public static function findSymbolicOperator($english_operator)
     {
@@ -42,6 +43,7 @@ abstract class AbstractRule implements \JsonSerializable
     }
 
     /**
+     * @param string $symbolic_operator
      */
     public static function findEnglishOperator($symbolic_operator)
     {
@@ -144,7 +146,7 @@ abstract class AbstractRule implements \JsonSerializable
                 $options['indent_unit'] = "    ";
             }
 
-            echo ($this->toString($options));
+            echo($this->toString($options));
         }
         elseif ('dump' == $mode) {
             if ($xdebug_enabled = ini_get('xdebug.overload_var_dump')) {

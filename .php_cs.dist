@@ -8,6 +8,7 @@ $finder = PhpCsFixer\Finder::create()
 
 return PhpCsFixer\Config::create()
     ->setRules([
+        // '@PSR-2' => true,
         // '@Symfony' => true,
         'array_syntax' => ['syntax' => 'short'],
         'binary_operator_spaces' => [
@@ -43,6 +44,18 @@ return PhpCsFixer\Config::create()
         // 'no_alternative_syntax' => true, // ???
         // 'combine_consecutive_unsets' => false,
         'no_spaces_after_function_name' => true,
+        'object_operator_without_whitespace' => true,
+        'no_mixed_echo_print' => true,
+        'no_short_bool_cast' => true,
+        'no_singleline_whitespace_before_semicolons' => true,
+        'no_trailing_whitespace' => true,
+        'normalize_index_brace' => true,
+        'no_useless_return' => true,
+
+        'blank_line_after_namespace' => true, // psr-2
+        'single_line_after_imports' => true, // psr-2
+        'single_import_per_statement' => true, // psr-2
+        'single_blank_line_at_eof' => true, // psr-2
     ])
     ->setFinder($finder)
 ;

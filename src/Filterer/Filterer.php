@@ -6,6 +6,7 @@
  * @author  Jean Claveau
  */
 namespace JClaveau\LogicalFilter\Filterer;
+
 use       JClaveau\LogicalFilter\Filterer\FiltererInterface;
 use       JClaveau\LogicalFilter\LogicalFilter;
 

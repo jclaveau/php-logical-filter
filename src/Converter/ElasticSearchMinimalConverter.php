@@ -6,6 +6,7 @@
  * @author  Jean Claveau
  */
 namespace JClaveau\LogicalFilter\Converter;
+
 use       JClaveau\LogicalFilter\LogicalFilter;
 
 /**

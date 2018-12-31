@@ -16,11 +16,11 @@
     <rule ref="PSR2.ControlStructures.SwitchDeclaration"/>
     <rule ref="PSR2.Files.EndFileNewline"/>
     <rule ref="PSR2.Methods.MethodDeclaration"/>
+    <rule ref="PSR2.Namespaces.NamespaceDeclaration"/>
+    <rule ref="PSR2.ControlStructures.ElseIfDeclaration"/>
 <!--
     <rule ref="PSR2.ControlStructures.ControlStructureSpacing"/>
-    <rule ref="PSR2.ControlStructures.ElseIfDeclaration"/>
-    <rule ref="PSR2.Namespaces.NamespaceDeclaration"/>
-    <rule ref="PSR2.Namespaces.UseDeclaration"/>
+    <rule ref="PSR2.Namespaces.UseDeclaration"/> => forces only 1 space after "use" which is not in psr 2 https://www.php-fig.org/psr/psr-2/#3-namespace-and-use-declarations
 -->
 
 <!--

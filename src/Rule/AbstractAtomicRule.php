@@ -1,5 +1,6 @@
 <?php
 namespace JClaveau\LogicalFilter\Rule;
+
 use       JClaveau\LogicalFilter\FilteredValue;
 use       JClaveau\LogicalFilter\FilteredKey;
 

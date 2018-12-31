@@ -1,5 +1,6 @@
 <?php
 namespace JClaveau\LogicalFilter\Rule;
+
 use       JClaveau\VisibilityViolator;
 
 /**
