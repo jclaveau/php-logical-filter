@@ -1,0 +1,55 @@
+<?php
+
+$finder = PhpCsFixer\Finder::create()
+//    ->exclude('somedir')
+    ->notPath('src/Symfony/Component/Translation/Tests/fixtures/resources.php')
+    ->in(__DIR__ . '/src')
+;
+
+return PhpCsFixer\Config::create()
+    ->setRules([
+        // '@Symfony' => true,
+        'array_syntax' => ['syntax' => 'short'],
+        'binary_operator_spaces' => [
+            'align_double_arrow' => true, // \n after 'if', 'foreach' line...
+            'align_equals'       => true, // \n after 'if', 'foreach' line...
+        ],
+        'braces' => [
+            'position_after_control_structures' => 'same', // \n after 'if', 'foreach' line...
+            'position_before_control_structures' => 'previous', // \n after 'if', 'foreach' line...
+        ],
+        'single_blank_line_before_namespace' => false,
+        // 'array_indentation' => true,
+        // 'method_argument_space' => ['ensure_fully_multiline' => true],
+        'no_short_bool_cast' => true,
+        'no_whitespace_in_blank_line' => true,
+        'not_operator_with_space' => true, // not_operator_with_successor_space
+        'phpdoc_to_comment' => true, // not_operator_with_successor_space
+        'align_multiline_comment' => true,
+        // 'multiline_comment_opening_closing' => true, // bugs with /**/ https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/4179
+        'no_closing_tag' => true,
+        'no_short_echo_tag' => true,
+        'trailing_comma_in_multiline_array' => true,
+        'whitespace_after_comma_in_array' => true,
+        'visibility_required' => true,
+
+        'yoda_style' => true,
+        // 'no_empty_comment' => true, // removes the /**/
+        // 'blank_line_before_return' => false,
+        // 'no_spaces_inside_parenthesis' => true,
+        'no_extra_blank_lines' => true,
+        // 'no_empty_statement' => true, // ???
+        // 'method_argument_space' => true, // remove multiple spaces between args => break vertical alignment
+        // 'no_alternative_syntax' => true, // ???
+        // 'combine_consecutive_unsets' => false,
+        'no_spaces_after_function_name' => true,
+    ])
+    ->setFinder($finder)
+;
+
+// 'blank_line_after_opening_tag' => true,
+// 'blank_line_after_namespace' => true,
+// no_empty_statement
+// no_blank_lines_after_class_opening
+// date_time_immutable
+// no_useless_else
