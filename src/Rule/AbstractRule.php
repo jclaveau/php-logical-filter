@@ -30,7 +30,8 @@ abstract class AbstractRule implements \JsonSerializable
     ];
 
     /**
-     * @param string $english_operator
+     * @param  string $english_operator
+     * @return string
      */
     public static function findSymbolicOperator($english_operator)
     {
@@ -43,7 +44,8 @@ abstract class AbstractRule implements \JsonSerializable
     }
 
     /**
-     * @param string $symbolic_operator
+     * @param  string $symbolic_operator
+     * @return string
      */
     public static function findEnglishOperator($symbolic_operator)
     {
