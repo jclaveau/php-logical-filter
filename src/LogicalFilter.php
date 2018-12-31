@@ -295,10 +295,10 @@ class LogicalFilter implements \JsonSerializable
         }
         elseif ( 3 == count($rules_composition)
             && ! in_array( AndRule::operator, $rules_composition, true )
-            && ! in_array( OrRule::operator,  $rules_composition, true )
+            && ! in_array( OrRule::operator, $rules_composition, true )
             && ! in_array( NotRule::operator, $rules_composition, true )
             && ! in_array( AbstractRule::findSymbolicOperator( AndRule::operator ), $rules_composition, true )
-            && ! in_array( AbstractRule::findSymbolicOperator( OrRule::operator ),  $rules_composition, true )
+            && ! in_array( AbstractRule::findSymbolicOperator( OrRule::operator ), $rules_composition, true )
             && ! in_array( AbstractRule::findSymbolicOperator( NotRule::operator ), $rules_composition, true )
         ) {
             // atomic or composit rules

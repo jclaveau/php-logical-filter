@@ -40,7 +40,6 @@ return PhpCsFixer\Config::create()
         // 'no_spaces_inside_parenthesis' => true,
         'no_extra_blank_lines' => true,
         // 'no_empty_statement' => true, // ???
-        // 'method_argument_space' => true, // remove multiple spaces between args => break vertical alignment
         // 'no_alternative_syntax' => true, // ???
         // 'combine_consecutive_unsets' => false,
         'no_spaces_after_function_name' => true,
@@ -56,6 +55,9 @@ return PhpCsFixer\Config::create()
         'single_line_after_imports' => true, // psr-2
         'single_import_per_statement' => true, // psr-2
         'single_blank_line_at_eof' => true, // psr-2
+        'lowercase_constants' => true, // psr-2
+        'lowercase_keywords' => true, // psr-2
+        'method_argument_space' => true, // psr-2, remove multiple spaces between args => break vertical alignment
     ])
     ->setFinder($finder)
 ;
