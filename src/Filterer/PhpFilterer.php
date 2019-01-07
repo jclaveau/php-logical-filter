@@ -7,15 +7,17 @@
  */
 namespace JClaveau\LogicalFilter\Filterer;
 
-use       JClaveau\LogicalFilter\LogicalFilter;
-use       JClaveau\LogicalFilter\Rule\EqualRule;
-use       JClaveau\LogicalFilter\Rule\BelowRule;
-use       JClaveau\LogicalFilter\Rule\AboveRule;
-use       JClaveau\LogicalFilter\Rule\NotEqualRule;
-use       JClaveau\LogicalFilter\Rule\InRule;
-use       JClaveau\LogicalFilter\Rule\NotInRule;
-use       JClaveau\LogicalFilter\FilteredKey;
-use       JClaveau\LogicalFilter\FilteredValue;
+use JClaveau\LogicalFilter\LogicalFilter;
+use JClaveau\LogicalFilter\Rule\EqualRule;
+use JClaveau\LogicalFilter\Rule\BelowRule;
+use JClaveau\LogicalFilter\Rule\AboveRule;
+use JClaveau\LogicalFilter\Rule\BelowOrEqualRule;
+use JClaveau\LogicalFilter\Rule\AboveOrEqualRule;
+use JClaveau\LogicalFilter\Rule\NotEqualRule;
+use JClaveau\LogicalFilter\Rule\InRule;
+use JClaveau\LogicalFilter\Rule\NotInRule;
+use JClaveau\LogicalFilter\FilteredKey;
+use JClaveau\LogicalFilter\FilteredValue;
 
 /**
  */
@@ -87,6 +89,22 @@ class PhpFilterer extends Filterer
             }
             else {
                 $result = ! in_array($value_to_validate, $value);
+            }
+        }
+        elseif (AboveOrEqualRule::operator === $operator) {
+            if ( ! isset($value_to_validate)) {
+                $result = false;
+            }
+            else {
+                $result = $value_to_validate >= $value;
+            }
+        }
+        elseif (BelowOrEqualRule::operator === $operator) {
+            if ( ! isset($value_to_validate)) {
+                $result = false;
+            }
+            else {
+                $result = $value_to_validate <= $value;
             }
         }
         else {

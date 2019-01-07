@@ -267,15 +267,13 @@ abstract class Filterer implements FiltererInterface
 
                 $case_is_good = null;
                 foreach ($and_case->getOperands() as $i => $rule) {
-                    if ($rule instanceof OrRule && $rule instanceof AndRule) {
+                    $class = get_class($rule);
+
+                    if (in_array($class, [OrRule::class, AndRule::class, ])) {
                         $field = null;
                         $value = $rule->getOperands();
                     }
-                    elseif ($rule instanceof NotEqualRule
-                        || $rule instanceof AbstractAtomicRule
-                        || $rule instanceof InRule
-                        || $rule instanceof NotInRule
-                    ) {
+                    elseif ($rule instanceof AbstractAtomicRule || ! $rule->isNormalizationAllowed($options)) {
                         $field = $rule->getField();
                         $value = $rule->getValues();
                     }
