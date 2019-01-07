@@ -79,6 +79,8 @@ class FiltererTest extends \AbstractTest
             ['field_4', '!=', null],
             ['non_existing_field', '=', 8],
             ['field_6', '!in', [8, 9, 10]], // add != null rule to check if the field exists
+            ['field_4', '<=', 16],
+            ['field_4', '>=', -5],
         ]);
 
         $filterer = new PhpFilterer();
@@ -120,6 +122,8 @@ class FiltererTest extends \AbstractTest
             ],
             ['field_3', '=', null],
             ['field_4', '!=', null],
+            ['field_4', '<=', 16],
+            ['field_4', '>=', -5],
         ]);
 
         $data_to_filter = [
@@ -238,6 +242,8 @@ class FiltererTest extends \AbstractTest
             ['field_3', '=', null],
             ['field_2', '!=', null],
             ['field_4', '><', ['a', 'z']],
+            ['field_5', '<=', 16],
+            ['field_5', '>=', -5],
         ]);
 
         $filtered_rules = (new RuleFilterer)
@@ -250,6 +256,8 @@ class FiltererTest extends \AbstractTest
                     ],
                     ['operator', '!=', '!='],
                     ['operator', '!in', ['=><', '><=']],
+                    ['field', '<=', 'field_4'],
+                    ['field', '>=', 'field_1'],
                 ]
             ),
             $filter_to_filter->getRules()

@@ -7,19 +7,21 @@
  */
 namespace JClaveau\LogicalFilter\Filterer;
 
-use       JClaveau\LogicalFilter\LogicalFilter;
-use       JClaveau\LogicalFilter\Rule\EqualRule;
-use       JClaveau\LogicalFilter\Rule\BelowRule;
-use       JClaveau\LogicalFilter\Rule\AboveRule;
-use       JClaveau\LogicalFilter\Rule\OrRule;
-use       JClaveau\LogicalFilter\Rule\AndRule;
-use       JClaveau\LogicalFilter\Rule\NotRule;
-use       JClaveau\LogicalFilter\Rule\NotEqualRule;
-use       JClaveau\LogicalFilter\Rule\AbstractOperationRule;
-use       JClaveau\LogicalFilter\Rule\AbstractRule;
-use       JClaveau\LogicalFilter\Rule\InRule;
-use       JClaveau\LogicalFilter\Rule\NotInRule;
-use       JClaveau\LogicalFilter\Rule\RegexpRule;
+use JClaveau\LogicalFilter\LogicalFilter;
+use JClaveau\LogicalFilter\Rule\EqualRule;
+use JClaveau\LogicalFilter\Rule\BelowRule;
+use JClaveau\LogicalFilter\Rule\AboveRule;
+use JClaveau\LogicalFilter\Rule\BelowOrEqualRule;
+use JClaveau\LogicalFilter\Rule\AboveOrEqualRule;
+use JClaveau\LogicalFilter\Rule\OrRule;
+use JClaveau\LogicalFilter\Rule\AndRule;
+use JClaveau\LogicalFilter\Rule\NotRule;
+use JClaveau\LogicalFilter\Rule\NotEqualRule;
+use JClaveau\LogicalFilter\Rule\AbstractOperationRule;
+use JClaveau\LogicalFilter\Rule\AbstractRule;
+use JClaveau\LogicalFilter\Rule\InRule;
+use JClaveau\LogicalFilter\Rule\NotInRule;
+use JClaveau\LogicalFilter\Rule\RegexpRule;
 
 /**
  * This filterer is intended to validate Rules.
@@ -160,6 +162,12 @@ class RuleFilterer extends Filterer
         }
         elseif (AboveRule::operator === $operator) {
             $out = $value_to_compare > $value;
+        }
+        elseif (BelowOrEqualRule::operator === $operator) {
+            $out = $value_to_compare <= $value;
+        }
+        elseif (AboveOrEqualRule::operator === $operator) {
+            $out = $value_to_compare >= $value;
         }
         elseif (RegexpRule::operator === $operator) {
             // TODO support optionnal parameters
