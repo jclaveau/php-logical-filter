@@ -296,7 +296,11 @@ abstract class AbstractRule implements \JsonSerializable
      */
     protected function forceLogicalCore()
     {
-        if ($this instanceof AbstractAtomicRule || $this instanceof NotRule || $this instanceof InRule) {
+        if (   $this instanceof AbstractAtomicRule
+            || $this instanceof NotRule
+            || $this instanceof InRule
+            || ! $this->isNormalizationAllowed([])
+        ) {
             $ruleTree = new OrRule([
                 new AndRule([
                     $this,

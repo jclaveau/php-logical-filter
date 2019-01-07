@@ -1243,10 +1243,8 @@ class LogicalFilterTest extends \AbstractTest
         $filter = new LogicalFilter( ['field_1', '=', 3] );
 
         $this->assertEquals(
-            [
-                'or',
-                [
-                    'and',
+            ['or',
+                ['and',
                     ['field_1', '=', 3],
                 ],
             ],
@@ -1325,6 +1323,74 @@ class LogicalFilterTest extends \AbstractTest
             ['or',
                 ['and',
                     ['not', ['field_1', '=', 3]],
+                ],
+            ],
+            $result->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_forceLogicalCore_with_AboveOrEqualRule_at_root()
+    {
+        $filter = (new LogicalFilter( ['field_1', '>=', 3] ))
+            // ->dump()
+            ;
+
+        $result = VisibilityViolator::callHiddenMethod(
+            $filter->getRules(), 'forceLogicalCore'
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ['field_1', '>=', 3],
+                ],
+            ],
+            $result->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_forceLogicalCore_with_BelowOrEqualRule_at_root()
+    {
+        $filter = (new LogicalFilter( ['field_1', '<=', 3] ))
+            // ->dump()
+            ;
+
+        $result = VisibilityViolator::callHiddenMethod(
+            $filter->getRules(), 'forceLogicalCore'
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ['field_1', '<=', 3],
+                ],
+            ],
+            $result->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_forceLogicalCore_with_InRule_at_root()
+    {
+        $filter = (new LogicalFilter(
+                ['field_1', 'in', [3, 4, 5, 6]]
+            ))
+            // ->dump()
+            ;
+
+        $result = VisibilityViolator::callHiddenMethod(
+            $filter->getRules(), 'forceLogicalCore'
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ['field_1', 'in', [3, 4, 5, 6]],
                 ],
             ],
             $result->toArray()
