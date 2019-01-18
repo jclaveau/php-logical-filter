@@ -628,7 +628,7 @@ class LogicalFilter implements \JsonSerializable
      * @param  array|callable Associative array of renamings or callable
      *                        that would rename the fields.
      *
-     * @return string $this
+     * @return LogicalFilter  $this
      */
     public function renameFields($renamings)
     {
