@@ -778,13 +778,31 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     * @param  array|LogicalFilter
      * @param  array|callable Associative array of renamings or callable
      *                        that would rename the fields.
      *
-     * @return array The rules matching the filter
-     *
+     * @return array          The rules matching the filter
      *
      * @todo Make it available on AbstractRule also
+     *
+     * $filter->onEachRule(
+     *      ['field', 'in', [...]],
+     *      function ($rule, $key, array &$rules) {
+     *          // ...
+     * })
+     *
+     * $filter->onEachRule(
+     *      ['field', 'in', [...]],
+     *      [
+     *          Filterer::on_row_matches => function ($rule, $key, array &$rules) {
+     *              // ...
+     *          },
+     *          Filterer::on_row_mismatches => function ($rule, $key, array &$rules) {
+     *              // ...
+     *          },
+     *      ]
+     * )
      */
     public function onEachRule($filter=[], $options)
     {
@@ -792,7 +810,7 @@ class LogicalFilter implements \JsonSerializable
         // ->dump()
         ;
 
-        if ( ! $this->rules) {
+        if (! $this->rules) {
             return [];
         }
 
