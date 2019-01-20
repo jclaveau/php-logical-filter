@@ -524,6 +524,28 @@ class LogicalFilter implements \JsonSerializable
         return $this;
     }
 
+
+    /**
+     * Forces the two firsts levels of the tree to be an OrRule having
+     * only AndRules as operands:
+     * ['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+     * As a simplified ruleTree will alwways be reduced to this structure
+     * with no suboperands others than atomic ones or a simpler one like:
+     * ['or', ['field', '=', '1'], ['field2', '>', '3']]
+     *
+     * This helpes to ease the result of simplify()
+     *
+     * @return OrRule
+     */
+    public function addMinimalCase()
+    {
+        if ($this->rules) {
+            $this->rules = $this->rules->addMinimalCase();
+        }
+
+        return $this;
+    }
+
     /**
      * Checks if there is at least on set of conditions which is not
      * contradictory.
@@ -718,7 +740,7 @@ class LogicalFilter implements \JsonSerializable
                 $this->rules,
                 [
                     Filterer::on_row_matches => function($rule, $key, &$rows) {
-                        unset( $rows[$key] );
+                        unset($rows[$key]);
                     },
                     Filterer::on_row_mismatches => function($rule, $key, &$rows) {
                     },
@@ -841,7 +863,7 @@ class LogicalFilter implements \JsonSerializable
      */
     public function onEachCase(callable $action)
     {
-        $this->simplify(['force_logical_core' => true]);
+        $this->simplify()->addMinimalCase();
 
         if (! $this->rules) {
             return $this;

@@ -125,24 +125,11 @@ abstract class Filterer implements FiltererInterface
      */
     public function apply( LogicalFilter $filter, $tree_to_filter, $options=[] )
     {
-        $root_OrRule = $filter
-            ->simplify(['force_logical_core' => true])
-            ->getRules()
-            // ->dump(true)
-            ;
-
-        if (null !== $root_OrRule) {
-            if ( ! $root_OrRule->hasSolution()) {
-                return null;
-            }
-
-            $root_cases = $root_OrRule->getOperands();
-        }
-        else {
-            $root_cases = [];
+        if (! $filter->hasSolution()) {
+            return null;
         }
 
-        if ( ! isset($options['recurse'])) {
+        if (! isset($options['recurse'])) {
             $options['recurse'] = 'before';
         }
         elseif ( ! in_array($options['recurse'], ['before', 'after', null])) {
@@ -154,7 +141,7 @@ abstract class Filterer implements FiltererInterface
         }
 
         return $this->foreachRow(
-            $root_cases,
+            !$filter->getRules() ? [] : $filter->addMinimalCase()->getRules()->getOperands(),
             $tree_to_filter,
             $path=[],
             $options
@@ -224,25 +211,12 @@ abstract class Filterer implements FiltererInterface
      */
     public function hasMatchingCase( LogicalFilter $filter, $row_to_check, $key_to_check, $options=[] )
     {
-        $root_OrRule = $filter
-            ->simplify(['force_logical_core' => true])
-            ->getRules()
-            // ->dump(true)
-            ;
-
-        if (null !== $root_OrRule) {
-            if ( ! $root_OrRule->hasSolution()) {
-                return null;
-            }
-
-            $root_cases = $root_OrRule->getOperands();
-        }
-        else {
-            $root_cases = [];
+        if (! $filter->hasSolution()) {
+            return null;
         }
 
         return $this->applyOnRow(
-            $root_cases,
+            !$filter->getRules() ? [] : $filter->addMinimalCase()->getRules()->getOperands(),
             $row_to_check,
             $path=[$key_to_check],
             $options

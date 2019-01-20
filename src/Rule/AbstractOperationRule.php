@@ -161,6 +161,14 @@ abstract class AbstractOperationRule extends AbstractRule
     }
 
     /**
+     * @return string The current simplification step
+     */
+    public function getSimplificationStep()
+    {
+        return $this->current_simplification_step;
+    }
+
+    /**
      * Checks if a simplification step is reached.
      *
      * @param  string $step
@@ -465,25 +473,9 @@ abstract class AbstractOperationRule extends AbstractRule
         }
 
         if ($force_logical_core) {
-            $instance = $instance->forceLogicalCore();
-            // for the simplification status at
-            foreach ($operands = $instance->getOperands() as $andOperand) {
-                if ( ! $andOperand instanceof AndRule) {
-                    throw new \LogicException(
-                        "A rule is intended to be an and case: \n"
-                        .$andOperand
-                        ."\nof:\n"
-                        .$instance
-                    );
-                }
-
-                $andOperand->moveSimplificationStepForward(self::simplified, $options, true);
-            }
-            $instance->setOperands($operands);
-            $instance->moveSimplificationStepForward(self::simplified, $options, true);
-
-            $cache_keys[] = $instance->getSemanticId().'-'.$options_id;
-            // self::$simplification_cache[ $instance->getSemanticId().'-'.$options_id ] = $instance;
+            // Adding a minimal case structure  already considered as
+            // 'simplified' can only be done here
+            $instance = $instance->addMinimalCase();
         }
 
         $cache_keys[] = $instance->getSemanticId().'-'.$options_id;

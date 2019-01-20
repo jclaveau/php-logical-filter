@@ -283,6 +283,14 @@ abstract class AbstractRule implements \JsonSerializable
     }
 
     /**
+     * @deprecated addMinimalCase
+     */
+    protected function forceLogicalCore()
+    {
+        return $this->addMinimalCase();
+    }
+
+    /**
      * Forces the two firsts levels of the tree to be an OrRule having
      * only AndRules as operands:
      * ['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
@@ -294,8 +302,20 @@ abstract class AbstractRule implements \JsonSerializable
      *
      * @return OrRule
      */
-    protected function forceLogicalCore()
+    public function addMinimalCase()
     {
+        // Simplification step is required to call hasSolution() on the
+        // returned OrRule value
+        if ($this instanceof AndRule || $this instanceof OrRule) {
+            $simplification_step_to_keep = $this->getSimplificationStep();
+        }
+        elseif ($this->hasSolution()) {
+            $simplification_step_to_keep = AbstractOperationRule::simplified;
+        }
+        else {
+            $simplification_step_to_keep = null;
+        }
+
         if (   $this instanceof AbstractAtomicRule
             || $this instanceof NotRule
             || $this instanceof InRule
@@ -314,7 +334,7 @@ abstract class AbstractRule implements \JsonSerializable
         }
         elseif ($this instanceof OrRule) {
             foreach ($this->operands as $i => $operand) {
-                if ( ! $operand instanceof AndRule) {
+                if (! $operand instanceof AndRule) {
                     $this->operands[$i] = new AndRule([$operand]);
                 }
             }
@@ -326,6 +346,24 @@ abstract class AbstractRule implements \JsonSerializable
                 .$this
             );
         }
+
+        if ($simplification_step_to_keep) {
+            foreach ($operands = $ruleTree->getOperands() as $andOperand) {
+                if (! $andOperand instanceof AndRule) {
+                    throw new \LogicException(
+                        "A rule is intended to be an and case: \n"
+                        .$andOperand
+                        ."\nof:\n"
+                        .$ruleTree
+                    );
+                }
+
+                $andOperand->moveSimplificationStepForward($simplification_step_to_keep, [], true);
+            }
+            $ruleTree->setOperands($operands);
+            $ruleTree->moveSimplificationStepForward($simplification_step_to_keep, [], true);
+        }
+
 
         return $ruleTree;
     }
