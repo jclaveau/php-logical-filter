@@ -80,7 +80,7 @@ class LogicalFilter implements \JsonSerializable
      */
     protected function getDefaultFilterer()
     {
-        if ( ! $this->default_filterer) {
+        if (! $this->default_filterer) {
             $this->default_filterer = new PhpFilterer();
         }
 
@@ -138,7 +138,7 @@ class LogicalFilter implements \JsonSerializable
      * @param  array         $rules_description Rules description
      * @return LogicalFilter $this
      */
-    protected function addRules( $operation, array $rules_description )
+    protected function addRules($operation, array $rules_description)
     {
         if ($rules_description == [null]) {
             // TODO this is due to the bad design of using "Null" instead of
@@ -211,7 +211,7 @@ class LogicalFilter implements \JsonSerializable
                     $fake_root
                 );
 
-                $this->addRule( $fake_root->getOperands()[0], $operation );
+                $this->addRule($fake_root->getOperands()[0], $operation);
             }
         }
         else {
@@ -234,7 +234,7 @@ class LogicalFilter implements \JsonSerializable
      */
     protected function addRule( AbstractRule $rule, $operation=AndRule::operator )
     {
-        if ( $this->rules && in_array( get_class($this->rules), [AndRule::class, OrRule::class] )
+        if ($this->rules && in_array( get_class($this->rules), [AndRule::class, OrRule::class])
             && ! $this->rules->getOperands() ) {
             throw new \LogicException(
                  "You are trying to add rules to a LogicalFilter which had "
@@ -539,7 +539,7 @@ class LogicalFilter implements \JsonSerializable
      */
     public function hasSolution($save_simplification=true)
     {
-        if ( ! $this->rules) {
+        if (! $this->rules) {
             return true;
         }
 
@@ -749,7 +749,7 @@ class LogicalFilter implements \JsonSerializable
         // ->dump()
         ;
 
-        if ( ! $this->rules) {
+        if (! $this->rules) {
             return [];
         }
 
@@ -778,14 +778,6 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
-     * @param  array|LogicalFilter
-     * @param  array|callable Associative array of renamings or callable
-     *                        that would rename the fields.
-     *
-     * @return array          The rules matching the filter
-     *
-     * @todo Make it available on AbstractRule also
-     *
      * $filter->onEachRule(
      *      ['field', 'in', [...]],
      *      function ($rule, $key, array &$rules) {
@@ -803,6 +795,14 @@ class LogicalFilter implements \JsonSerializable
      *          },
      *      ]
      * )
+     *
+     * @todo Make it available on AbstractRule also
+     *
+     * @param  array|LogicalFilter
+     * @param  array|callable Associative array of renamings or callable
+     *                        that would rename the fields.
+     *
+     * @return array          The rules matching the filter
      */
     public function onEachRule($filter=[], $options)
     {
@@ -830,12 +830,20 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     * $filter->onEachCase(function (AndRule $case, $key, array &$caseRules) {
+     *      // do whatever you want on the current case...
+     * })
+     *
+     * @param  array|callable $action Callback to apply on each case.
+     * @return LogicalFilter  $this
+     *
+     * @todo Make it available on AbstractRule also
      */
     public function onEachCase(callable $action)
     {
         $this->simplify(['force_logical_core' => true]);
 
-        if ( ! $this->rules) {
+        if (! $this->rules) {
             return $this;
         }
 
@@ -848,7 +856,6 @@ class LogicalFilter implements \JsonSerializable
             call_user_func_array($action, $arguments);
         }
 
-        // Debug::dumpJson($operands, true);
         $this->rules = new OrRule($operands);
 
         return $this;
@@ -880,7 +887,7 @@ class LogicalFilter implements \JsonSerializable
      *
      * @return LogicalFilter
      */
-    public function saveAs( &$variable )
+    public function saveAs( &$variable)
     {
         return $variable = $this;
     }
@@ -891,7 +898,7 @@ class LogicalFilter implements \JsonSerializable
      *
      * @return LogicalFilter
      */
-    public function saveCopyAs( &$copied_variable )
+    public function saveCopyAs( &$copied_variable)
     {
         $copied_variable = $this->copy();
         return $this;
@@ -927,10 +934,11 @@ class LogicalFilter implements \JsonSerializable
 
             // get line and file from the previous level of the caller
             // TODO go deeper if this case exist?
-            if ( ! isset($caller['file'])) {
+            if (! isset($caller['file'])) {
                 $caller['file'] = $bt[ $callstack_depth - 3 ]['file'];
             }
-            if ( ! isset($caller['line'])) {
+
+            if (! isset($caller['line'])) {
                 $caller['line'] = $bt[ $callstack_depth - 3 ]['line'];
             }
 
@@ -966,13 +974,13 @@ class LogicalFilter implements \JsonSerializable
      */
     public function applyOn($data_to_filter, $action_on_matches=null, $filterer=null)
     {
-        if ( ! $filterer) {
+        if (! $filterer) {
             $filterer = $this->getDefaultFilterer();
         }
         elseif (is_callable($filterer)) {
             $filterer = new CustomizableFilterer($filterer);
         }
-        elseif ( ! $filterer instanceof Filterer) {
+        elseif (! $filterer instanceof Filterer) {
             throw new \InvalidArgumentException(
                  "The given \$filterer must be null or a callable or a instance "
                 ."of Filterer instead of: ".var_export($filterer, true)
@@ -984,7 +992,7 @@ class LogicalFilter implements \JsonSerializable
             return $data_to_filter->flushRules()->addRule( $filtered_rules );
         }
         else {
-            return $filterer->apply( $this, $data_to_filter );
+            return $filterer->apply($this, $data_to_filter);
         }
     }
 
@@ -1001,20 +1009,20 @@ class LogicalFilter implements \JsonSerializable
      */
     public function validates($value_to_check, $key_to_check=null, $filterer=null)
     {
-        if ( ! $filterer) {
+        if (! $filterer) {
             $filterer = $this->getDefaultFilterer();
         }
         elseif (is_callable($filterer)) {
             $filterer = new CustomizableFilterer($filterer);
         }
-        elseif ( ! $filterer instanceof Filterer) {
+        elseif (! $filterer instanceof Filterer) {
             throw new \InvalidArgumentException(
                  "The given \$filterer must be null or a callable or a instance "
                 ."of Filterer instead of: ".var_export($filterer, true)
             );
         }
 
-        return $filterer->hasMatchingCase( $this, $value_to_check, $key_to_check );
+        return $filterer->hasMatchingCase($this, $value_to_check, $key_to_check);
     }
 
     /**/
