@@ -884,6 +884,88 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     * Retrieves the minimum possibility and the maximum possibility for
+     * each field of the rules matching the filter.
+     *
+     * @param  array|LogicalFilter|AbstractRule $ruleFilter
+     *
+     * @return array The bounds of the range and a nullable property for each field
+     */
+    public function getRanges($ruleFilter=null)
+    {
+        $ranges = [];
+
+        $this->onEachCase(function (AndRule $and_rule) use (&$ranges, $ruleFilter) {
+            (new self($and_rule))->onEachRule(
+                ['and',
+                    $ruleFilter,
+                    ['operator', 'in', [
+                        '=', '>', '<', '>=', '<=',
+                        '><', '><=', '=><=', '=><',
+                    ]],
+                ],
+                function ($rule) use (&$ranges) {
+
+                    $field = $rule->getField();
+
+                    $range = isset($ranges[ $field ])
+                           ? $ranges[ $field ]
+                           : ['min' => [], 'max' => [], 'nullable' => false];
+
+                    if ($rule::operator == '=') {
+                        if (null === $rule->getValues()) {
+                            $range['nullable'] = true;
+                        }
+                        else {
+                            $range['min'][] = $rule->getValues();
+                            $range['max'][] = $rule->getValues();
+                        }
+                    }
+                    elseif (in_array($rule::operator, ['<', '<='])) {
+                        $range['max'][] = $rule->getValues();
+                    }
+                    elseif (in_array($rule::operator, ['>', '>='])) {
+                        $range['min'][] = $rule->getValues();
+                    }
+                    elseif (in_array($rule::operator, ['><', '><=', '=><=', '=><'])) {
+                        $range['min'][] = $rule->getValues()[0];
+                        $range['max'][] = $rule->getValues()[1];
+                    }
+                    else {
+                        throw new \LogicException(
+                            "Buggy case: ".$rule::operator
+                        );
+                    }
+
+                    $ranges[ $field ] = $range;
+                }
+            );
+        });
+
+        foreach ($ranges as &$range) {
+            $range['min'] = min($range['min']);
+            $range['max'] = max($range['max']);
+        }
+
+        return $ranges;
+    }
+
+    /**
+     * Retrieves the minimum possibility and the maximum possibility for
+     * the given field.
+     *
+     * @param  mixed $field
+     * @return array The minimum and maximum possible for the rules of the filter
+     */
+    public function getFieldRange($field)
+    {
+        $range = $this->getRanges(['field', '=', $field]);
+        return isset($range[$field])
+            ? $range[$field]
+            : ['min' => null, 'max' => null, 'nullable' => false];
+    }
+
+    /**
      * Clone the current object and its rules.
      *
      * @return LogicalFilter A copy of the current instance with a copied ruletree

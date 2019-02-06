@@ -726,5 +726,148 @@ trait LogicalFilterTest_rules_manipulation_trait
         );
     }
 
+    /**
+     */
+    public function test_getFieldRange_numbers()
+    {
+        $filter = (new LogicalFilter(
+            ["or",
+                ['field_2', '=', 2],
+                ['and',
+                    ['field_2', '>', 4],
+                    ['field_2', '<', -4],
+                ],
+                ['field_2', '<', 8],
+            ]
+        ));
+
+        $this->assertEquals(
+            [
+                'min'      => 2,
+                'max'      => 8,
+                'nullable' => false,
+            ],
+            $filter->getFieldRange('field_2')
+        );
+
+        $filter = (new LogicalFilter(
+            ["or",
+                ['field_2', '=', 2],
+                ['and',
+                    ['field_2', '>', -10],
+                    ['field_2', '<', 6],
+                ],
+                ['field_2', '<', 8],
+            ]
+        ));
+
+        $this->assertEquals(
+            [
+                'min'      => -10,
+                'max'      => 8,
+                'nullable' => false,
+            ],
+            $filter->getFieldRange('field_2')
+        );
+    }
+
+    /**
+     */
+    public function test_getFieldRange_strings()
+    {
+        $filter = (new LogicalFilter(
+            ["or",
+                ['field_2', '=', 'dddd'],
+                ['and',
+                    ['field_2', '>', 'aaaa'],
+                    ['field_2', '<', 'rrrr'],
+                ],
+                ['field_2', '<', 'tttt'],
+            ]
+        ));
+
+        $this->assertEquals(
+            [
+                'min'      => 'aaaa',
+                'max'      => 'tttt',
+                'nullable' => false,
+            ],
+            $filter->getFieldRange('field_2')
+        );
+    }
+
+    /**
+     */
+    public function test_getFieldRange_null()
+    {
+        $filter = (new LogicalFilter(
+            ["or",
+                ['field_2', '=', null],
+                ['and',
+                    ['field_2', '>', -10],
+                    ['field_2', '<', 6],
+                ],
+                ['field_2', '<', 8],
+            ]
+        ));
+
+        $this->assertEquals(
+            [
+                'min'      => -10,
+                'max'      => 8,
+                'nullable' => true,
+            ],
+            $filter->getFieldRange('field_2')
+        );
+    }
+
+    /**
+     */
+    public function test_getFieldRange_DateTimes()
+    {
+        $filter = (new LogicalFilter(
+            ["or",
+                ['and',
+                    ['field_2', '>', new \DateTimeImmutable('2019-02-06')],
+                    ['field_2', '<', new \DateTimeImmutable('2019-02-09')],
+                ],
+                ['field_2', '<', new \DateTimeImmutable('2019-02-13')],
+            ]
+        ));
+
+        $this->assertEquals(
+            [
+                'min'      => new \DateTimeImmutable('2019-02-06'),
+                'max'      => new \DateTimeImmutable('2019-02-13'),
+                'nullable' => false,
+            ],
+            $filter->getFieldRange('field_2')
+        );
+    }
+
+    /**
+     */
+    public function test_getFieldRange_no_matching_rule()
+    {
+        $filter = (new LogicalFilter(
+            ["or",
+                ['and',
+                    ['field_2', '>', new \DateTimeImmutable('2019-02-06')],
+                    ['field_2', '<', new \DateTimeImmutable('2019-02-09')],
+                ],
+                ['field_2', '<', new \DateTimeImmutable('2019-02-13')],
+            ]
+        ));
+
+        $this->assertEquals(
+            [
+                'min'      => null,
+                'max'      => null,
+                'nullable' => false,
+            ],
+            $filter->getFieldRange('field_8')
+        );
+    }
+
     /**/
 }
