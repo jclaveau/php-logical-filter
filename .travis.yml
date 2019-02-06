@@ -8,7 +8,7 @@ php:
  - '5.6'
  - '7.2'
 # - hhvm # dont work with FiltererTest::test_filterer_customizable (and I don't use hhvm)
- - nightly
+# - nightly
 
 # Commands to be run before your environment runs.
 before_script:
