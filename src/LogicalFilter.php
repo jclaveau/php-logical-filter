@@ -955,7 +955,7 @@ class LogicalFilter implements \JsonSerializable
      * the given field.
      *
      * @param  mixed $field
-     * @return array The minimum and maximum possible for the rules of the filter
+     * @return array The bounds of the range and a nullable property for the given field
      */
     public function getFieldRange($field)
     {

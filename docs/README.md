@@ -20,6 +20,7 @@
     * [setOperands](#setoperands)
     * [renameFields](#renamefields)
     * [moveSimplificationStepForward](#movesimplificationstepforward)
+    * [getSimplificationStep](#getsimplificationstep)
     * [simplicationStepReached](#simplicationstepreached)
     * [removeNegations](#removenegations)
     * [cleanOperations](#cleanoperations)
@@ -41,6 +42,7 @@
     * [__toString](#__tostring)
     * [getInstanceId](#getinstanceid)
     * [getSemanticId](#getsemanticid)
+    * [addMinimalCase](#addminimalcase)
     * [setOptions](#setoptions)
     * [getOption](#getoption)
     * [getOptions](#getoptions)
@@ -65,6 +67,7 @@
     * [__toString](#__tostring-1)
     * [getInstanceId](#getinstanceid-1)
     * [getSemanticId](#getsemanticid-1)
+    * [addMinimalCase](#addminimalcase-1)
     * [setOptions](#setoptions-1)
     * [getOption](#getoption-1)
     * [getOptions](#getoptions-1)
@@ -81,6 +84,7 @@
     * [setOperands](#setoperands-1)
     * [renameFields](#renamefields-1)
     * [moveSimplificationStepForward](#movesimplificationstepforward-1)
+    * [getSimplificationStep](#getsimplificationstep-1)
     * [simplicationStepReached](#simplicationstepreached-1)
     * [removeNegations](#removenegations-1)
     * [cleanOperations](#cleanoperations-1)
@@ -104,6 +108,7 @@
     * [toArray](#toarray-2)
     * [getInstanceId](#getinstanceid-2)
     * [getSemanticId](#getsemanticid-2)
+    * [addMinimalCase](#addminimalcase-2)
     * [setOptions](#setoptions-2)
     * [getOption](#getoption-2)
     * [getOptions](#getoptions-2)
@@ -130,6 +135,7 @@
     * [setOperands](#setoperands-2)
     * [renameFields](#renamefields-2)
     * [moveSimplificationStepForward](#movesimplificationstepforward-2)
+    * [getSimplificationStep](#getsimplificationstep-2)
     * [simplicationStepReached](#simplicationstepreached-2)
     * [removeNegations](#removenegations-2)
     * [cleanOperations](#cleanoperations-2)
@@ -151,6 +157,7 @@
     * [__toString](#__tostring-3)
     * [getInstanceId](#getinstanceid-3)
     * [getSemanticId](#getsemanticid-3)
+    * [addMinimalCase](#addminimalcase-3)
     * [setOptions](#setoptions-3)
     * [getOption](#getoption-3)
     * [getOptions](#getoptions-3)
@@ -175,6 +182,7 @@
     * [__toString](#__tostring-4)
     * [getInstanceId](#getinstanceid-4)
     * [getSemanticId](#getsemanticid-4)
+    * [addMinimalCase](#addminimalcase-4)
     * [setOptions](#setoptions-4)
     * [getOption](#getoption-4)
     * [getOptions](#getoptions-4)
@@ -202,6 +210,7 @@
     * [setOperands](#setoperands-3)
     * [renameFields](#renamefields-3)
     * [moveSimplificationStepForward](#movesimplificationstepforward-3)
+    * [getSimplificationStep](#getsimplificationstep-3)
     * [simplicationStepReached](#simplicationstepreached-3)
     * [removeNegations](#removenegations-3)
     * [cleanOperations](#cleanoperations-3)
@@ -223,6 +232,7 @@
     * [__toString](#__tostring-5)
     * [getInstanceId](#getinstanceid-5)
     * [getSemanticId](#getsemanticid-5)
+    * [addMinimalCase](#addminimalcase-5)
     * [setOptions](#setoptions-5)
     * [getOption](#getoption-5)
     * [getOptions](#getoptions-5)
@@ -245,6 +255,7 @@
     * [setOperands](#setoperands-4)
     * [renameFields](#renamefields-4)
     * [moveSimplificationStepForward](#movesimplificationstepforward-4)
+    * [getSimplificationStep](#getsimplificationstep-4)
     * [simplicationStepReached](#simplicationstepreached-4)
     * [removeNegations](#removenegations-4)
     * [cleanOperations](#cleanoperations-4)
@@ -266,6 +277,7 @@
     * [__toString](#__tostring-6)
     * [getInstanceId](#getinstanceid-6)
     * [getSemanticId](#getsemanticid-6)
+    * [addMinimalCase](#addminimalcase-6)
     * [setOptions](#setoptions-6)
     * [getOption](#getoption-6)
     * [getOptions](#getoptions-6)
@@ -288,6 +300,7 @@
     * [setOperands](#setoperands-5)
     * [renameFields](#renamefields-5)
     * [moveSimplificationStepForward](#movesimplificationstepforward-5)
+    * [getSimplificationStep](#getsimplificationstep-5)
     * [simplicationStepReached](#simplicationstepreached-5)
     * [removeNegations](#removenegations-5)
     * [cleanOperations](#cleanoperations-5)
@@ -309,6 +322,7 @@
     * [__toString](#__tostring-7)
     * [getInstanceId](#getinstanceid-7)
     * [getSemanticId](#getsemanticid-7)
+    * [addMinimalCase](#addminimalcase-7)
     * [setOptions](#setoptions-7)
     * [getOption](#getoption-7)
     * [getOptions](#getoptions-7)
@@ -327,6 +341,7 @@
     * [setOperands](#setoperands-6)
     * [renameFields](#renamefields-6)
     * [moveSimplificationStepForward](#movesimplificationstepforward-6)
+    * [getSimplificationStep](#getsimplificationstep-6)
     * [simplicationStepReached](#simplicationstepreached-6)
     * [removeNegations](#removenegations-6)
     * [cleanOperations](#cleanoperations-6)
@@ -348,6 +363,7 @@
     * [__toString](#__tostring-8)
     * [getInstanceId](#getinstanceid-8)
     * [getSemanticId](#getsemanticid-8)
+    * [addMinimalCase](#addminimalcase-8)
     * [setOptions](#setoptions-8)
     * [getOption](#getoption-8)
     * [getOptions](#getoptions-8)
@@ -394,6 +410,7 @@
     * [__toString](#__tostring-9)
     * [getInstanceId](#getinstanceid-9)
     * [getSemanticId](#getsemanticid-9)
+    * [addMinimalCase](#addminimalcase-9)
     * [setOptions](#setoptions-9)
     * [getOption](#getoption-9)
     * [getOptions](#getoptions-9)
@@ -424,6 +441,7 @@
     * [setOperands](#setoperands-7)
     * [renameFields](#renamefields-7)
     * [moveSimplificationStepForward](#movesimplificationstepforward-7)
+    * [getSimplificationStep](#getsimplificationstep-7)
     * [simplicationStepReached](#simplicationstepreached-7)
     * [removeNegations](#removenegations-7)
     * [cleanOperations](#cleanoperations-7)
@@ -445,6 +463,7 @@
     * [__toString](#__tostring-10)
     * [getInstanceId](#getinstanceid-10)
     * [getSemanticId](#getsemanticid-10)
+    * [addMinimalCase](#addminimalcase-10)
     * [setOptions](#setoptions-10)
     * [getOption](#getoption-10)
     * [getOptions](#getoptions-10)
@@ -465,6 +484,7 @@
     * [hasSolutionIf](#hassolutionif)
     * [getRules](#getrules)
     * [simplify](#simplify-8)
+    * [addMinimalCase](#addminimalcase-11)
     * [hasSolution](#hassolution-11)
     * [toArray](#toarray-11)
     * [toString](#tostring-11)
@@ -479,6 +499,8 @@
     * [listLeafRulesMatching](#listleafrulesmatching)
     * [onEachRule](#oneachrule)
     * [onEachCase](#oneachcase)
+    * [getRanges](#getranges)
+    * [getFieldRange](#getfieldrange)
     * [copy](#copy-11)
     * [__clone](#__clone-8)
     * [saveAs](#saveas)
@@ -505,6 +527,7 @@
     * [setOperands](#setoperands-8)
     * [renameFields](#renamefields-9)
     * [moveSimplificationStepForward](#movesimplificationstepforward-8)
+    * [getSimplificationStep](#getsimplificationstep-8)
     * [simplicationStepReached](#simplicationstepreached-8)
     * [removeNegations](#removenegations-8)
     * [cleanOperations](#cleanoperations-8)
@@ -524,6 +547,7 @@
     * [__toString](#__tostring-12)
     * [getInstanceId](#getinstanceid-11)
     * [getSemanticId](#getsemanticid-12)
+    * [addMinimalCase](#addminimalcase-12)
     * [setOptions](#setoptions-11)
     * [getOption](#getoption-11)
     * [getOptions](#getoptions-12)
@@ -545,6 +569,7 @@
     * [setOperands](#setoperands-9)
     * [renameFields](#renamefields-10)
     * [moveSimplificationStepForward](#movesimplificationstepforward-9)
+    * [getSimplificationStep](#getsimplificationstep-9)
     * [simplicationStepReached](#simplicationstepreached-9)
     * [removeNegations](#removenegations-9)
     * [cleanOperations](#cleanoperations-9)
@@ -564,6 +589,7 @@
     * [__toString](#__tostring-13)
     * [getInstanceId](#getinstanceid-12)
     * [getSemanticId](#getsemanticid-13)
+    * [addMinimalCase](#addminimalcase-13)
     * [setOptions](#setoptions-12)
     * [getOption](#getoption-12)
     * [getOptions](#getoptions-13)
@@ -580,6 +606,7 @@
     * [setOperands](#setoperands-10)
     * [renameFields](#renamefields-11)
     * [moveSimplificationStepForward](#movesimplificationstepforward-10)
+    * [getSimplificationStep](#getsimplificationstep-10)
     * [simplicationStepReached](#simplicationstepreached-10)
     * [removeNegations](#removenegations-10)
     * [cleanOperations](#cleanoperations-10)
@@ -603,6 +630,7 @@
     * [toArray](#toarray-14)
     * [getInstanceId](#getinstanceid-13)
     * [getSemanticId](#getsemanticid-14)
+    * [addMinimalCase](#addminimalcase-14)
     * [setOptions](#setoptions-13)
     * [getOption](#getoption-13)
     * [getOptions](#getoptions-14)
@@ -618,6 +646,7 @@
     * [setOperands](#setoperands-11)
     * [renameFields](#renamefields-12)
     * [moveSimplificationStepForward](#movesimplificationstepforward-11)
+    * [getSimplificationStep](#getsimplificationstep-11)
     * [simplicationStepReached](#simplicationstepreached-11)
     * [removeNegations](#removenegations-11)
     * [cleanOperations](#cleanoperations-11)
@@ -641,6 +670,7 @@
     * [toArray](#toarray-15)
     * [getInstanceId](#getinstanceid-14)
     * [getSemanticId](#getsemanticid-15)
+    * [addMinimalCase](#addminimalcase-15)
     * [setOptions](#setoptions-14)
     * [getOption](#getoption-14)
     * [getOptions](#getoptions-15)
@@ -676,6 +706,7 @@
     * [__toString](#__tostring-16)
     * [getInstanceId](#getinstanceid-15)
     * [getSemanticId](#getsemanticid-16)
+    * [addMinimalCase](#addminimalcase-16)
     * [setOptions](#setoptions-15)
     * [getOption](#getoption-15)
     * [getOptions](#getoptions-16)
@@ -1102,6 +1133,26 @@ AboveOrEqualRule::moveSimplificationStepForward( string $step_to_go_to, array $s
 
 ---
 
+### getSimplificationStep
+
+
+
+```php
+AboveOrEqualRule::getSimplificationStep(  ): string
+```
+
+
+
+
+
+**Return Value:**
+
+The current simplification step
+
+
+
+---
+
 ### simplicationStepReached
 
 Checks if a simplification step is reached.
@@ -1341,7 +1392,7 @@ AboveOrEqualRule::isNormalizationAllowed( array $contextual_options = array() ):
 
 
 ```php
-AboveOrEqualRule::findSymbolicOperator(  $english_operator )
+AboveOrEqualRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -1351,7 +1402,7 @@ AboveOrEqualRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -1363,7 +1414,7 @@ AboveOrEqualRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-AboveOrEqualRule::findEnglishOperator(  $symbolic_operator )
+AboveOrEqualRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -1373,7 +1424,7 @@ AboveOrEqualRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -1550,6 +1601,27 @@ AboveOrEqualRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+AboveOrEqualRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -1817,7 +1889,7 @@ $this
 
 
 ```php
-AboveRule::findSymbolicOperator(  $english_operator )
+AboveRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -1827,7 +1899,7 @@ AboveRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -1839,7 +1911,7 @@ AboveRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-AboveRule::findEnglishOperator(  $symbolic_operator )
+AboveRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -1849,7 +1921,7 @@ AboveRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -2046,6 +2118,27 @@ AboveRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+AboveRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -2376,6 +2469,26 @@ AndRule::moveSimplificationStepForward( string $step_to_go_to, array $simplifica
 
 ---
 
+### getSimplificationStep
+
+
+
+```php
+AndRule::getSimplificationStep(  ): string
+```
+
+
+
+
+
+**Return Value:**
+
+The current simplification step
+
+
+
+---
+
 ### simplicationStepReached
 
 Checks if a simplification step is reached.
@@ -2615,7 +2728,7 @@ AndRule::isNormalizationAllowed( array $current_simplification_options )
 
 
 ```php
-AndRule::findSymbolicOperator(  $english_operator )
+AndRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -2625,7 +2738,7 @@ AndRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -2637,7 +2750,7 @@ AndRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-AndRule::findEnglishOperator(  $symbolic_operator )
+AndRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -2647,7 +2760,7 @@ AndRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -2868,6 +2981,27 @@ AndRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+AndRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -3475,6 +3609,26 @@ BelowOrEqualRule::moveSimplificationStepForward( string $step_to_go_to, array $s
 
 ---
 
+### getSimplificationStep
+
+
+
+```php
+BelowOrEqualRule::getSimplificationStep(  ): string
+```
+
+
+
+
+
+**Return Value:**
+
+The current simplification step
+
+
+
+---
+
 ### simplicationStepReached
 
 Checks if a simplification step is reached.
@@ -3714,7 +3868,7 @@ BelowOrEqualRule::isNormalizationAllowed( array $contextual_options = array() ):
 
 
 ```php
-BelowOrEqualRule::findSymbolicOperator(  $english_operator )
+BelowOrEqualRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -3724,7 +3878,7 @@ BelowOrEqualRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -3736,7 +3890,7 @@ BelowOrEqualRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-BelowOrEqualRule::findEnglishOperator(  $symbolic_operator )
+BelowOrEqualRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -3746,7 +3900,7 @@ BelowOrEqualRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -3923,6 +4077,27 @@ BelowOrEqualRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+BelowOrEqualRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -4190,7 +4365,7 @@ $this
 
 
 ```php
-BelowRule::findSymbolicOperator(  $english_operator )
+BelowRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -4200,7 +4375,7 @@ BelowRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -4212,7 +4387,7 @@ BelowRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-BelowRule::findEnglishOperator(  $symbolic_operator )
+BelowRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -4222,7 +4397,7 @@ BelowRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -4419,6 +4594,27 @@ BelowRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+BelowRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -4980,6 +5176,26 @@ BetweenOrEqualBothRule::moveSimplificationStepForward( string $step_to_go_to, ar
 
 ---
 
+### getSimplificationStep
+
+
+
+```php
+BetweenOrEqualBothRule::getSimplificationStep(  ): string
+```
+
+
+
+
+
+**Return Value:**
+
+The current simplification step
+
+
+
+---
+
 ### simplicationStepReached
 
 Checks if a simplification step is reached.
@@ -5219,7 +5435,7 @@ BetweenOrEqualBothRule::isNormalizationAllowed( array $current_simplification_op
 
 
 ```php
-BetweenOrEqualBothRule::findSymbolicOperator(  $english_operator )
+BetweenOrEqualBothRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -5229,7 +5445,7 @@ BetweenOrEqualBothRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -5241,7 +5457,7 @@ BetweenOrEqualBothRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-BetweenOrEqualBothRule::findEnglishOperator(  $symbolic_operator )
+BetweenOrEqualBothRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -5251,7 +5467,7 @@ BetweenOrEqualBothRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -5428,6 +5644,27 @@ BetweenOrEqualBothRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+BetweenOrEqualBothRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -5895,6 +6132,26 @@ BetweenOrEqualLowerRule::moveSimplificationStepForward( string $step_to_go_to, a
 
 ---
 
+### getSimplificationStep
+
+
+
+```php
+BetweenOrEqualLowerRule::getSimplificationStep(  ): string
+```
+
+
+
+
+
+**Return Value:**
+
+The current simplification step
+
+
+
+---
+
 ### simplicationStepReached
 
 Checks if a simplification step is reached.
@@ -6134,7 +6391,7 @@ BetweenOrEqualLowerRule::isNormalizationAllowed( array $current_simplification_o
 
 
 ```php
-BetweenOrEqualLowerRule::findSymbolicOperator(  $english_operator )
+BetweenOrEqualLowerRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -6144,7 +6401,7 @@ BetweenOrEqualLowerRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -6156,7 +6413,7 @@ BetweenOrEqualLowerRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-BetweenOrEqualLowerRule::findEnglishOperator(  $symbolic_operator )
+BetweenOrEqualLowerRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -6166,7 +6423,7 @@ BetweenOrEqualLowerRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -6343,6 +6600,27 @@ BetweenOrEqualLowerRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+BetweenOrEqualLowerRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -6810,6 +7088,26 @@ BetweenOrEqualUpperRule::moveSimplificationStepForward( string $step_to_go_to, a
 
 ---
 
+### getSimplificationStep
+
+
+
+```php
+BetweenOrEqualUpperRule::getSimplificationStep(  ): string
+```
+
+
+
+
+
+**Return Value:**
+
+The current simplification step
+
+
+
+---
+
 ### simplicationStepReached
 
 Checks if a simplification step is reached.
@@ -7049,7 +7347,7 @@ BetweenOrEqualUpperRule::isNormalizationAllowed( array $current_simplification_o
 
 
 ```php
-BetweenOrEqualUpperRule::findSymbolicOperator(  $english_operator )
+BetweenOrEqualUpperRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -7059,7 +7357,7 @@ BetweenOrEqualUpperRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -7071,7 +7369,7 @@ BetweenOrEqualUpperRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-BetweenOrEqualUpperRule::findEnglishOperator(  $symbolic_operator )
+BetweenOrEqualUpperRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -7081,7 +7379,7 @@ BetweenOrEqualUpperRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -7258,6 +7556,27 @@ BetweenOrEqualUpperRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+BetweenOrEqualUpperRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -7654,6 +7973,26 @@ BetweenRule::moveSimplificationStepForward( string $step_to_go_to, array $simpli
 
 ---
 
+### getSimplificationStep
+
+
+
+```php
+BetweenRule::getSimplificationStep(  ): string
+```
+
+
+
+
+
+**Return Value:**
+
+The current simplification step
+
+
+
+---
+
 ### simplicationStepReached
 
 Checks if a simplification step is reached.
@@ -7893,7 +8232,7 @@ BetweenRule::isNormalizationAllowed( array $current_simplification_options )
 
 
 ```php
-BetweenRule::findSymbolicOperator(  $english_operator )
+BetweenRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -7903,7 +8242,7 @@ BetweenRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -7915,7 +8254,7 @@ BetweenRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-BetweenRule::findEnglishOperator(  $symbolic_operator )
+BetweenRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -7925,7 +8264,7 @@ BetweenRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -8102,6 +8441,27 @@ BetweenRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+BetweenRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -8803,7 +9163,7 @@ $this
 
 
 ```php
-EqualRule::findSymbolicOperator(  $english_operator )
+EqualRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -8813,7 +9173,7 @@ EqualRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -8825,7 +9185,7 @@ EqualRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-EqualRule::findEnglishOperator(  $symbolic_operator )
+EqualRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -8835,7 +9195,7 @@ EqualRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -9032,6 +9392,27 @@ EqualRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+EqualRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -9656,6 +10037,26 @@ InRule::moveSimplificationStepForward( string $step_to_go_to, array $simplificat
 
 ---
 
+### getSimplificationStep
+
+
+
+```php
+InRule::getSimplificationStep(  ): string
+```
+
+
+
+
+
+**Return Value:**
+
+The current simplification step
+
+
+
+---
+
 ### simplicationStepReached
 
 Checks if a simplification step is reached.
@@ -9891,7 +10292,7 @@ InRule::isNormalizationAllowed( array $contextual_options )
 
 
 ```php
-InRule::findSymbolicOperator(  $english_operator )
+InRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -9901,7 +10302,7 @@ InRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -9913,7 +10314,7 @@ InRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-InRule::findEnglishOperator(  $symbolic_operator )
+InRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -9923,7 +10324,7 @@ InRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -10100,6 +10501,27 @@ InRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+InRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -10549,6 +10971,27 @@ LogicalFilter::simplify( array $options = array() ): $this
 
 ---
 
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+LogicalFilter::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
+
+
+
+
+
+---
+
 ### hasSolution
 
 Checks if there is at least on set of conditions which is not
@@ -10729,7 +11172,7 @@ LogicalFilter::flushRules(  ): $this
 
 
 ```php
-LogicalFilter::renameFields(  $renamings ): string
+LogicalFilter::renameFields(  $renamings ): \JClaveau\LogicalFilter\LogicalFilter
 ```
 
 
@@ -10831,13 +11274,29 @@ The rules matching the filter
 
 ### onEachRule
 
-
+$filter->onEachRule(
+     ['field', 'in', [.
 
 ```php
 LogicalFilter::onEachRule(  $filter = array(),  $options ): array
 ```
 
+..]],
+     function ($rule, $key, array &$rules) {
+         // ...
+})
 
+$filter->onEachRule(
+     ['field', 'in', [...]],
+     [
+         Filterer::on_row_matches => function ($rule, $key, array &$rules) {
+             // ...
+         },
+         Filterer::on_row_mismatches => function ($rule, $key, array &$rules) {
+             // ...
+         },
+     ]
+)
 
 
 **Parameters:**
@@ -10858,10 +11317,39 @@ The rules matching the filter
 
 ### onEachCase
 
-
+$filter->onEachCase(function (AndRule $case, $key, array &$caseRules) {
+     // do whatever you want on the current case.
 
 ```php
-LogicalFilter::onEachCase( callable $action )
+LogicalFilter::onEachCase( array|callable $action ): \JClaveau\LogicalFilter\LogicalFilter
+```
+
+..
+})
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$action` | **array&#124;callable** | Callback to apply on each case. |
+
+
+**Return Value:**
+
+$this
+
+
+
+---
+
+### getRanges
+
+Retrieves the minimum possibility and the maximum possibility for
+each field of the rules matching the filter.
+
+```php
+LogicalFilter::getRanges( array|\JClaveau\LogicalFilter\LogicalFilter|\JClaveau\LogicalFilter\Rule\AbstractRule $ruleFilter = null ): array
 ```
 
 
@@ -10871,8 +11359,39 @@ LogicalFilter::onEachCase( callable $action )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$action` | **callable** |  |
+| `$ruleFilter` | **array&#124;\JClaveau\LogicalFilter\LogicalFilter&#124;\JClaveau\LogicalFilter\Rule\AbstractRule** |  |
 
+
+**Return Value:**
+
+The bounds of the range and a nullable property for each field
+
+
+
+---
+
+### getFieldRange
+
+Retrieves the minimum possibility and the maximum possibility for
+the given field.
+
+```php
+LogicalFilter::getFieldRange( mixed $field ): array
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$field` | **mixed** |  |
+
+
+**Return Value:**
+
+The bounds of the range and a nullable property for the given field
 
 
 
@@ -11463,6 +11982,26 @@ NotEqualRule::moveSimplificationStepForward( string $step_to_go_to, array $simpl
 
 ---
 
+### getSimplificationStep
+
+
+
+```php
+NotEqualRule::getSimplificationStep(  ): string
+```
+
+
+
+
+
+**Return Value:**
+
+The current simplification step
+
+
+
+---
+
 ### simplicationStepReached
 
 Checks if a simplification step is reached.
@@ -11653,7 +12192,7 @@ NotEqualRule::__clone(  )
 
 
 ```php
-NotEqualRule::findSymbolicOperator(  $english_operator )
+NotEqualRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -11663,7 +12202,7 @@ NotEqualRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -11675,7 +12214,7 @@ NotEqualRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-NotEqualRule::findEnglishOperator(  $symbolic_operator )
+NotEqualRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -11685,7 +12224,7 @@ NotEqualRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -11862,6 +12401,27 @@ NotEqualRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+NotEqualRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -12316,6 +12876,26 @@ NotInRule::moveSimplificationStepForward( string $step_to_go_to, array $simplifi
 
 ---
 
+### getSimplificationStep
+
+
+
+```php
+NotInRule::getSimplificationStep(  ): string
+```
+
+
+
+
+
+**Return Value:**
+
+The current simplification step
+
+
+
+---
+
 ### simplicationStepReached
 
 Checks if a simplification step is reached.
@@ -12506,7 +13086,7 @@ NotInRule::__clone(  )
 
 
 ```php
-NotInRule::findSymbolicOperator(  $english_operator )
+NotInRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -12516,7 +13096,7 @@ NotInRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -12528,7 +13108,7 @@ NotInRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-NotInRule::findEnglishOperator(  $symbolic_operator )
+NotInRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -12538,7 +13118,7 @@ NotInRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -12715,6 +13295,27 @@ NotInRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+NotInRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -13044,6 +13645,26 @@ NotRule::moveSimplificationStepForward( string $step_to_go_to, array $simplifica
 
 ---
 
+### getSimplificationStep
+
+
+
+```php
+NotRule::getSimplificationStep(  ): string
+```
+
+
+
+
+
+**Return Value:**
+
+The current simplification step
+
+
+
+---
+
 ### simplicationStepReached
 
 Checks if a simplification step is reached.
@@ -13279,7 +13900,7 @@ NotRule::isNormalizationAllowed( array $current_simplification_options = array()
 
 
 ```php
-NotRule::findSymbolicOperator(  $english_operator )
+NotRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -13289,7 +13910,7 @@ NotRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -13301,7 +13922,7 @@ NotRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-NotRule::findEnglishOperator(  $symbolic_operator )
+NotRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -13311,7 +13932,7 @@ NotRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -13532,6 +14153,27 @@ NotRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+NotRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -13861,6 +14503,26 @@ OrRule::moveSimplificationStepForward( string $step_to_go_to, array $simplificat
 
 ---
 
+### getSimplificationStep
+
+
+
+```php
+OrRule::getSimplificationStep(  ): string
+```
+
+
+
+
+
+**Return Value:**
+
+The current simplification step
+
+
+
+---
+
 ### simplicationStepReached
 
 Checks if a simplification step is reached.
@@ -14100,7 +14762,7 @@ OrRule::isNormalizationAllowed( array $current_simplification_options )
 
 
 ```php
-OrRule::findSymbolicOperator(  $english_operator )
+OrRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -14110,7 +14772,7 @@ OrRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -14122,7 +14784,7 @@ OrRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-OrRule::findEnglishOperator(  $symbolic_operator )
+OrRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -14132,7 +14794,7 @@ OrRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -14353,6 +15015,27 @@ OrRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+OrRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -14891,7 +15574,7 @@ $this
 
 
 ```php
-RegexpRule::findSymbolicOperator(  $english_operator )
+RegexpRule::findSymbolicOperator( string $english_operator ): string
 ```
 
 
@@ -14901,7 +15584,7 @@ RegexpRule::findSymbolicOperator(  $english_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$english_operator` | **** |  |
+| `$english_operator` | **string** |  |
 
 
 
@@ -14913,7 +15596,7 @@ RegexpRule::findSymbolicOperator(  $english_operator )
 
 
 ```php
-RegexpRule::findEnglishOperator(  $symbolic_operator )
+RegexpRule::findEnglishOperator( string $symbolic_operator ): string
 ```
 
 
@@ -14923,7 +15606,7 @@ RegexpRule::findEnglishOperator(  $symbolic_operator )
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$symbolic_operator` | **** |  |
+| `$symbolic_operator` | **string** |  |
 
 
 
@@ -15120,6 +15803,27 @@ RegexpRule::getSemanticId(  ): string
 ```
 
 
+
+
+
+
+
+---
+
+### addMinimalCase
+
+Forces the two firsts levels of the tree to be an OrRule having
+only AndRules as operands:
+['field', '=', '1'] <=> ['or', ['and', ['field', '=', '1']]]
+As a simplified ruleTree will alwways be reduced to this structure
+with no suboperands others than atomic ones or a simpler one like:
+['or', ['field', '=', '1'], ['field2', '>', '3']]
+
+```php
+RegexpRule::addMinimalCase(  ): \JClaveau\LogicalFilter\Rule\OrRule
+```
+
+This helpes to ease the result of simplify()
 
 
 
@@ -15515,4 +16219,4 @@ RuleFilterer::validateRule(  $field,  $operator,  $value,  $rule, array $path,  
 
 
 --------
-> This document was automatically generated from source code comments on 2018-12-31 using [phpDocumentor](http://www.phpdoc.org/) and [cvuorinen/phpdoc-markdown-public](https://github.com/cvuorinen/phpdoc-markdown-public)
+> This document was automatically generated from source code comments on 2019-02-06 using [phpDocumentor](http://www.phpdoc.org/) and [cvuorinen/phpdoc-markdown-public](https://github.com/cvuorinen/phpdoc-markdown-public)

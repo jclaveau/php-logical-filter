@@ -456,7 +456,7 @@ abstract class AbstractOperationRule extends AbstractRule
         // the root rule cannot be cleaned so we wrap it and apply a
         // last non recursive clean
         // TODO kind of monad|become|cese
-        //@see https://github.com/jclaveau/php-logical-filter/issues/20
+        // @see https://github.com/jclaveau/php-logical-filter/issues/20
         if ($instance instanceof AndRule || $instance instanceof OrRule ) {
             if ( ! $instance->getOperands()) {
                 return $instance;
@@ -473,8 +473,6 @@ abstract class AbstractOperationRule extends AbstractRule
         }
 
         if ($force_logical_core) {
-            // Adding a minimal case structure  already considered as
-            // 'simplified' can only be done here
             $instance = $instance->addMinimalCase();
         }
 
