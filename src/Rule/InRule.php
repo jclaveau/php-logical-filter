@@ -12,29 +12,21 @@ namespace JClaveau\LogicalFilter\Rule;
  */
 class InRule extends OrRule
 {
+    use Trait_RuleWithField;
+
     /** @var string operator */
     const operator = 'in';
 
-    /** @var string $field */
-    protected $field;
-
     /** @var array $native_possibilities */
     protected $native_possibilities = [];
-
-    /** @var array $cache */
-    protected $cache = [
-        'array'       => null,
-        'string'      => null,
-        'semantic_id' => null,
-    ];
 
     /**
      * @param string $field         The field to apply the rule on.
      * @param mixed  $possibilities The values the field can belong to.
      */
-    public function __construct( $field, $possibilities, array $options=[] )
+    public function __construct($field, $possibilities, array $options=[])
     {
-        if ( ! empty($options)) {
+        if (! empty($options)) {
             $this->setOptions($options);
         }
 
@@ -43,64 +35,11 @@ class InRule extends OrRule
     }
 
     /**
-     * @return string The field
-     */
-    public function getField()
-    {
-        return $this->field;
-    }
-
-    /**
-     * @return $this
-     */
-    public function setField($field)
-    {
-        if ($this->field != $field) {
-            $this->field = $field;
-            $this->flushCache();
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param  array|callable Associative array of renamings or callable
-     *                        that would rename the fields.
-     *
-     * @return AbstractAtomicRule $this
-     */
-    final public function renameFields($renamings)
-    {
-        $old_field = $this->field;
-
-        if (is_callable($renamings)) {
-            $this->field = call_user_func($renamings, $this->field);
-        }
-        elseif (is_array($renamings)) {
-            if (isset($renamings[$this->field])) {
-                $this->field = $renamings[$this->field];
-            }
-        }
-        else {
-            throw new \InvalidArgumentException(
-                "\$renamings MUST be a callable or an associative array "
-                ."instead of: " . var_export($renamings, true)
-            );
-        }
-
-        if ($old_field != $this->field) {
-            $this->flushCache();
-        }
-
-        return $this;
-    }
-
-    /**
      * @return array
      */
     public function getPossibilities()
     {
-        return array_values( $this->native_possibilities );
+        return array_values($this->native_possibilities);
     }
 
     /**

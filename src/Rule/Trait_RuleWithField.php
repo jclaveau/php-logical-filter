@@ -41,6 +41,8 @@ trait Trait_RuleWithField
     }
 
     /**
+     * Changes the field property of the rule.
+     *
      * @param  array|callable Associative array of renamings or callable
      *                        that would rename the fields.
      *
@@ -48,6 +50,22 @@ trait Trait_RuleWithField
      */
     final public function renameField($renamings)
     {
+        $this->renameFields_andReturnIsChanged($renamings);
+        return $this;
+    }
+
+    /**
+     * Changes the field property of the rule.
+     *
+     * @param  array|callable Associative array of renamings or callable
+     *                        that would rename the fields.
+     *
+     * @return bool Whether or not the field changed
+     */
+    final public function renameFields_andReturnIsChanged($renamings)
+    {
+        $old_field = $this->field;
+
         if (is_callable($renamings)) {
             $this->setField( call_user_func($renamings, $this->field) );
         }
@@ -63,7 +81,15 @@ trait Trait_RuleWithField
             );
         }
 
-        return $this;
+        if ($old_field != $this->field) {
+            $this->flushCache();
+            return true;
+        }
+
+        // TODO remove this forced cache flushing ONLY when carefully
+        // unit tested
+        $this->flushCache();
+        return false;
     }
 
     /**/

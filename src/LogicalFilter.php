@@ -654,10 +654,7 @@ class LogicalFilter implements \JsonSerializable
      */
     public function renameFields($renamings)
     {
-        if (method_exists($this->rules, 'renameField')) {
-            $this->rules->renameField($renamings);
-        }
-        elseif ($this->rules) {
+        if ($this->rules) {
             $this->rules->renameFields($renamings);
         }
 

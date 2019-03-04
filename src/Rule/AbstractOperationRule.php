@@ -105,22 +105,44 @@ abstract class AbstractOperationRule extends AbstractRule
      * @param  array|callable $renamings Associative array of renamings or callable
      *                                   that would rename the fields.
      *
-     * @return string $this
+     * @return $this
      */
     public function renameFields($renamings)
     {
+        $this->renameFields_andReturnIsChanged($renamings);
+        return $this;
+    }
+
+    /**
+     * @param  array|callable $renamings Associative array of renamings or callable
+     *                                   that would rename the fields.
+     *
+     * @return boolean Whether or not the operation changed semantically
+     */
+    public function renameFields_andReturnIsChanged($renamings)
+    {
+        $is_changed = false;
+
         foreach ($this->operands as $operand) {
             if (method_exists($operand, 'renameField')) {
-                $operand->renameField($renamings);
+                if ($operand->renameFields_andReturnIsChanged($renamings)) {
+                    $is_changed = true;
+                }
             }
             else {
-                $operand->renameFields($renamings);
+                if ($operand->renameFields_andReturnIsChanged($renamings)) {
+                    $is_changed = true;
+                }
             }
         }
 
-        // TODO flush cache only in case of change?
-        $this->flushCache();
+        if ($is_changed) {
+            $this->flushCache();
+        }
 
+        // TODO remove this forced cache flushing ONLY when carefully
+        // unit tested
+        $this->flushCache();
         return $this;
     }
 
