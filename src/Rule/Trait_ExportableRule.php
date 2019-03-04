@@ -14,7 +14,7 @@ trait Trait_ExportableRule
      *
      * @see https://secure.php.net/manual/en/jsonserializable.jsonserialize.php
      */
-    public function jsonSerialize()
+    public final function jsonSerialize()
     {
         return $this->toArray();
     }
@@ -22,9 +22,20 @@ trait Trait_ExportableRule
     /**
      * @return string
      */
-    public function __toString()
+    public final function __toString()
     {
         return $this->toString();
+    }
+
+    /**
+     * It would be great if __toBool() existed. Meanwhile we can definitively
+     * bind it to hasSolution().
+     *
+     * @return bool If the rule can have a solution or not.
+     */
+    public final function toBool()
+    {
+        return $this->hasSolution();
     }
 
     /**
