@@ -6,6 +6,7 @@
     * [getField](#getfield)
     * [setField](#setfield)
     * [renameField](#renamefield)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged)
     * [removeSameOperationOperands](#removesameoperationoperands)
     * [rootifyDisjunctions](#rootifydisjunctions)
     * [toArray](#toarray)
@@ -55,6 +56,7 @@
     * [getField](#getfield-1)
     * [setField](#setfield-1)
     * [renameField](#renamefield-1)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged-1)
     * [findSymbolicOperator](#findsymbolicoperator-1)
     * [findEnglishOperator](#findenglishoperator-1)
     * [generateSimpleRule](#generatesimplerule-1)
@@ -83,6 +85,7 @@
     * [getOperands](#getoperands-1)
     * [setOperands](#setoperands-1)
     * [renameFields](#renamefields-1)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged-2)
     * [moveSimplificationStepForward](#movesimplificationstepforward-1)
     * [getSimplificationStep](#getsimplificationstep-1)
     * [simplicationStepReached](#simplicationstepreached-1)
@@ -121,6 +124,7 @@
     * [getField](#getfield-2)
     * [setField](#setfield-2)
     * [renameField](#renamefield-2)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged-3)
     * [removeSameOperationOperands](#removesameoperationoperands-2)
     * [rootifyDisjunctions](#rootifydisjunctions-2)
     * [toArray](#toarray-3)
@@ -170,6 +174,7 @@
     * [getField](#getfield-3)
     * [setField](#setfield-3)
     * [renameField](#renamefield-3)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged-4)
     * [findSymbolicOperator](#findsymbolicoperator-4)
     * [findEnglishOperator](#findenglishoperator-4)
     * [generateSimpleRule](#generatesimplerule-4)
@@ -209,6 +214,7 @@
     * [getOperands](#getoperands-3)
     * [setOperands](#setoperands-3)
     * [renameFields](#renamefields-3)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged-5)
     * [moveSimplificationStepForward](#movesimplificationstepforward-3)
     * [getSimplificationStep](#getsimplificationstep-3)
     * [simplicationStepReached](#simplicationstepreached-3)
@@ -254,6 +260,7 @@
     * [getOperands](#getoperands-4)
     * [setOperands](#setoperands-4)
     * [renameFields](#renamefields-4)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged-6)
     * [moveSimplificationStepForward](#movesimplificationstepforward-4)
     * [getSimplificationStep](#getsimplificationstep-4)
     * [simplicationStepReached](#simplicationstepreached-4)
@@ -299,6 +306,7 @@
     * [getOperands](#getoperands-5)
     * [setOperands](#setoperands-5)
     * [renameFields](#renamefields-5)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged-7)
     * [moveSimplificationStepForward](#movesimplificationstepforward-5)
     * [getSimplificationStep](#getsimplificationstep-5)
     * [simplicationStepReached](#simplicationstepreached-5)
@@ -340,6 +348,7 @@
     * [getOperands](#getoperands-6)
     * [setOperands](#setoperands-6)
     * [renameFields](#renamefields-6)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged-8)
     * [moveSimplificationStepForward](#movesimplificationstepforward-6)
     * [getSimplificationStep](#getsimplificationstep-6)
     * [simplicationStepReached](#simplicationstepreached-6)
@@ -398,6 +407,7 @@
     * [getField](#getfield-8)
     * [setField](#setfield-4)
     * [renameField](#renamefield-4)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged-9)
     * [findSymbolicOperator](#findsymbolicoperator-9)
     * [findEnglishOperator](#findenglishoperator-9)
     * [generateSimpleRule](#generatesimplerule-9)
@@ -427,6 +437,10 @@
     * [onCloseOr](#oncloseor-2)
     * [onAndPossibility](#onandpossibility-2)
 * [InRule](#inrule)
+    * [getField](#getfield-9)
+    * [setField](#setfield-5)
+    * [renameField](#renamefield-5)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged-10)
     * [removeSameOperationOperands](#removesameoperationoperands-7)
     * [rootifyDisjunctions](#rootifydisjunctions-7)
     * [toArray](#toarray-10)
@@ -467,8 +481,6 @@
     * [setOptions](#setoptions-10)
     * [getOption](#getoption-10)
     * [getOptions](#getoptions-10)
-    * [getField](#getfield-9)
-    * [setField](#setfield-5)
     * [getPossibilities](#getpossibilities)
     * [addPossibilities](#addpossibilities)
     * [setPossibilities](#setpossibilities)
@@ -511,7 +523,8 @@
 * [NotEqualRule](#notequalrule)
     * [getField](#getfield-10)
     * [setField](#setfield-6)
-    * [renameField](#renamefield-5)
+    * [renameField](#renamefield-6)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged-11)
     * [__construct](#__construct-14)
     * [isNormalizationAllowed](#isnormalizationallowed-8)
     * [negateOperand](#negateoperand)
@@ -568,6 +581,7 @@
     * [getOperands](#getoperands-9)
     * [setOperands](#setoperands-9)
     * [renameFields](#renamefields-10)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged-12)
     * [moveSimplificationStepForward](#movesimplificationstepforward-9)
     * [getSimplificationStep](#getsimplificationstep-9)
     * [simplicationStepReached](#simplicationstepreached-9)
@@ -605,6 +619,7 @@
     * [getOperands](#getoperands-10)
     * [setOperands](#setoperands-10)
     * [renameFields](#renamefields-11)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged-13)
     * [moveSimplificationStepForward](#movesimplificationstepforward-10)
     * [getSimplificationStep](#getsimplificationstep-10)
     * [simplicationStepReached](#simplicationstepreached-10)
@@ -645,6 +660,7 @@
     * [getOperands](#getoperands-11)
     * [setOperands](#setoperands-11)
     * [renameFields](#renamefields-12)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged-14)
     * [moveSimplificationStepForward](#movesimplificationstepforward-11)
     * [getSimplificationStep](#getsimplificationstep-11)
     * [simplicationStepReached](#simplicationstepreached-11)
@@ -693,7 +709,8 @@
     * [toString](#tostring-16)
     * [getField](#getfield-12)
     * [setField](#setfield-8)
-    * [renameField](#renamefield-6)
+    * [renameField](#renamefield-7)
+    * [renameFields_andReturnIsChanged](#renamefields_andreturnischanged-15)
     * [findSymbolicOperator](#findsymbolicoperator-15)
     * [findEnglishOperator](#findenglishoperator-15)
     * [generateSimpleRule](#generatesimplerule-15)
@@ -784,7 +801,7 @@ $field
 
 ### renameField
 
-
+Changes the field property of the rule.
 
 ```php
 AboveOrEqualRule::renameField(  $renamings ): \JClaveau\LogicalFilter\Rule\AbstractAtomicRule
@@ -803,6 +820,33 @@ AboveOrEqualRule::renameField(  $renamings ): \JClaveau\LogicalFilter\Rule\Abstr
 **Return Value:**
 
 $this
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+
+
+```php
+AboveOrEqualRule::renameFields_andReturnIsChanged( array|callable $renamings ): boolean
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **array&#124;callable** | Associative array of renamings or callable
+                                  that would rename the fields. |
+
+
+**Return Value:**
+
+Whether or not the operation changed semantically
 
 
 
@@ -1087,7 +1131,7 @@ $this
 
 
 ```php
-AboveOrEqualRule::renameFields( array|callable $renamings ): string
+AboveOrEqualRule::renameFields( array|callable $renamings ): $this
 ```
 
 
@@ -1100,10 +1144,6 @@ AboveOrEqualRule::renameFields( array|callable $renamings ): string
 | `$renamings` | **array&#124;callable** | Associative array of renamings or callable
                                   that would rename the fields. |
 
-
-**Return Value:**
-
-$this
 
 
 
@@ -1860,7 +1900,7 @@ $field
 
 ### renameField
 
-
+Changes the field property of the rule.
 
 ```php
 AboveRule::renameField(  $renamings ): \JClaveau\LogicalFilter\Rule\AbstractAtomicRule
@@ -1879,6 +1919,32 @@ AboveRule::renameField(  $renamings ): \JClaveau\LogicalFilter\Rule\AbstractAtom
 **Return Value:**
 
 $this
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+Changes the field property of the rule.
+
+```php
+AboveRule::renameFields_andReturnIsChanged(  $renamings ): boolean
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **** |  |
+
+
+**Return Value:**
+
+Whether or not the field changed
 
 
 
@@ -2423,7 +2489,30 @@ AndRule::setOperands( array $operands ): $this
 
 
 ```php
-AndRule::renameFields( array|callable $renamings ): string
+AndRule::renameFields( array|callable $renamings ): $this
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **array&#124;callable** | Associative array of renamings or callable
+                                  that would rename the fields. |
+
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+
+
+```php
+AndRule::renameFields_andReturnIsChanged( array|callable $renamings ): boolean
 ```
 
 
@@ -2439,7 +2528,7 @@ AndRule::renameFields( array|callable $renamings ): string
 
 **Return Value:**
 
-$this
+Whether or not the operation changed semantically
 
 
 
@@ -3260,7 +3349,7 @@ $field
 
 ### renameField
 
-
+Changes the field property of the rule.
 
 ```php
 BelowOrEqualRule::renameField(  $renamings ): \JClaveau\LogicalFilter\Rule\AbstractAtomicRule
@@ -3279,6 +3368,33 @@ BelowOrEqualRule::renameField(  $renamings ): \JClaveau\LogicalFilter\Rule\Abstr
 **Return Value:**
 
 $this
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+
+
+```php
+BelowOrEqualRule::renameFields_andReturnIsChanged( array|callable $renamings ): boolean
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **array&#124;callable** | Associative array of renamings or callable
+                                  that would rename the fields. |
+
+
+**Return Value:**
+
+Whether or not the operation changed semantically
 
 
 
@@ -3563,7 +3679,7 @@ $this
 
 
 ```php
-BelowOrEqualRule::renameFields( array|callable $renamings ): string
+BelowOrEqualRule::renameFields( array|callable $renamings ): $this
 ```
 
 
@@ -3576,10 +3692,6 @@ BelowOrEqualRule::renameFields( array|callable $renamings ): string
 | `$renamings` | **array&#124;callable** | Associative array of renamings or callable
                                   that would rename the fields. |
 
-
-**Return Value:**
-
-$this
 
 
 
@@ -4336,7 +4448,7 @@ $field
 
 ### renameField
 
-
+Changes the field property of the rule.
 
 ```php
 BelowRule::renameField(  $renamings ): \JClaveau\LogicalFilter\Rule\AbstractAtomicRule
@@ -4355,6 +4467,32 @@ BelowRule::renameField(  $renamings ): \JClaveau\LogicalFilter\Rule\AbstractAtom
 **Return Value:**
 
 $this
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+Changes the field property of the rule.
+
+```php
+BelowRule::renameFields_andReturnIsChanged(  $renamings ): boolean
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **** |  |
+
+
+**Return Value:**
+
+Whether or not the field changed
 
 
 
@@ -5130,7 +5268,30 @@ BetweenOrEqualBothRule::setOperands( array $operands ): $this
 
 
 ```php
-BetweenOrEqualBothRule::renameFields( array|callable $renamings ): string
+BetweenOrEqualBothRule::renameFields( array|callable $renamings ): $this
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **array&#124;callable** | Associative array of renamings or callable
+                                  that would rename the fields. |
+
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+
+
+```php
+BetweenOrEqualBothRule::renameFields_andReturnIsChanged( array|callable $renamings ): boolean
 ```
 
 
@@ -5146,7 +5307,7 @@ BetweenOrEqualBothRule::renameFields( array|callable $renamings ): string
 
 **Return Value:**
 
-$this
+Whether or not the operation changed semantically
 
 
 
@@ -6086,7 +6247,30 @@ BetweenOrEqualLowerRule::setOperands( array $operands ): $this
 
 
 ```php
-BetweenOrEqualLowerRule::renameFields( array|callable $renamings ): string
+BetweenOrEqualLowerRule::renameFields( array|callable $renamings ): $this
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **array&#124;callable** | Associative array of renamings or callable
+                                  that would rename the fields. |
+
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+
+
+```php
+BetweenOrEqualLowerRule::renameFields_andReturnIsChanged( array|callable $renamings ): boolean
 ```
 
 
@@ -6102,7 +6286,7 @@ BetweenOrEqualLowerRule::renameFields( array|callable $renamings ): string
 
 **Return Value:**
 
-$this
+Whether or not the operation changed semantically
 
 
 
@@ -7042,7 +7226,30 @@ BetweenOrEqualUpperRule::setOperands( array $operands ): $this
 
 
 ```php
-BetweenOrEqualUpperRule::renameFields( array|callable $renamings ): string
+BetweenOrEqualUpperRule::renameFields( array|callable $renamings ): $this
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **array&#124;callable** | Associative array of renamings or callable
+                                  that would rename the fields. |
+
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+
+
+```php
+BetweenOrEqualUpperRule::renameFields_andReturnIsChanged( array|callable $renamings ): boolean
 ```
 
 
@@ -7058,7 +7265,7 @@ BetweenOrEqualUpperRule::renameFields( array|callable $renamings ): string
 
 **Return Value:**
 
-$this
+Whether or not the operation changed semantically
 
 
 
@@ -7927,7 +8134,30 @@ BetweenRule::setOperands( array $operands ): $this
 
 
 ```php
-BetweenRule::renameFields( array|callable $renamings ): string
+BetweenRule::renameFields( array|callable $renamings ): $this
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **array&#124;callable** | Associative array of renamings or callable
+                                  that would rename the fields. |
+
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+
+
+```php
+BetweenRule::renameFields_andReturnIsChanged( array|callable $renamings ): boolean
 ```
 
 
@@ -7943,7 +8173,7 @@ BetweenRule::renameFields( array|callable $renamings ): string
 
 **Return Value:**
 
-$this
+Whether or not the operation changed semantically
 
 
 
@@ -9134,7 +9364,7 @@ $field
 
 ### renameField
 
-
+Changes the field property of the rule.
 
 ```php
 EqualRule::renameField(  $renamings ): \JClaveau\LogicalFilter\Rule\AbstractAtomicRule
@@ -9153,6 +9383,32 @@ EqualRule::renameField(  $renamings ): \JClaveau\LogicalFilter\Rule\AbstractAtom
 **Return Value:**
 
 $this
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+Changes the field property of the rule.
+
+```php
+EqualRule::renameFields_andReturnIsChanged(  $renamings ): boolean
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **** |  |
+
+
+**Return Value:**
+
+Whether or not the field changed
 
 
 
@@ -9710,6 +9966,105 @@ possibilities only.
 * Parent class: \JClaveau\LogicalFilter\Rule\OrRule
 
 
+### getField
+
+
+
+```php
+InRule::getField(  ): string
+```
+
+
+
+
+
+**Return Value:**
+
+$field
+
+
+
+---
+
+### setField
+
+
+
+```php
+InRule::setField(  $field ): string
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$field` | **** |  |
+
+
+**Return Value:**
+
+$field
+
+
+
+---
+
+### renameField
+
+Changes the field property of the rule.
+
+```php
+InRule::renameField(  $renamings ): \JClaveau\LogicalFilter\Rule\AbstractAtomicRule
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **** |  |
+
+
+**Return Value:**
+
+$this
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+
+
+```php
+InRule::renameFields_andReturnIsChanged( array|callable $renamings ): boolean
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **array&#124;callable** | Associative array of renamings or callable
+                                  that would rename the fields. |
+
+
+**Return Value:**
+
+Whether or not the operation changed semantically
+
+
+
+---
+
 ### removeSameOperationOperands
 
 Remove AndRules operands of AndRules and OrRules of OrRules.
@@ -9992,7 +10347,7 @@ $this
 
 
 ```php
-InRule::renameFields(  $renamings ): \JClaveau\LogicalFilter\Rule\AbstractAtomicRule
+InRule::renameFields( array|callable $renamings ): $this
 ```
 
 
@@ -10002,12 +10357,9 @@ InRule::renameFields(  $renamings ): \JClaveau\LogicalFilter\Rule\AbstractAtomic
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$renamings` | **** |  |
+| `$renamings` | **array&#124;callable** | Associative array of renamings or callable
+                                  that would rename the fields. |
 
-
-**Return Value:**
-
-$this
 
 
 
@@ -10590,48 +10942,6 @@ InRule::getOptions(  $contextual_options = array() )
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `$contextual_options` | **** |  |
-
-
-
-
----
-
-### getField
-
-
-
-```php
-InRule::getField(  ): string
-```
-
-
-
-
-
-**Return Value:**
-
-The field
-
-
-
----
-
-### setField
-
-
-
-```php
-InRule::setField(  $field ): $this
-```
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$field` | **** |  |
 
 
 
@@ -11619,7 +11929,7 @@ $field
 
 ### renameField
 
-
+Changes the field property of the rule.
 
 ```php
 NotEqualRule::renameField(  $renamings ): \JClaveau\LogicalFilter\Rule\AbstractAtomicRule
@@ -11638,6 +11948,33 @@ NotEqualRule::renameField(  $renamings ): \JClaveau\LogicalFilter\Rule\AbstractA
 **Return Value:**
 
 $this
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+
+
+```php
+NotEqualRule::renameFields_andReturnIsChanged( array|callable $renamings ): boolean
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **array&#124;callable** | Associative array of renamings or callable
+                                  that would rename the fields. |
+
+
+**Return Value:**
+
+Whether or not the operation changed semantically
 
 
 
@@ -11936,7 +12273,7 @@ NotEqualRule::setOperands( array $operands ): $this
 
 
 ```php
-NotEqualRule::renameFields( array|callable $renamings ): string
+NotEqualRule::renameFields( array|callable $renamings ): $this
 ```
 
 
@@ -11949,10 +12286,6 @@ NotEqualRule::renameFields( array|callable $renamings ): string
 | `$renamings` | **array&#124;callable** | Associative array of renamings or callable
                                   that would rename the fields. |
 
-
-**Return Value:**
-
-$this
 
 
 
@@ -12830,7 +13163,30 @@ NotInRule::setOperands( array $operands ): $this
 
 
 ```php
-NotInRule::renameFields( array|callable $renamings ): string
+NotInRule::renameFields( array|callable $renamings ): $this
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **array&#124;callable** | Associative array of renamings or callable
+                                  that would rename the fields. |
+
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+
+
+```php
+NotInRule::renameFields_andReturnIsChanged( array|callable $renamings ): boolean
 ```
 
 
@@ -12846,7 +13202,7 @@ NotInRule::renameFields( array|callable $renamings ): string
 
 **Return Value:**
 
-$this
+Whether or not the operation changed semantically
 
 
 
@@ -13599,7 +13955,30 @@ NotRule::setOperands( array $operands ): $this
 
 
 ```php
-NotRule::renameFields( array|callable $renamings ): string
+NotRule::renameFields( array|callable $renamings ): $this
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **array&#124;callable** | Associative array of renamings or callable
+                                  that would rename the fields. |
+
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+
+
+```php
+NotRule::renameFields_andReturnIsChanged( array|callable $renamings ): boolean
 ```
 
 
@@ -13615,7 +13994,7 @@ NotRule::renameFields( array|callable $renamings ): string
 
 **Return Value:**
 
-$this
+Whether or not the operation changed semantically
 
 
 
@@ -14457,7 +14836,30 @@ OrRule::setOperands( array $operands ): $this
 
 
 ```php
-OrRule::renameFields( array|callable $renamings ): string
+OrRule::renameFields( array|callable $renamings ): $this
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **array&#124;callable** | Associative array of renamings or callable
+                                  that would rename the fields. |
+
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+
+
+```php
+OrRule::renameFields_andReturnIsChanged( array|callable $renamings ): boolean
 ```
 
 
@@ -14473,7 +14875,7 @@ OrRule::renameFields( array|callable $renamings ): string
 
 **Return Value:**
 
-$this
+Whether or not the operation changed semantically
 
 
 
@@ -15545,7 +15947,7 @@ $field
 
 ### renameField
 
-
+Changes the field property of the rule.
 
 ```php
 RegexpRule::renameField(  $renamings ): \JClaveau\LogicalFilter\Rule\AbstractAtomicRule
@@ -15564,6 +15966,32 @@ RegexpRule::renameField(  $renamings ): \JClaveau\LogicalFilter\Rule\AbstractAto
 **Return Value:**
 
 $this
+
+
+
+---
+
+### renameFields_andReturnIsChanged
+
+Changes the field property of the rule.
+
+```php
+RegexpRule::renameFields_andReturnIsChanged(  $renamings ): boolean
+```
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$renamings` | **** |  |
+
+
+**Return Value:**
+
+Whether or not the field changed
 
 
 
@@ -16219,4 +16647,4 @@ RuleFilterer::validateRule(  $field,  $operator,  $value,  $rule, array $path,  
 
 
 --------
-> This document was automatically generated from source code comments on 2019-02-06 using [phpDocumentor](http://www.phpdoc.org/) and [cvuorinen/phpdoc-markdown-public](https://github.com/cvuorinen/phpdoc-markdown-public)
+> This document was automatically generated from source code comments on 2019-03-04 using [phpDocumentor](http://www.phpdoc.org/) and [cvuorinen/phpdoc-markdown-public](https://github.com/cvuorinen/phpdoc-markdown-public)
