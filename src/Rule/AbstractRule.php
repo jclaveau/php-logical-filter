@@ -4,6 +4,7 @@ namespace JClaveau\LogicalFilter\Rule;
 abstract class AbstractRule implements \JsonSerializable
 {
     use Trait_RuleWithOptions;
+    use Trait_RuleWithCache;
 
     /** @var  array $ruleAliases */
     protected static $ruleAliases = [
@@ -20,13 +21,6 @@ abstract class AbstractRule implements \JsonSerializable
         '!='   => 'not_equal',
         'in'   => 'in',
         '!in'  => 'not_in',
-    ];
-
-    /** @var array $cache */
-    protected $cache = [
-        'array'       => null,
-        'string'      => null,
-        'semantic_id' => null,
     ];
 
     /**
@@ -56,10 +50,6 @@ abstract class AbstractRule implements \JsonSerializable
 
         return $symbolic_operator;
     }
-
-    protected static $static_cache = [
-        'rules_generation' => [],
-    ];
 
     /**
      *
@@ -195,28 +185,6 @@ abstract class AbstractRule implements \JsonSerializable
         }
 
         return $this;
-    }
-
-    /**
-     */
-    public function flushCache()
-    {
-        $this->cache = [
-            'array'       => null,
-            'string'      => null,
-            'semantic_id' => null,
-        ];
-
-        return $this;
-    }
-
-    /**
-     */
-    public static function flushStaticCache()
-    {
-        self::$static_cache = [
-            'rules_generation' => [],
-        ];
     }
 
     /**
