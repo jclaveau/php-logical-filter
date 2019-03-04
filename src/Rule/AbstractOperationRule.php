@@ -124,15 +124,8 @@ abstract class AbstractOperationRule extends AbstractRule
         $is_changed = false;
 
         foreach ($this->operands as $operand) {
-            if (method_exists($operand, 'renameField')) {
-                if ($operand->renameFields_andReturnIsChanged($renamings)) {
-                    $is_changed = true;
-                }
-            }
-            else {
-                if ($operand->renameFields_andReturnIsChanged($renamings)) {
-                    $is_changed = true;
-                }
+            if ($operand->renameFields_andReturnIsChanged($renamings)) {
+                $is_changed = true;
             }
         }
 
