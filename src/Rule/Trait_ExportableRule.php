@@ -39,6 +39,19 @@ trait Trait_ExportableRule
     }
 
     /**
+     * Indicates if a rule can have solutions. For example a "between rule"
+     * cannot have solution if its limits are inconsistent:
+     * ['field', '><', [12, 4]] => 'field' cannot be above 12 and below 4
+     *
+     * @param  array $contextual_options Options for the simplification
+     *                                   applied during hasSolution() and more.
+     * @return bool
+     *
+     * @see    simplify()
+     */
+    abstract public function hasSolution(array $contextual_options=[]);
+
+    /**
      * @return string
      */
     abstract public function toString(array $options=[]);
