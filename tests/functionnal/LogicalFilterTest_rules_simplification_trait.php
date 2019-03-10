@@ -159,6 +159,29 @@ trait LogicalFilterTest_rules_simplification_trait
 
     /**
      */
+    public function test_BelowRule_and_AboveRule_are_strictly_compared()
+    {
+        $this->assertFalse(
+            (new LogicalFilter([
+                'and',
+                ['field_1', '=', 3],
+                ['field_1', '<', 3],
+            ]))
+            ->hasSolution()
+        );
+
+        $this->assertFalse(
+            (new LogicalFilter([
+                'and',
+                ['field_1', '=', 3],
+                ['field_1', '>', 3],
+            ]))
+            ->hasSolution()
+        );
+    }
+
+    /**
+     */
     public function test_simplify_nested_or_operations()
     {
         $filter = (new LogicalFilter([
@@ -380,42 +403,40 @@ trait LogicalFilterTest_rules_simplification_trait
      */
     public function test_simplify_remove_monooperands_and()
     {
-        $filter = (new LogicalFilter([
-            'and',
-            [
-                'and',
-                [
-                    'and',
-                    ['field_5', '=', 'a'],
+        $filter = (new LogicalFilter(
+            ['and',
+                ['and',
+                    ['and',
+                        ['field_5', '=', 'a'],
+                    ],
                 ],
-            ],
-        ]))
+            ]
+        ))
         ->simplify()
         // ->dump(false, false)
         ;
 
-        $this->assertEquals( ['field_5', '=', 'a'], $filter->toArray() );
+        $this->assertEquals(['field_5', '=', 'a'], $filter->toArray());
     }
 
     /**
      */
     public function test_simplify_remove_monooperands_or()
     {
-        $filter = (new LogicalFilter([
-            'or',
-            [
-                'or',
-                [
-                    'or',
-                    ['field_5', '=', 'a'],
+        $filter = (new LogicalFilter(
+            ['or',
+                ['or',
+                    ['or',
+                        ['field_5', '=', 'a'],
+                    ],
                 ],
-            ],
-        ]))
+            ]
+        ))
         ->simplify()
         // ->dump(false, false)
         ;
 
-        $this->assertEquals( ['field_5', '=', 'a'], $filter->toArray() );
+        $this->assertEquals(['field_5', '=', 'a'], $filter->toArray());
     }
 
     /**
