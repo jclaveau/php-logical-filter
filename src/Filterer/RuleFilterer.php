@@ -28,10 +28,7 @@ use JClaveau\LogicalFilter\Rule\RegexpRule;
  *
  * Manipulating the rules of a logical filter is easier with another one.
  * This filterer is used for the functions of the exposed api like
- * removeRules(), manipulateRules()
- *
- * @todo addRules()
- *
+ * removeRules().
  */
 class RuleFilterer extends Filterer
 {
@@ -45,6 +42,9 @@ class RuleFilterer extends Filterer
     const path        = 'path';
 
     /**
+     * Retrieves the children of the current rule to seek during the
+     * recursive scanning of the rule tree.
+     *
      * @return array
      */
     public function getChildren($row) // strict issue if forcing  AbstractRule with php 5.6 here
@@ -61,21 +61,40 @@ class RuleFilterer extends Filterer
     }
 
     /**
+     * Provides the updated rule to replace the scanned one during rule
+     * scanning.
+     *
+     * @param  AbstractRule $row
+     * @param  $filtered_children
+     *
+     * @return AbstractRule
      */
-    public function setChildren( &$row, $filtered_children ) // strict issue if forcing  AbstractRule with php 5.6 here
+    public function setChildren(&$row, $filtered_children) // strict issue if forcing  AbstractRule with php 5.6 here
     {
         if ($row instanceof AbstractOperationRule) {
-            return $row->setOperandsOrReplaceByOperation( $filtered_children, [] ); // no simplification options?
+            return $row->setOperandsOrReplaceByOperation($filtered_children, []); // no simplification options?
         }
     }
 
     /**
+     * For each rule of the scanned rule tree this method validates its
+     * matching against the filtering logical filter.
      *
-     * @return true | false | null
+     * @param  string       $field
+     * @param  string       $operator
+     * @param  mixed        $value
+     * @param  AbstractRule $value
+     * @param  array        $path
+     * @param  mixed        $all_operands
+     * @param  array        $options
+     *
+     * @return  + true if the rule validates
+     *          + false if not
+     *          + null if the matchin has no sens (like filktering by field on an operation rule)
      */
-    public function validateRule ($field, $operator, $value, $rule, array $path, $all_operands, $options)
+    public function validateRule($field, $operator, $value, $rule, array $path, $all_operands, $options)
     {
-        if (    ! empty($options[ Filterer::leaves_only ])
+        if (   ! empty($options[ Filterer::leaves_only ])
             && in_array( get_class($rule), [OrRule::class, AndRule::class, NotRule::class] )
         ) {
             // return true;
@@ -83,7 +102,7 @@ class RuleFilterer extends Filterer
         }
 
         if (self::field === $field) {
-            if ( ! method_exists($rule, 'getField')) {
+            if (! method_exists($rule, 'getField')) {
                 // if (in_array( get_class($rule), [AndRule::class, OrRule::class]))
                 return null; // The filter cannot be applied to this rule
             }
@@ -117,17 +136,17 @@ class RuleFilterer extends Filterer
         }
         elseif (self::depth === $field) {
             // original $depth is lost once the filter is simplified
-            throw new \InvalidArgumentException('Depth rule uppport not implemented');
+            throw new \InvalidArgumentException('Depth rule suppport not implemented');
         }
         elseif (self::path === $field) {
             // TODO the description of its parents
-            throw new \InvalidArgumentException('Path rule uppport not implemented');
+            throw new \InvalidArgumentException('Path rule suppport not implemented');
         }
         elseif (self::children === $field) {
-            if ( ! method_exists($rule, 'getOperands')) {
+            if (! method_exists($rule, 'getOperands')) {
                 return null; // The filter cannot be applied to this rule
             }
-            $value_to_compare = count( $rule->getOperands() );
+            $value_to_compare = count($rule->getOperands());
         }
         else {
             throw new \InvalidArgumentException(
@@ -197,7 +216,7 @@ class RuleFilterer extends Filterer
             );
         }
 
-        if ( ! empty($options['debug'])) {
+        if (! empty($options['debug'])) {
             var_dump(
                 "$field, $operator, " . var_export($value, true)
                  . ' ||  '. $value_to_compare . ' => ' . var_export($out, true)
@@ -211,13 +230,15 @@ class RuleFilterer extends Filterer
     }
 
     /**
+     * Type checkings before calling apply.
+     *
      * @param LogicalFilter      $filter
      * @param array|AbstractRule $ruleTree_to_filter
      * @param array              $options leaves_only | debug
      */
-    public function apply( LogicalFilter $filter, $ruleTree_to_filter, $options=[] )
+    public function apply(LogicalFilter $filter, $ruleTree_to_filter, $options=[])
     {
-        if ( ! $ruleTree_to_filter) {
+        if (! $ruleTree_to_filter) {
             return $ruleTree_to_filter;
         }
 
@@ -225,7 +246,7 @@ class RuleFilterer extends Filterer
             $ruleTree_to_filter = [$ruleTree_to_filter];
         }
 
-        if ( ! is_array($ruleTree_to_filter)) {
+        if (! is_array($ruleTree_to_filter)) {
             throw new \InvalidArgumentException(
                 "\$ruleTree_to_filter must be an array or an AbstractRule "
                 ."instead of: " . var_export($ruleTree_to_filter, true)
@@ -235,7 +256,7 @@ class RuleFilterer extends Filterer
         // Produces "Only variables should be passed by reference" on Travis
         $result = parent::apply($filter, $ruleTree_to_filter, $options);
 
-        return reset( $result );
+        return reset($result);
     }
 
     /**/
