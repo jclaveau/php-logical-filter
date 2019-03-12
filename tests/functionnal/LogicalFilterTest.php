@@ -13,13 +13,15 @@ use JClaveau\LogicalFilter\Rule\AboveRule;
 use JClaveau\LogicalFilter\Rule\BelowRule;
 
 require  __DIR__ . "/LogicalFilterTest_rules_manipulation_trait.php";
-require  __DIR__ . "/LogicalFilterTest_rules_simplification_trait.php";
+require  __DIR__ . "/simplification/LogicalFilterTest_rules_simplification_trait_leaf_rules.php";
+require  __DIR__ . "/simplification/LogicalFilterTest_rules_simplification_trait_composit_rules.php";
 require  __DIR__ . "/LogicalFilterTest_collection_integration_trait.php";
 
 class LogicalFilterTest extends \AbstractTest
 {
     use LogicalFilterTest_rules_manipulation_trait;
-    use LogicalFilterTest_rules_simplification_trait;
+    use LogicalFilterTest_rules_simplification_leaf_rules;
+    use LogicalFilterTest_rules_simplification_composit_rules;
     use LogicalFilterTest_collection_integration_trait;
 
     /**
@@ -631,53 +633,6 @@ class LogicalFilterTest extends \AbstractTest
 
     /**
      */
-    public function test_add_InRule()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', 'in', ['a', 'b', 'c']],
-            null,
-            ['inrule.simplification_threshold' => 20]
-        );
-
-        // toArray must be iso to the provided descrition
-        $this->assertEquals(
-            ['field_1', 'in', ['a', 'b', 'c']],
-            $filter->toArray()
-        );
-
-        $filter->getRules(false)->addPossibilities(['d', 'e']);
-
-        $this->assertEquals(
-            ['a', 'b', 'c', 'd', 'e'],
-            $filter->getRules()->getPossibilities()
-        );
-
-        $this->assertEquals(
-            [
-                'or',
-                ['field_1', '=', 'a'],
-                ['field_1', '=', 'b'],
-                ['field_1', '=', 'c'],
-                ['field_1', '=', 'd'],
-                ['field_1', '=', 'e'],
-            ],
-            $filter
-                // ->dump(!true)
-                ->simplify([
-                    // 'stop_after' =>
-                    // AbstractOperationRule::remove_negations,
-                    // AbstractOperationRule::rootify_disjunctions,
-                    // AbstractOperationRule::unify_atomic_operands,
-                    // AbstractOperationRule::remove_invalid_branches,
-                    'in.normalization_threshold' => 6
-                ])
-                // ->dump(true)
-                ->toArray()
-        );
-    }
-
-    /**
-     */
     public function test_setDefaultOptions()
     {
         $default_inrule_threshold = LogicalFilter::getDefaultOptions()['in.normalization_threshold'];
@@ -723,99 +678,6 @@ class LogicalFilterTest extends \AbstractTest
         LogicalFilter::setDefaultOptions([
             'in.normalization_threshold' => $default_inrule_threshold,
         ]);
-    }
-
-    /**
-     */
-    public function test_add_NotEqualRule()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '!=', 'a']
-        );
-
-        // toArray must be iso to the provided descrition
-        $this->assertEquals(
-            ['field_1', '!=', 'a'],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_AboveOrEqualRule()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '>=', 2]
-        );
-
-        // toArray must be iso to the provided descrition
-        $this->assertEquals(
-            ['field_1', '>=', 2],
-            $filter->toArray()
-        );
-
-        $this->assertEquals(
-            ['field_1', '>=', 2],
-            $filter
-                ->simplify()
-                ->toArray()
-        );
-
-        $this->assertEquals(
-            ['or',
-                ['field_1', '>', 2],
-                ['field_1', '=', 2],
-            ],
-            $filter
-                ->simplify(['above_or_equal.normalization' => true])
-                // ->dump()
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_BelowOrEqualRule()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '<=', 2]
-        );
-
-        // toArray must be iso to the provided descrition
-        $this->assertEquals(
-            ['field_1', '<=', 2],
-            $filter->toArray()
-        );
-
-        $this->assertEquals(
-            ['field_1', '<=', 2],
-            $filter->simplify()->toArray()
-        );
-
-        $this->assertEquals(
-            ['or',
-                ['field_1', '<', 2],
-                ['field_1', '=', 2],
-            ],
-            $filter
-                ->simplify(['below_or_equal.normalization' => true])
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_NotInRule()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '!in', [2, 3]]
-        );
-
-        // toArray must be iso to the provided descrition
-        $this->assertEquals(
-            ['field_1', '!in', [2, 3]],
-            $filter->toArray()
-        );
     }
 
     /**

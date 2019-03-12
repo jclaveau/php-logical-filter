@@ -10,7 +10,7 @@ use JClaveau\LogicalFilter\Rule\EqualRule;
 use JClaveau\LogicalFilter\Rule\AboveRule;
 use JClaveau\LogicalFilter\Rule\BelowRule;
 
-trait LogicalFilterTest_rules_simplification_trait
+trait LogicalFilterTest_rules_simplification_leaf_rules
 {
     /**
      */
