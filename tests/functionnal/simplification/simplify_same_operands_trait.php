@@ -16,7 +16,10 @@ trait LogicalFilterTest_simplify_same_operands
         ->simplify()
         ;
 
-        $this->assertEquals(['field_5', '>', 5], $filter->toArray());
+        $this->assertEquals(
+            ['field_5', '>', 5],
+            $filter->toArray()
+        );
     }
 
     /**
@@ -30,100 +33,114 @@ trait LogicalFilterTest_simplify_same_operands
             ]
         ))
         ->simplify()
-        // ->dump(!true)
+        // ->dump(true)
         ;
 
-        $this->assertEmpty(
-            $filter->getRules()->getOperands()
+        $this->assertEquals(
+            ['and'],
+            $filter->toArray()
         );
     }
 
     /**
      */
-    public function test_simplify_same_operands_multiple_aboves_or_below()
+    public function test_simplify_same_operands_multiple_above_in_and()
     {
-        // above in and
-        /**/
-        $filter = (new LogicalFilter([
-            'and',
-            ['field_5', '>', null],  // equivalent to true
-            ['field_5', '>', 3],
-            ['field_5', '>', 5],
-            ['field_5', '>', 5],
-        ]))
+        $filter = (new LogicalFilter(
+            ['and',
+                ['field_5', '>', null],  // equivalent to true
+                ['field_5', '>', 3],
+                ['field_5', '>', 5],
+                ['field_5', '>', 5],
+            ]
+        ))
         ->simplify()
         // ->dump(!true)
         ;
 
         $this->assertEquals(
             ['field_5', '>', 5],
-            $filter->getRules()->toArray()
+            $filter->toArray()
         );
-        /**/
+    }
 
-        // above in or
-        $filter = (new LogicalFilter([
-            'or',
-            ['field_5', '>', null],  // equivalent to true
-            ['field_5', '>', 3],
-            ['field_5', '>', 5],
-            ['field_5', '>', 5],
-        ]))
+    /**
+     */
+    public function test_simplify_same_operands_multiple_above_in_or()
+    {
+        $filter = (new LogicalFilter(
+            ['or',
+                ['field_5', '>', null],  // equivalent to true
+                ['field_5', '>', 3],
+                ['field_5', '>', 5],
+                ['field_5', '>', 5],
+            ]
+        ))
         ->simplify()
         // ->dump(true)
         ;
 
         $this->assertEquals(
             ['field_5', '>', 3],
-            $filter->getRules()->toArray()
+            $filter->toArray()
         );
-        /**/
-
-        // below in and
-        $filter = (new LogicalFilter([
-            'and',
-            ['field_5', '<', 3],
-            ['field_5', '<', 5],
-            ['field_5', '<', 5],
-            ['field_5', '<', null],  // equivalent to true
-        ]))
-        ->simplify()
-        // ->dump(!true)
-        ;
-
-        $this->assertEquals(
-            ['field_5', '<', 3],
-            $filter->getRules()->toArray()
-        );
-        /**/
-
-        // below in or
-        $filter = (new LogicalFilter([
-            'or',
-            ['field_5', '<', 3],
-            ['field_5', '<', 5],
-            ['field_5', '<', 5],
-            ['field_5', '<', null],  // equivalent to true
-        ]))
-        ->simplify()
-        // ->dump(!true)
-        ;
-
-        $this->assertEquals(
-            ['field_5', '<', 5],
-            $filter->getRules()->toArray()
-        );
-        /**/
     }
 
     /**
      */
-    public function test_simplify_same_operands_EqualRule_of_null_and_equal()
+    public function test_simplify_same_operands_multiple_below_in_and()
     {
         $filter = (new LogicalFilter(
-            ['field_1', '=', null]
+            ['and',
+                ['field_5', '<', 3],
+                ['field_5', '<', 5],
+                ['field_5', '<', 5],
+                ['field_5', '<', null],  // equivalent to true
+            ]
         ))
-        ->and_(['field_1', '=', 3])
+        ->simplify()
+        // ->dump(!true)
+        ;
+
+        $this->assertEquals(
+            ['field_5', '<', 3],
+            $filter->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify_same_operands_multiple_below_in_or()
+    {
+        // below in or
+        $filter = (new LogicalFilter(
+            ['or',
+                ['field_5', '<', 3],
+                ['field_5', '<', 5],
+                ['field_5', '<', 5],
+                ['field_5', '<', null],  // equivalent to true
+            ]
+        ))
+        ->simplify()
+        // ->dump(!true)
+        ;
+
+        $this->assertEquals(
+            ['field_5', '<', 5],
+            $filter->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify_same_operands_equals_with_null()
+    {
+        $filter = (new LogicalFilter(
+            ['and',
+                ['field_1', '=', null],
+                ['field_1', '=', 3],
+            ]
+        ))
         ;
 
         $this->assertEquals(
@@ -136,7 +153,6 @@ trait LogicalFilterTest_simplify_same_operands
     }
 
     /**
-     * @todo
      * @see https://github.com/jclaveau/php-logical-filter/issues/47
      */
     public function test_simplify_same_operands_which_are_operations()
@@ -171,13 +187,14 @@ trait LogicalFilterTest_simplify_same_operands
      */
     public function test_simplify_same_operands_with_same_casted_values()
     {
-        $filter = (new LogicalFilter([
-            'or',
-            ['and',
-                ['field_6', '=', 3],
-                ['field_6', '=', '3'],
-            ],
-        ]))
+        $filter = (new LogicalFilter(
+            ['or',
+                ['and',
+                    ['field_6', '=', 3],
+                    ['field_6', '=', '3'],
+                ],
+            ]
+        ))
         ->simplify()
         ;
 
