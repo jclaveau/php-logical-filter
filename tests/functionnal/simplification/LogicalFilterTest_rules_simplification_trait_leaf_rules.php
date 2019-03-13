@@ -135,29 +135,6 @@ trait LogicalFilterTest_rules_simplification_leaf_rules
 
     /**
      */
-    public function test_BelowRule_and_AboveRule_are_strictly_compared()
-    {
-        $this->assertFalse(
-            (new LogicalFilter([
-                'and',
-                ['field_1', '=', 3],
-                ['field_1', '<', 3],
-            ]))
-            ->hasSolution()
-        );
-
-        $this->assertFalse(
-            (new LogicalFilter([
-                'and',
-                ['field_1', '=', 3],
-                ['field_1', '>', 3],
-            ]))
-            ->hasSolution()
-        );
-    }
-
-    /**
-     */
     public function test_simplify_nested_or_operations()
     {
         $filter = (new LogicalFilter([
@@ -317,58 +294,6 @@ trait LogicalFilterTest_rules_simplification_leaf_rules
         ;
 
         $this->assertEquals(['field_5', '=', 'a'], $filter->toArray());
-    }
-
-    /**
-     */
-    public function test_simplify_between_EqualRule_of_null_and_equal()
-    {
-        $filter = (new LogicalFilter(
-            ['field_1', '=', null]
-        ))
-        ->and_(['field_1', '=', 3])
-        ;
-
-        $this->assertEquals(
-            ['and'],
-            $filter
-                ->simplify()
-                // ->dump(true)
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_simplify_between_EqualRule_of_null_and_above_or_below()
-    {
-        $filter = (new LogicalFilter(
-            ['field_1', '=', null]
-        ))
-        ->and_(['field_1', '<', 3])
-        ;
-
-        $this->assertEquals(
-            ['and'],
-            $filter
-                ->simplify()
-                // ->dump(true)
-                ->toArray()
-        );
-
-        $filter = (new LogicalFilter(
-            ['field_1', '=', null]
-        ))
-        ->and_(['field_1', '>', 3])
-        ;
-
-        $this->assertEquals(
-            ['and'],
-            $filter
-                ->simplify()
-                // ->dump(true)
-                ->toArray()
-        );
     }
 
     /**
@@ -539,51 +464,6 @@ trait LogicalFilterTest_rules_simplification_leaf_rules
 
     /**
      */
-    public function test_hasSolution()
-    {
-        $this->assertFalse(
-            (new LogicalFilter([
-                'and',
-                ['field_5', 'above', 'a'],
-                ['field_5', 'below', 'a'],
-            ]))
-            ->hasSolution()
-        );
-
-        $this->assertFalse(
-            (new LogicalFilter([
-                'and',
-                ['field_5', 'equal', 'a'],
-                ['field_5', 'below', 'a'],
-            ]))
-            ->hasSolution()
-        );
-
-        $this->assertFalse(
-            (new LogicalFilter([
-                'and',
-                ['field_5', 'equal', 'a'],
-                ['field_5', 'above', 'a'],
-            ]))
-            ->hasSolution()
-        );
-
-        $this->assertTrue(
-            (new LogicalFilter([
-                'or',
-                [
-                    'and',
-                    ['field_5', 'above', 'a'],
-                    ['field_5', 'below', 'a'],
-                ],
-                ['field_6', 'equal', 'b'],
-            ]))
-            ->hasSolution()
-        );
-    }
-
-    /**
-     */
     public function test_hasSolution_on_null_filter()
     {
         // A filter has all solutions if it contains no rule.
@@ -656,65 +536,6 @@ trait LogicalFilterTest_rules_simplification_leaf_rules
             $filter
                 ->simplify()
                 // ->dump()
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_onEachCase()
-    {
-        $filter = (new LogicalFilter(
-            ['and',
-                ['or',
-                    ['field', '=', 'plop'],
-                    ['field', '<', 4],
-                ],
-                ['field2', '>', 1],
-            ]
-        ))
-        // ->dump()
-        ;
-
-        $cases = [];
-        $filter->onEachCase(function (AndRule $case) use (&$cases) {
-            $cases[] = $case->toArray();
-            // Modifying cases
-            $case->addOperand(
-                (new LogicalFilter(['field3', 'regexp', "#^lalala#"]))->getRules()
-            );
-        })
-        // ->dump(true)
-        ;
-
-        $this->assertEquals(
-            [
-                ['and',
-                    ['field', '=', 'plop'],
-                    ['field2', '>', 1],
-                ],
-                ['and',
-                    ['field', '<', 4],
-                    ['field2', '>', 1],
-                ],
-            ],
-            $cases
-        );
-
-        $this->assertEquals(
-            ['or',
-                ['and',
-                    ['field', '=', 'plop'],
-                    ['field2', '>', 1],
-                    ['field3', 'regexp', "#^lalala#"],
-                ],
-                ['and',
-                    ['field', '<', 4],
-                    ['field2', '>', 1],
-                    ['field3', 'regexp', "#^lalala#"],
-                ],
-            ],
-            $filter
                 ->toArray()
         );
     }

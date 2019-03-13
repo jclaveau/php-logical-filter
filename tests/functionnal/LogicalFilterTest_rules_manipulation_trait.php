@@ -492,6 +492,66 @@ trait LogicalFilterTest_rules_manipulation_trait
         );
     }
 
+
+    /**
+     */
+    public function test_onEachCase()
+    {
+        $filter = (new LogicalFilter(
+            ['and',
+                ['or',
+                    ['field', '=', 'plop'],
+                    ['field', '<', 4],
+                ],
+                ['field2', '>', 1],
+            ]
+        ))
+        // ->dump()
+        ;
+
+        $cases = [];
+        $filter->onEachCase(function (Rule\AndRule $case) use (&$cases) {
+            $cases[] = $case->toArray();
+            // Modifying cases
+            $case->addOperand(
+                (new LogicalFilter(['field3', 'regexp', "#^lalala#"]))->getRules()
+            );
+        })
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            [
+                ['and',
+                    ['field', '=', 'plop'],
+                    ['field2', '>', 1],
+                ],
+                ['and',
+                    ['field', '<', 4],
+                    ['field2', '>', 1],
+                ],
+            ],
+            $cases
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ['field', '=', 'plop'],
+                    ['field2', '>', 1],
+                    ['field3', 'regexp', "#^lalala#"],
+                ],
+                ['and',
+                    ['field', '<', 4],
+                    ['field2', '>', 1],
+                    ['field3', 'regexp', "#^lalala#"],
+                ],
+            ],
+            $filter
+                ->toArray()
+        );
+    }
+
     /**
      */
     public function test_applyOn_another_filter()
