@@ -35,30 +35,6 @@ trait LogicalFilterTest_rules_simplification_leaf_rules
         );
     }
 
-    /**
-     */
-    public function test_simplify_basic()
-    {
-        // $filter = (new LogicalFilter([
-            // 'and',
-            // ['field_5', '>', 'a'],
-            // ['field_6', '<', 'a'],
-            // [
-                // '!',
-                // ['field_5', '=', 'a'],
-            // ],
-        // ]);
-
-        $filter = (new LogicalFilter([
-            'and',
-            ['field_5', '>', 3],
-            ['field_5', '>', 5],
-        ]))
-        ->simplify()
-        ;
-
-        $this->assertEquals( ['field_5', '>', 5], $filter->toArray() );
-    }
 
     /**
      */
@@ -234,24 +210,6 @@ trait LogicalFilterTest_rules_simplification_leaf_rules
                 ['field_9', '>', 5],
             ],
             $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_simplify_multiple_equals()
-    {
-        $filter = (new LogicalFilter([
-            'and',
-            ['field_5', '=', 3],
-            ['field_5', '=', 5],
-        ]))
-        ->simplify()
-        // ->dump(!true)
-        ;
-
-        $this->assertEmpty(
-            $filter->getRules()->getOperands()
         );
     }
 
@@ -735,59 +693,6 @@ trait LogicalFilterTest_rules_simplification_leaf_rules
         // saving simplifications
         $this->assertFalse( $filter->hasSolution() );
         $this->assertEquals( ['and'], $filter->toArray() );
-    }
-
-    /**
-     * @todo
-     * @see https://github.com/jclaveau/php-logical-filter/issues/47
-     */
-    public function test_simplify_same_operands_which_are_operations()
-    {
-        $filter = (new LogicalFilter([
-            'or',
-            ['and',
-                ['field_6', '>', 3],
-                ['field_7', '>', 5],
-            ],
-            ['and',
-                ['field_6', '>', 3],
-                ['field_7', '>', 5],
-            ],
-        ]))
-        ->simplify()
-        ;
-
-        $this->assertEquals( [
-                'and',
-                ['field_6', '>', 3],
-                ['field_7', '>', 5],
-            ],
-            $filter
-                // ->dump(true)
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_simplify_same_operands_with_same_casted_values()
-    {
-        $filter = (new LogicalFilter([
-            'or',
-            ['and',
-                ['field_6', '=', 3],
-                ['field_6', '=', '3'],
-            ],
-        ]))
-        ->simplify()
-        ;
-
-        $this->assertEquals(
-            ['field_6', '=', 3],
-            $filter
-                // ->dump(true)
-                ->toArray()
-        );
     }
 
     /**

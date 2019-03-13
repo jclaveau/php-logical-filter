@@ -1286,7 +1286,7 @@ trait LogicalFilterTest_rules_simplification_composit_rules
 
     /**
      */
-    public function test_simplify_simplifySameOperands_multiple_in()
+    public function test_simplify_different_operands_in_and_equal()
     {
         $filter = (new LogicalFilter(
             ["and",
