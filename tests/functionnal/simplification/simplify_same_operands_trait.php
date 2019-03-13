@@ -227,5 +227,90 @@ trait LogicalFilterTest_simplify_same_operands
         );
     }
 
+    /**
+     */
+    public function test_simplify_with_in_rules()
+    {
+        $filter = (new LogicalFilter(
+            ["and",
+                ["field", "in", ["PLOP", "PROUT"]],
+                ["field", "in", ["PLOUF", "PROUT"]],
+                ["field", "in", ["PROUT", "PLOUF", "POUET"]],
+            ]
+        ))
+        ->simplify()
+        ;
+
+        $this->assertEquals(
+            ['field', '=', 'PROUT'],
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify_not_in_rules()
+    {
+        $filter = (new LogicalFilter(
+            ["and",
+                ["field", "!in", [
+                    "PLOP",
+                    "PROUT",
+                ]],
+                ["field", "!in", [
+                    "PLOUF",
+                    "PROUT",
+                ]],
+                ["field", "!in", [
+                    "PROUT",
+                    "PLOUF",
+                    "POUET",
+                ]],
+            ]
+        ));
+
+        // reversed alphabetical order:
+        $this->assertEquals(
+            ['field', '!in', ['PLOP', 'PROUT', 'PLOUF', 'POUET']],
+            $filter
+                ->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
+
+        // reversed alphabetical order:
+        // + PROUT
+        // + POUET
+        // + PLOUF
+        // + PLOP
+        $this->assertEquals(
+            ["or",
+                ["field", ">", "PROUT"],
+                ["field", "<", "PLOP"],
+                ["and",
+                    ["field", ">", "POUET"],
+                    ["field", "<", "PROUT"],
+                ],
+                ["and",
+                    ["field", ">", "PLOUF"],
+                    ["field", "<", "POUET"],
+                ],
+                ["and",
+                    ["field", ">", "PLOP"],
+                    ["field", "<", "PLOUF"],
+                ],
+            ],
+            $filter
+                ->simplify([
+                    'not_equal.normalization' => true,
+                    'in.normalization_threshold' => 4,
+                ])
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
     /**/
 }

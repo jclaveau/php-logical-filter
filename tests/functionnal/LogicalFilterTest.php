@@ -16,6 +16,8 @@ require  __DIR__ . "/LogicalFilterTest_rules_manipulation_trait.php";
 require  __DIR__ . "/simplification/LogicalFilterTest_rules_simplification_trait_leaf_rules.php";
 require  __DIR__ . "/simplification/LogicalFilterTest_rules_simplification_trait_composit_rules.php";
 require  __DIR__ . "/simplification/simplify_same_operands_trait.php";
+require  __DIR__ . "/simplification/simplify_different_operands_trait.php";
+require  __DIR__ . "/simplification/simplify_normalization_trait.php";
 require  __DIR__ . "/LogicalFilterTest_collection_integration_trait.php";
 
 class LogicalFilterTest extends \AbstractTest
@@ -25,6 +27,8 @@ class LogicalFilterTest extends \AbstractTest
     use LogicalFilterTest_rules_simplification_composit_rules;
     use LogicalFilterTest_collection_integration_trait;
     use LogicalFilterTest_simplify_same_operands;
+    use LogicalFilterTest_simplify_different_operands;
+    use LogicalFilterTest_simplify_normalization;
 
     /**
      */
