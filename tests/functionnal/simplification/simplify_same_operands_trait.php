@@ -229,12 +229,11 @@ trait LogicalFilterTest_simplify_same_operands
 
     /**
      */
-    public function test_simplify_with_in_rules()
+    public function test_simplify_same_operands_in()
     {
         $filter = (new LogicalFilter(
             ["and",
-                ["field", "in", ["PLOP", "PROUT"]],
-                ["field", "in", ["PLOUF", "PROUT"]],
+                ["field", "in", ["PLOP", "PROUT", "PLOUF"]],
                 ["field", "in", ["PROUT", "PLOUF", "POUET"]],
             ]
         ))
@@ -242,7 +241,7 @@ trait LogicalFilterTest_simplify_same_operands
         ;
 
         $this->assertEquals(
-            ['field', '=', 'PROUT'],
+            ["field", "in", ["PROUT", "PLOUF"]],
             $filter
                 // ->dump(true)
                 ->toArray()
@@ -251,7 +250,7 @@ trait LogicalFilterTest_simplify_same_operands
 
     /**
      */
-    public function test_simplify_not_in_rules()
+    public function test_simplify_same_operands_not_in()
     {
         $filter = (new LogicalFilter(
             ["and",

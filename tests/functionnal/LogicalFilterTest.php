@@ -19,9 +19,11 @@ require  __DIR__ . "/simplification/simplify_same_operands_trait.php";
 require  __DIR__ . "/simplification/simplify_different_operands_trait.php";
 require  __DIR__ . "/simplification/simplify_normalization_trait.php";
 require  __DIR__ . "/LogicalFilterTest_collection_integration_trait.php";
+require  __DIR__ . "/LogicalFilterTest_rules_descriptions_trait.php";
 
 class LogicalFilterTest extends \AbstractTest
 {
+    use LogicalFilterTest_rules_descriptions;
     use LogicalFilterTest_rules_manipulation_trait;
     use LogicalFilterTest_rules_simplification_leaf_rules;
     use LogicalFilterTest_rules_simplification_composit_rules;

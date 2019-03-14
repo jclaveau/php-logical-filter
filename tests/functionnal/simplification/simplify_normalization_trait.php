@@ -5,83 +5,7 @@ trait LogicalFilterTest_simplify_normalization
 {
     /**
      */
-    public function test_do_not_simplify_if_possibilities_count_above_threshold()
-    {
-        // The constant InRule::simplification_threshold forbids the simplification
-        // of the InRule to avoid combinations explosion (and fatal error
-        // due to more than allowed ram used)
-        $filter = new LogicalFilter(['field', 'in', [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16,
-            17,
-            18,
-            19,
-            20,
-            21,
-            22,
-            23,
-            24,
-            25,
-            26,
-            27,
-        ]]);
-
-        $this->assertEquals(
-            ['field', 'in', [
-                0,
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                10,
-                11,
-                12,
-                13,
-                14,
-                15,
-                16,
-                17,
-                18,
-                19,
-                20,
-                21,
-                22,
-                23,
-                24,
-                25,
-                26,
-                27,
-            ]],
-            $filter
-                ->simplify()
-                // ->dump()
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_simplify_not_in_rules_with_normalization()
+    public function test_normalize_not_in()
     {
         /* simple case */
         $filter = (new LogicalFilter(
@@ -290,45 +214,158 @@ trait LogicalFilterTest_simplify_normalization
 
     /**
      */
-    public function test_add_InRule()
+    public function test_normalize_not_equal()
     {
         $filter = new LogicalFilter(
-            ['field_1', 'in', ['a', 'b', 'c']],
-            null,
-            ['inrule.simplification_threshold' => 20]
-        );
-
-        // toArray must be iso to the provided descrition
-        $this->assertEquals(
-            ['field_1', 'in', ['a', 'b', 'c']],
-            $filter->toArray()
-        );
-
-        $filter->getRules(false)->addPossibilities(['d', 'e']);
-
-        $this->assertEquals(
-            ['a', 'b', 'c', 'd', 'e'],
-            $filter->getRules()->getPossibilities()
+            ['field_1', '!=', 'a']
         );
 
         $this->assertEquals(
-            [
-                'or',
-                ['field_1', '=', 'a'],
-                ['field_1', '=', 'b'],
-                ['field_1', '=', 'c'],
-                ['field_1', '=', 'd'],
-                ['field_1', '=', 'e'],
+            ['field_1', '!=', 'a'],
+            $filter
+                ->simplify()
+                ->toArray()
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['field_1', '>', 'a'],
+                ['field_1', '<', 'a'],
             ],
             $filter
-                // ->dump(!true)
+                ->simplify(['not_equal.normalization' => true])
+                // ->dump()
+                ->toArray()
+        );
+
+        // $this->assertEquals(
+            // ['and',
+                // ['field_1', '!=', 2],
+                // ['field_1', '!=', 3],
+            // ],
+            // $filter
+                // ->simplify(['not_in.normalization' => true])
+                // ->dump(true)
+                // ->toArray()
+        // );
+
+        // $this->assertEquals(
+            // ['or',
+                // ['field_1', '>', 3],
+                // ['field_1', '<', 2],
+                // ['and',
+                    // ['field_1', '>', 2],
+                    // ['field_1', '<', 3],
+                // ],
+            // ],
+            // $filter
+                // ->simplify(['not_equal.normalization' => true])
+                // ->dump(true)
+                // ->toArray()
+        // );
+
+    }
+
+    /**
+     */
+    public function test_normalize_below_or_equal()
+    {
+        $filter = new LogicalFilter(
+            ['field_1', '<=', 2]
+        );
+
+        $this->assertEquals(
+            ['field_1', '<=', 2],
+            $filter->simplify()->toArray()
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['field_1', '<', 2],
+                ['field_1', '=', 2],
+            ],
+            $filter
+                ->simplify(['below_or_equal.normalization' => true])
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_normalize_above_or_equal()
+    {
+        $filter = new LogicalFilter(
+            ['field_1', '>=', 2]
+        );
+
+        $this->assertEquals(
+            ['field_1', '>=', 2],
+            $filter
+                ->simplify()
+                ->toArray()
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['field_1', '>', 2],
+                ['field_1', '=', 2],
+            ],
+            $filter
+                ->simplify(['above_or_equal.normalization' => true])
+                // ->dump()
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_normalize_in_default_threshold_reached()
+    {
+        $filter = new LogicalFilter(['field', 'in', [
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
+        ]]);
+
+        $this->assertEquals(
+            ['field', 'in', [
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
+            ]],
+            $filter
+                ->simplify()
+                // ->dump()
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_normalize_in_custom_threshold_by_simplification()
+    {
+        $filter = (new LogicalFilter(
+            ["and",
+                ["type", "in", ["lolo","lala","lili"]],
+                ["type", "in", ["lolo","lala","lili","lulu"]],
+                ["user", "in", [10,23,27,28,30,32,56,60,61,62,65,74,76,77,86,98,99,104,110,111,116,118,123,130,134,135,142,144,146,147,148,149,150,151,154,157,159,163,170,174,178,179,188,198,200,209,210,211,212,213,222,235,236,243,244,245,246,259,262,266,268,270,271,272,273]],
+            ]
+        ));
+
+        $this->assertEquals(
+            ["or",
+                ['and',
+                    ["type", "=", "lolo"],
+                    ["user", "in", [10,23,27,28,30,32,56,60,61,62,65,74,76,77,86,98,99,104,110,111,116,118,123,130,134,135,142,144,146,147,148,149,150,151,154,157,159,163,170,174,178,179,188,198,200,209,210,211,212,213,222,235,236,243,244,245,246,259,262,266,268,270,271,272,273]],
+                ],
+                ['and',
+                    ["type", "=", "lala"],
+                    ["user", "in", [10,23,27,28,30,32,56,60,61,62,65,74,76,77,86,98,99,104,110,111,116,118,123,130,134,135,142,144,146,147,148,149,150,151,154,157,159,163,170,174,178,179,188,198,200,209,210,211,212,213,222,235,236,243,244,245,246,259,262,266,268,270,271,272,273]],
+                ],
+                ['and',
+                    ["type", "=", "lili"],
+                    ["user", "in", [10,23,27,28,30,32,56,60,61,62,65,74,76,77,86,98,99,104,110,111,116,118,123,130,134,135,142,144,146,147,148,149,150,151,154,157,159,163,170,174,178,179,188,198,200,209,210,211,212,213,222,235,236,243,244,245,246,259,262,266,268,270,271,272,273]],
+                ],
+            ],
+            $filter
                 ->simplify([
-                    // 'stop_after' =>
-                    // AbstractOperationRule::remove_negations,
-                    // AbstractOperationRule::rootify_disjunctions,
-                    // AbstractOperationRule::unify_atomic_operands,
-                    // AbstractOperationRule::remove_invalid_branches,
-                    'in.normalization_threshold' => 6
+                    'in.normalization_threshold' => 5
                 ])
                 // ->dump(true)
                 ->toArray()
@@ -337,29 +374,7 @@ trait LogicalFilterTest_simplify_normalization
 
     /**
      */
-    public function test_simplify_in_without_threshold()
-    {
-        $filter = (new LogicalFilter(
-            ["and",
-                ["field", "in", [1, 2, 3, 4]],
-            ],
-            null,
-            ['inrule.simplification_threshold' => 0]
-        ))
-        ->simplify()
-        ;
-
-        $this->assertEquals(
-            ["field", "in", [1, 2, 3, 4]],
-            $filter
-                // ->dump(true)
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_simplify_in_rules_changing_simplification_threshold()
+    public function test_normalize_in_rules_changing_simplification_threshold()
     {
         $filter = (new LogicalFilter(
             ["and",
@@ -438,180 +453,84 @@ trait LogicalFilterTest_simplify_normalization
 
     /**
      */
-    public function test_simplify_NotEqualRule()
+    public function test_normalize_in_custom_threshold_by_filter_being_null()
     {
-        $filter = new LogicalFilter(
-            ['field_1', '!=', 'a']
-        );
-
-        $this->assertEquals(
-            ['field_1', '!=', 'a'],
-            $filter
-                ->simplify()
-                ->toArray()
-        );
-
-        $this->assertEquals(
-            ['or',
-                ['field_1', '>', 'a'],
-                ['field_1', '<', 'a'],
+        $filter = (new LogicalFilter(
+            ["and",
+                ["field", "in", [1, 2, 3, 4]],
             ],
+            null,
+            ['inrule.simplification_threshold' => 0]
+        ))
+        ->simplify()
+        ;
+
+        $this->assertEquals(
+            ["field", "in", [1, 2, 3, 4]],
             $filter
-                ->simplify(['not_equal.normalization' => true])
-                // ->dump()
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_BelowOrEqualRule()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '<=', 2]
-        );
-
-        // toArray must be iso to the provided descrition
-        $this->assertEquals(
-            ['field_1', '<=', 2],
-            $filter->toArray()
-        );
-
-        $this->assertEquals(
-            ['field_1', '<=', 2],
-            $filter->simplify()->toArray()
-        );
-
-        $this->assertEquals(
-            ['or',
-                ['field_1', '<', 2],
-                ['field_1', '=', 2],
-            ],
-            $filter
-                ->simplify(['below_or_equal.normalization' => true])
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_AboveOrEqualRule()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '>=', 2]
-        );
-
-        // toArray must be iso to the provided descrition
-        $this->assertEquals(
-            ['field_1', '>=', 2],
-            $filter->toArray()
-        );
-
-        $this->assertEquals(
-            ['field_1', '>=', 2],
-            $filter
-                ->simplify()
-                ->toArray()
-        );
-
-        $this->assertEquals(
-            ['or',
-                ['field_1', '>', 2],
-                ['field_1', '=', 2],
-            ],
-            $filter
-                ->simplify(['above_or_equal.normalization' => true])
-                // ->dump()
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_NotEqualRule()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '!=', 'a']
-        );
-
-        // toArray must be iso to the provided descrition
-        $this->assertEquals(
-            ['field_1', '!=', 'a'],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_NotInRule()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '!in', [2, 3]]
-        );
-
-        // toArray must be iso to the provided descrition
-        $this->assertEquals(
-            ['field_1', '!in', [2, 3]],
-            $filter->toArray()
-        );
-
-
-        // $this->assertEquals(
-            // ['and',
-                // ['field_1', '!=', 2],
-                // ['field_1', '!=', 3],
-            // ],
-            // $filter
-                // ->simplify(['not_in.normalization' => true])
                 // ->dump(true)
-                // ->toArray()
-        // );
-
-        // $this->assertEquals(
-            // ['or',
-                // ['field_1', '>', 3],
-                // ['field_1', '<', 2],
-                // ['and',
-                    // ['field_1', '>', 2],
-                    // ['field_1', '<', 3],
-                // ],
-            // ],
-            // $filter
-                // ->simplify(['not_equal.normalization' => true])
-                // ->dump(true)
-                // ->toArray()
-        // );
+                ->toArray()
+        );
     }
 
     /**
      */
-    public function test_simplify_of_InRule_with_simplification_disallowed()
+    public function test_normalize_in_as_equal_always()
     {
-        $filter = (new LogicalFilter([
-            "and",
-            ["type", "in", ["lolo","lala","lili"]],
-            ["type", "in", ["lolo","lala","lili","lulu"]],
-            ["user", "in", [10,23,27,28,30,32,56,60,61,62,65,74,76,77,86,98,99,104,110,111,116,118,123,130,134,135,142,144,146,147,148,149,150,151,154,157,159,163,170,174,178,179,188,198,200,209,210,211,212,213,222,235,236,243,244,245,246,259,262,266,268,270,271,272,273]],
-        ]));
+        $filter = (new LogicalFilter(
+            ["and",
+                ["field", "in", ["PLOP", "PROUT"]],
+                ["field", "in", ["PLOUF", "PROUT"]],
+                ["field", "in", ["PROUT", "PLOUF", "POUET"]],
+            ]
+        ))
+        ->simplify()
+        ;
 
         $this->assertEquals(
-            ["or",
-                ['and',
-                    ["type", "=", "lolo"],
-                    ["user", "in", [10,23,27,28,30,32,56,60,61,62,65,74,76,77,86,98,99,104,110,111,116,118,123,130,134,135,142,144,146,147,148,149,150,151,154,157,159,163,170,174,178,179,188,198,200,209,210,211,212,213,222,235,236,243,244,245,246,259,262,266,268,270,271,272,273]],
-                ],
-                ['and',
-                    ["type", "=", "lala"],
-                    ["user", "in", [10,23,27,28,30,32,56,60,61,62,65,74,76,77,86,98,99,104,110,111,116,118,123,130,134,135,142,144,146,147,148,149,150,151,154,157,159,163,170,174,178,179,188,198,200,209,210,211,212,213,222,235,236,243,244,245,246,259,262,266,268,270,271,272,273]],
-                ],
-                ['and',
-                    ["type", "=", "lili"],
-                    ["user", "in", [10,23,27,28,30,32,56,60,61,62,65,74,76,77,86,98,99,104,110,111,116,118,123,130,134,135,142,144,146,147,148,149,150,151,154,157,159,163,170,174,178,179,188,198,200,209,210,211,212,213,222,235,236,243,244,245,246,259,262,266,268,270,271,272,273]],
-                ],
+            ['field', '=', 'PROUT'],  // An in rule with only one possibility is always an equal one
+            $filter
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+
+    /**
+     */
+    public function test_normalize_in_custom_threshold_by_filter()
+    {
+        $filter = new LogicalFilter(
+            ['field_1', 'in', ['a', 'b', 'c']],
+            null,
+            ['inrule.simplification_threshold' => 20]
+        );
+
+        $filter->getRules(false)->addPossibilities(['d', 'e']);
+
+        $this->assertEquals(
+            ['a', 'b', 'c', 'd', 'e'],
+            $filter->getRules()->getPossibilities()
+        );
+
+        $this->assertEquals(
+            [
+                'or',
+                ['field_1', '=', 'a'],
+                ['field_1', '=', 'b'],
+                ['field_1', '=', 'c'],
+                ['field_1', '=', 'd'],
+                ['field_1', '=', 'e'],
             ],
             $filter
+                // ->dump(!true)
                 ->simplify([
-                    'in.normalization_threshold' => 5
+                    // 'stop_after' =>
+                    // AbstractOperationRule::remove_negations,
+                    // AbstractOperationRule::rootify_disjunctions,
+                    // AbstractOperationRule::unify_atomic_operands,
+                    // AbstractOperationRule::remove_invalid_branches,
+                    'in.normalization_threshold' => 6
                 ])
                 // ->dump(true)
                 ->toArray()
@@ -620,11 +539,10 @@ trait LogicalFilterTest_simplify_normalization
 
     /**
      */
-    public function test_simplify_with_big_combinations()
+    public function test_normalize_combined()
     {
         $filter = (new LogicalFilter(
-            [
-                "and",
+            ["and",
                 ["A_type", "in", [
                     "INTERNE",
                     "PROD",
