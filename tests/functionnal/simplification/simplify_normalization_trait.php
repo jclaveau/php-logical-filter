@@ -620,6 +620,73 @@ trait LogicalFilterTest_simplify_normalization
         );
     }
 
+    /**
+     */
+    public function test_add_BetweenRule()
+    {
+        $filter = new LogicalFilter(
+            ['field_1', '><', [2, 3]]
+        );
+
+        $this->assertEquals(
+            ['and',
+                ['field_1', '>', 2],
+                ['field_1', '<', 3],
+            ],
+            $filter->simplify()
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_setDefaultOptions()
+    {
+        $default_inrule_threshold = LogicalFilter::getDefaultOptions()['in.normalization_threshold'];
+
+        LogicalFilter::setDefaultOptions([
+            'in.normalization_threshold' => 20,
+        ]);
+
+        $filter = new LogicalFilter(
+            ['field_1', 'in', ['a', 'b', 'c']]
+        );
+
+        // toArray must be iso to the provided descrition
+        $this->assertEquals(
+            ['field_1', 'in', ['a', 'b', 'c']],
+            $filter->toArray()
+        );
+
+        $filter->getRules(false)->addPossibilities(['d', 'e']);
+
+        $this->assertEquals(
+            ['a', 'b', 'c', 'd', 'e'],
+            $filter->getRules()->getPossibilities()
+        );
+
+        $this->assertEquals(
+            [
+                'or',
+                ['field_1', '=', 'a'],
+                ['field_1', '=', 'b'],
+                ['field_1', '=', 'c'],
+                ['field_1', '=', 'd'],
+                ['field_1', '=', 'e'],
+            ],
+            $filter
+                ->simplify([
+
+                ])
+                // ->dump(true)
+                ->toArray()
+        );
+
+        LogicalFilter::setDefaultOptions([
+            'in.normalization_threshold' => $default_inrule_threshold,
+        ]);
+    }
 
     /**/
 }

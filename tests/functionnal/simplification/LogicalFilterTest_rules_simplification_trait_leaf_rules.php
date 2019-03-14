@@ -540,5 +540,127 @@ trait LogicalFilterTest_rules_simplification_leaf_rules
         );
     }
 
+    /**
+     */
+    public function test_NotRule_of_long_and()
+    {
+        $filter = (new LogicalFilter(
+            ['not',
+                ['and',
+                    ['field_1', '=', 2],
+                    ['field_2', '<', 3],
+                    ['field_3', '>', 4],
+                ],
+            ]
+        ))
+        // ->dump()
+        ;
+
+        $this->assertEquals(
+            ['or',
+                ['and', // 1
+                    ['not', ['field_1', '=', 2]],
+                    ['field_2', '<', 3],
+                    ['field_3', '>',  4],
+                ],
+
+                ['and', // 2
+                    ['field_1', '=', 2],
+                    ['not', ['field_2', '<', 3]],
+                    ['field_3', '>',  4],
+                ],
+
+                ['and', // 3
+                    ['not', ['field_1', '=', 2]],
+                    ['not', ['field_2', '<', 3]],
+                    ['field_3', '>',  4],
+                ],
+
+                ['and', // 4
+                    ['field_1', '=', 2],
+                    ['field_2', '<', 3],
+                    ['not', ['field_3', '>',  4]],
+                ],
+
+                ['and', // 5
+                    ['not', ['field_1', '=', 2]],
+                    ['field_2', '<', 3],
+                    ['not', ['field_3', '>',  4]],
+                ],
+
+                ['and', // 6
+                    ['field_1', '=', 2],
+                    ['not', ['field_2', '<', 3]],
+                    ['not', ['field_3', '>',  4]],
+                ],
+
+                ['and', // 7
+                    ['not', ['field_1', '=', 2]],
+                    ['not', ['field_2', '<', 3]],
+                    ['not', ['field_3', '>',  4]],
+                ],
+            ],
+            $filter
+                ->getRules()
+                ->negateOperand([])
+                // ->dump(true)
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_NotRule_of_null()
+    {
+        $filter = (new LogicalFilter(
+            ['field_1', '!=', null]
+        ));
+
+        $this->assertEquals(
+            ['field_1', '!=', null],
+            $filter->toArray()
+        );
+
+        $this->assertEquals(
+            ['field_1', '!=', null],
+            $filter
+                ->simplify()
+                // ->dump(!true)
+                ->toArray()
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['and',
+                    ['field_1', '!=', null],
+                ],
+            ],
+            $filter
+                ->simplify(['force_logical_core' => true])
+                // ->dump(true)
+                ->toArray()
+        );
+
+        $filter = (new LogicalFilter(
+            ['not', ['field_1', '=', null]]
+        ))
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            ['not', ['field_1', '=', null]],
+            $filter
+                ->toArray()
+        );
+
+        $this->assertEquals(
+            ['field_1', '!=', null],
+            $filter
+                ->simplify()
+                // ->dump()
+                ->toArray()
+        );
+    }
+
     /**/
 }

@@ -9,6 +9,101 @@ trait LogicalFilterTest_rules_manipulation_trait
 {
     /**
      */
+    public function test_renameFields()
+    {
+        $filter = new LogicalFilter(
+            ['and',
+                ['or',
+                    ['field_5', '>', 'a'],
+                    ['field_3', '<', 'a'],
+                ],
+                ['not',
+                    ['and',
+                        ['field_5', '>', 'a'],
+                        ['field_4', '=', 'a'],
+                    ],
+                ],
+                ['field_5', 'in', ['a', 'b', 'c']],
+                ['field_6', '>=', 'a'],
+                ['field_7', '<=', 'a'],
+                ['field_8', '><', ['a', 'Z']],
+                ['field_8', '=><', ['a', 'Z']],
+                ['field_8', '=><=', ['a', 'Z']],
+                ['field_8', '><=', ['a', 'Z']],
+            ]
+        );
+
+        $this->assertEquals(
+            ['and',
+                ['or',
+                    ['field_five', '>', 'a'],
+                    ['field_three', '<', 'a'],
+                ],
+                ['not',
+                    ['and',
+                        ['field_five', '>', 'a'],
+                        ['field_4', '=', 'a'],
+                    ],
+                ],
+                ['field_five', 'in', ['a', 'b', 'c']],
+                ['field_6', '>=', 'a'],
+                ['field_7', '<=', 'a'],
+                ['field_8', '><', ['a', 'Z']],
+                ['field_8', '=><', ['a', 'Z']],
+                ['field_8', '=><=', ['a', 'Z']],
+                ['field_8', '><=', ['a', 'Z']],
+            ],
+            $filter
+                ->copy()
+                ->renameFields([
+                    'field_5' => 'field_five',
+                    'field_3' => 'field_three',
+                ])
+                // ->dump(true)
+                ->toArray()
+        );
+
+        $this->assertEquals(
+            ['and',
+                ['or',
+                    ['property_5', '>', 'a'],
+                    ['property_3', '<', 'a'],
+                ],
+                ['not',
+                    ['and',
+                        ['property_5', '>', 'a'],
+                        ['property_4', '=', 'a'],
+                    ],
+                ],
+                ['property_5', 'in', ['a', 'b', 'c']],
+                ['property_6', '>=', 'a'],
+                ['property_7', '<=', 'a'],
+                ['property_8', '><', ['a', 'Z']],
+                ['property_8', '=><', ['a', 'Z']],
+                ['property_8', '=><=', ['a', 'Z']],
+                ['property_8', '><=', ['a', 'Z']],
+            ],
+            $filter
+                ->copy()
+                ->renameFields(function($field) {
+                    return str_replace('field_', 'property_', $field);
+                })
+                // ->dump(!true)
+                ->toArray()
+        );
+
+        try {
+            $filter->renameFields('sdfghjk');
+            $this->assertTrue(false, "An exception should be throw here");
+        }
+        catch (\InvalidArgumentException $e) {
+            // InvalidArgumentException: Minimum parameter must be a scalar
+            $this->assertTrue(true, "Exception thrown: ".$e->getMessage());
+        }
+    }
+
+    /**
+     */
     public function test_removeRules_simple_field()
     {
         $this->assertEquals(
