@@ -649,6 +649,50 @@ trait LogicalFilterTest_rules_manipulation_trait
 
     /**
      */
+    public function test_applyOn_lazy_value_and_lazy_key()
+    {
+        $filter = (new LogicalFilter(
+            ['or',
+                [value()['col_1'], '=', 'lololo'],
+                [key(), '=', 'key_1'],
+            ]
+        ))
+        // ->dump(true)
+        ;
+
+        $array = [
+            'key_0' => [
+                'col_1' => 'lelele',
+                'col_2' => 'lylyly',
+            ],
+            'key_1' => [
+                'col_1' => 'lalala',
+                'col_2' => 'lilili',
+            ],
+            'key_2' => [
+                'col_1' => 'lololo',
+                'col_2' => 'lululu',
+            ],
+        ];
+
+        $this->assertEquals(
+            [
+                'key_1' => [
+                    'col_1' => 'lalala',
+                    'col_2' => 'lilili',
+                ],
+                'key_2' => [
+                    'col_1' => 'lololo',
+                    'col_2' => 'lululu',
+                ],
+            ],
+            $filter
+                ->applyOn($array)
+        );
+    }
+
+    /**
+     */
     public function test_applyOn_another_filter()
     {
         $filter_to_filter = new LogicalFilter([

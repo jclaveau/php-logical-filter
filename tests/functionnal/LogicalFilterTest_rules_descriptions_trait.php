@@ -14,233 +14,86 @@ use JClaveau\LogicalFilter\Rule\BelowRule;
 
 trait LogicalFilterTest_rules_descriptions
 {
-    /**
-     */
-    public function test_add_equal()
+    public function validMinimalisticRulesProvider()
     {
-        $filter = new LogicalFilter(
-            ['field_1', '=', 2]
-        );
-
-        $this->assertEquals(
+        $valid_rule_descriptions = [
             ['field_1', '=', 2],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_below()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '<', 2]
-        );
-
-        $this->assertEquals(
+            ['field_1', '=', null],
             ['field_1', '<', 2],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_above()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '>', 2]
-        );
-
-        $this->assertEquals(
             ['field_1', '>', 2],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_and()
-    {
-        $filter = new LogicalFilter(
-            ['and',
-                ['field', '>', 3],
-                ['field', '<', 5],
-            ]
-        );
-
-        $this->assertEquals(
             ['and',
                 ['field', '>', 3],
                 ['field', '<', 5],
             ],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_or()
-    {
-        $filter = new LogicalFilter(
-            ['or',
-                ['field', '>', 3],
-                ['field', '<', 5],
-            ]
-        );
-
-        $this->assertEquals(
             ['or',
                 ['field', '>', 3],
                 ['field', '<', 5],
             ],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_not()
-    {
-        $filter = new LogicalFilter(
-            ['not',
-                ['field', '>', 3],
-            ]
-        );
-
-        $this->assertEquals(
             ['not',
                 ['field', '>', 3],
             ],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_in()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', 'in', ['a', 'b', 'c']]
-        );
-
-        $this->assertEquals(
-            ['field_1', 'in', ['a', 'b', 'c']],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_above_or_equal()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '>=', 2]
-        );
-
-        $this->assertEquals(
+            ['field_1', 'in', ['a', 'b', 'c', null]],
             ['field_1', '>=', 2],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_below_or_equal()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '<=', 2]
-        );
-
-        $this->assertEquals(
             ['field_1', '<=', 2],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_not_equal()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '!=', 'a']
-        );
-
-        $this->assertEquals(
             ['field_1', '!=', 'a'],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_not_in()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '!in', [2, 3]]
-        );
-
-        $this->assertEquals(
+            ['field_1', '!=', null],
             ['field_1', '!in', [2, 3]],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_between()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '><', [2, 3]]
-        );
-
-        $this->assertEquals(
             ['field_1', '><', [2, 3]],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_between_or_equals_lower()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '=><', [2, 3]]
-        );
-
-        $this->assertEquals(
             ['field_1', '=><', [2, 3]],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_add_between_or_equals_upper()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', '><=', [2, 3]]
-        );
-
-        $this->assertEquals(
             ['field_1', '><=', [2, 3]],
+            ['field_1', '=><=', [2, 3]],
+            ['field_1', 'regexp', '/^lalala*/'],
+        ];
+
+        $out = [];
+        foreach ($valid_rule_descriptions as $valid_rule_description) {
+            $out[] = [$valid_rule_description];
+        }
+
+        return $out;
+    }
+
+    /**
+     * @dataProvider validMinimalisticRulesProvider
+     */
+    public function test_add_valid_rule_description_via_constructor($rule_description)
+    {
+        $filter = new LogicalFilter(
+            $rule_description
+        );
+
+        $this->assertEquals(
+            $rule_description,
             $filter->toArray()
         );
     }
 
     /**
+     * @dataProvider validMinimalisticRulesProvider
      */
-    public function test_add_between_or_equals_both()
+    public function test_add_valid_rule_description_via_and_($rule_description)
     {
-        $filter = new LogicalFilter(
-            ['field_1', '=><=', [2, 3]]
-        );
+        $filter = new LogicalFilter;
+        $filter->and_($rule_description);
 
         $this->assertEquals(
-            ['field_1', '=><=', [2, 3]],
+            $rule_description,
             $filter->toArray()
         );
     }
 
-// TEST BELOW ARE NOT STRUCTURED
+    /**
+     * @dataProvider validMinimalisticRulesProvider
+     */
+    public function test_add_rules_from_toArray($rule_description)
+    {
+        $filter = new LogicalFilter($rule_description);
+
+        $this->assertEquals(
+            $filter->toArray(),
+            (new LogicalFilter( $filter->toArray() ))->toArray()
+        );
+    }
 
     /**
      */
@@ -249,107 +102,14 @@ trait LogicalFilterTest_rules_descriptions
         $filter = new LogicalFilter(['field', 'above', 3]);
 
         $this->assertEquals(
-            (new AboveRule('field', 3))->toArray(),
-            $filter->getRules()->toArray()
+            ['field', '>', 3],
+            $filter->toArray()
         );
 
         $filter = new LogicalFilter(new AboveRule('field', 3));
 
         $this->assertEquals(
-            (new AboveRule('field', 3))->toArray(),
-            $filter->getRules()->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_addRule_after_invalid_in()
-    {
-        $filter = new LogicalFilter;
-
-        $filter
-            ->and_('field', 'in', [])
-            ->and_('field2', '=', 'dfghjkl')
-            ;
-
-        $this->assertEquals(
-            ['and',
-                ['field', 'in', []],
-                ['field2', '=', 'dfghjkl'],
-            ],
-            $filter
-                // ->dump()
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_addRule_with_bad_operation()
-    {
-        $filter = new LogicalFilter( ['field_1', '=', 3] );
-
-        try {
-            VisibilityViolator::callHiddenMethod(
-                $filter, 'addRule', [new EqualRule('field', 2), 'bad_operator']
-            );
-
-            $this->assertTrue(
-                false,
-                "An exception claiming that an invaid operator is given "
-                ."should have been thrown here"
-            );
-        }
-        catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, "InvalidArgumentException throw: ".$e->getMessage());
-        }
-    }
-
-    /**
-     * @todo this looks that a useless uncleaned beginning of test
-     */
-    public function test_addRules_requiring_strict_check_of_operators()
-    {
-        $this->assertEquals(
-            ['not', ['depth', '=', 0]],
-            (new LogicalFilter(['not', ['depth', '=', 0]]))
-            // ->dump(true)
-            ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_or__of_true_filter()
-    {
-        // A || True <=> True
-        $filter = (new LogicalFilter(
-            ['field_2', '!=', 4]
-        ))
-        ->or_( (new LogicalFilter)->getRules() )
-        // ->dump(true)
-        ;
-
-        $this->assertEquals(
-            null, // TODO replace it by TrueRule
-            $filter->getRules()
-        );
-    }
-
-    /**
-     */
-    public function test_and__of_true_filter()
-    {
-        // A && True <=> A
-        $filter = (new LogicalFilter(
-            ['field_2', '!=', 4]
-        ))
-        ->and_( (new LogicalFilter)->getRules() )
-        // ->dump(true)
-        ;
-
-        $this->assertEquals(
-            ['field_2', '!=', 4],
+            ['field', '>', 3],
             $filter->toArray()
         );
     }
@@ -395,8 +155,46 @@ trait LogicalFilterTest_rules_descriptions
     }
 
     /**
+     * @dataProvider validMinimalisticRulesProvider
      */
-    public function test_construct_with_true_false_null_descriptions()
+    public function test_or__of_true_filter($rule_description)
+    {
+        // A || True <=> True
+        $filter = (new LogicalFilter(
+            $rule_description
+        ))
+        ->or_( (new LogicalFilter)->getRules() )
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            null, // TODO replace it by TrueRule
+            $filter->getRules()
+        );
+    }
+
+    /**
+     * @dataProvider validMinimalisticRulesProvider
+     */
+    public function test_and__of_true_filter($rule_description)
+    {
+        // A && True <=> A
+        $filter = (new LogicalFilter(
+            $rule_description
+        ))
+        ->and_( (new LogicalFilter)->getRules() )
+        // ->dump(true)
+        ;
+
+        $this->assertEquals(
+            $rule_description,
+            $filter->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_add_descriptions_containing_true_false_null_rules()
     {
         $filter = (new LogicalFilter(
                 ['and',
@@ -458,41 +256,62 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_addRules_with_nested_operations()
+    public function test_add_rule_after_in_with_no_possibility()
     {
-        $filter = new LogicalFilter();
-        $filter->and_([
-            ['field', 'in', ['a', 'b', 'c']],
-            'or',
-            [
-                ['field', 'in', ['d', 'e']],
-                'and',
-                [
-                    ['field_2', 'above', 3],
-                    'or',
-                    ['field_3', 'below', -2],
-                ],
-            ],
-        ]);
+        $filter = new LogicalFilter;
+
+        $filter
+            ->and_('field', 'in', [])
+            ->and_('field2', '=', 'dfghjkl')
+            ;
 
         $this->assertEquals(
-            (new OrRule([
-                new InRule('field', ['a', 'b', 'c']),
-                new AndRule([
-                    new InRule('field', ['d', 'e']),
-                    new OrRule([
-                        new AboveRule('field_2', 3),
-                        new BelowRule('field_3', -2),
-                    ]),
-                ]),
-            ]))->toArray(),
+            ['and',
+                ['field', 'in', []],
+                ['field2', '=', 'dfghjkl'],
+            ],
+            $filter
+                // ->dump()
+                ->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_add_operations_nested()
+    {
+        $filter = new LogicalFilter();
+        $filter->and_(
+            ['or',
+                ['field', 'in', ['a', 'b', 'c']],
+                ['and',
+                    ['field', 'in', ['d', 'e']],
+                    ['or',
+                        ['field_2', '>', 3],
+                        ['field_3', '<', -2],
+                    ],
+                ],
+            ]
+        );
+
+        $this->assertEquals(
+            ['or',
+                ['field', 'in', ['a', 'b', 'c']],
+                ['and',
+                    ['field', 'in', ['d', 'e']],
+                    ['or',
+                        ['field_2', '>', 3],
+                        ['field_3', '<', -2],
+                    ],
+                ],
+            ],
             $filter->toArray()
         );
     }
 
     /**
      */
-    public function test_addRules_without_operator()
+    public function test_add_operation_without_operator()
     {
         $filter = new LogicalFilter();
 
@@ -523,7 +342,7 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_addRules_with_different_operators()
+    public function test_add_operation_with_different_operators()
     {
         $filter = new LogicalFilter();
 
@@ -564,29 +383,18 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_addRules_with_negation()
+    public function test_add_negation_with_more_than_one_operand()
     {
         $filter = new LogicalFilter();
 
-        $filter->and_([
-            'not',
-            ['field_2', 'above', 3],
-        ]);
-
-        $this->assertEquals(
-            (new NotRule(
-                new AboveRule('field_2', 3)
-            ))->toArray(),
-            $filter->getRules()->toArray()
-        );
-
         // not with too much operands
         try {
-            $filter->and_([
-                'not',
-                ['field_2', 'above', 3],
-                ['field_2', 'equal', 5],
-            ]);
+            $filter->and_(
+                ['not',
+                    ['field_2', 'above', 3],
+                    ['field_2', 'equal', 5],
+                ]
+            );
 
             $this->assertTrue(
                 false,
@@ -607,13 +415,12 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_addRules_on_noSolution_filter()
+    public function test_add_rules_to_filter_with_no_solution_anymore()
     {
         // and root
-        $filter = (new LogicalFilter([
-            'and'
-        ]))
-        ;
+        $filter = (new LogicalFilter(
+            ['and']
+        ));
 
         try {
             $filter->and_('a', '<', 'b');
@@ -626,10 +433,9 @@ trait LogicalFilterTest_rules_descriptions
         }
 
         // or root
-        $filter = (new LogicalFilter([
-            'or',
-        ]))
-        ;
+        $filter = (new LogicalFilter(
+            ['or']
+        ));
 
         try {
             $filter->and_('a', '<', 'b');
@@ -644,25 +450,24 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_addRules_with_symbolic_operators()
+    public function test_add_negation_with_symbolic_operators()
     {
-        $filter = new LogicalFilter([
-            'and',
-            ['field_5', '>', 'a'],
-            ['field_5', '<', 'a'],
-            [
-                '!',
-                ['field_5', '=', 'a'],
-            ],
-        ]);
-
-        $this->assertEquals(
-            [
-                'and',
+        $filter = new LogicalFilter(
+            ['and',
                 ['field_5', '>', 'a'],
                 ['field_5', '<', 'a'],
                 [
-                    'not',
+                    '!',
+                    ['field_5', '=', 'a'],
+                ],
+            ]
+        );
+
+        $this->assertEquals(
+            ['and',
+                ['field_5', '>', 'a'],
+                ['field_5', '<', 'a'],
+                ['not',
                     ['field_5', '=', 'a'],
                 ],
             ],
@@ -672,41 +477,7 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_add_regexp()
-    {
-        $filter = new LogicalFilter(
-            ['field_1', 'regexp', '/^lalala*/']
-        );
-
-        $this->assertEquals(
-            ['field_1', 'regexp', '/^lalala*/'],
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_addRules_from_toArray()
-    {
-        $filter = new LogicalFilter([
-            'and',
-            ['field_5', '>', 'a'],
-            ['field_5', '<', 'a'],
-            [
-                '!',
-                ['field_5', '=', 'a'],
-            ],
-        ]);
-
-        $this->assertEquals(
-            $filter->toArray(),
-            (new LogicalFilter( $filter->toArray() ))->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_LogicalFilter_or_AbstractRule_in_operations_descriptions()
+    public function test_operations_containing_LogicalFilter_or_AbstractRule_as_operands()
     {
         $filter_to_use = (new LogicalFilter(
             ['field_1', '=', 'azerty']
@@ -803,27 +574,7 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_and_simple()
-    {
-        $filter = new LogicalFilter();
-
-        $filter->and_('field', 'in', ['a', 'b', 'c']);
-        $filter->and_('field', 'above', 3);
-        $filter->and_('field', 'below', 5);
-
-        $this->assertEquals(
-            (new AndRule([
-                new InRule('field', ['a', 'b', 'c']),
-                new AboveRule('field', 3),
-                new BelowRule('field', 5)
-            ]))->toArray(),
-            $filter->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_or_simple()
+    public function test_or__simple()
     {
         $filter = new LogicalFilter();
 
@@ -832,12 +583,11 @@ trait LogicalFilterTest_rules_descriptions
         $filter->or_('field', 'below', 5);
 
         $this->assertEquals(
-            (new OrRule([
-                new InRule('field', ['a', 'b', 'c']),
-                new AboveRule('field', 3),
-                new BelowRule('field', 5)
-            ]))
-                ->toArray(),
+            ['or',
+                ['field', 'in', ['a', 'b', 'c']],
+                ['field', '>', 3],
+                ['field', '<', 5],
+            ],
             $filter
                 // ->dump(true)
                 ->toArray()
@@ -846,7 +596,7 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_and_with_rules_instances_in_array()
+    public function test_and__with_rules_instances_in_array()
     {
         // in an array
         $filter = new LogicalFilter();
@@ -860,21 +610,19 @@ trait LogicalFilterTest_rules_descriptions
         ;
 
         $this->assertEquals(
-            (new AndRule([
-                new InRule('field', ['a', 'b', 'c']),
-                new AboveRule('field', 3),
-                new BelowRule('field', 5)
-            ]))
-                ->toArray(),
+            ['and',
+                ['field', 'in', ['a', 'b', 'c']],
+                ['field', '>', 3],
+                ['field', '<', 5],
+            ],
             $filter
-                // ->dump(true)
                 ->toArray()
         );
     }
 
     /**
      */
-    public function test_or_with_rules_instances()
+    public function test_or__with_rules_instances()
     {
         $filter = new LogicalFilter();
 
@@ -885,12 +633,11 @@ trait LogicalFilterTest_rules_descriptions
             ;
 
         $this->assertEquals(
-            (new OrRule([
-                new InRule('field', ['a', 'b', 'c']),
-                new AboveRule('field', 3),
-                new BelowRule('field', 5)
-            ]))
-                ->toArray(),
+            ['or',
+                ['field', 'in', ['a', 'b', 'c']],
+                ['field', '>', 3],
+                ['field', '<', 5],
+            ],
             $filter
                 // ->dump(true)
                 ->toArray()
@@ -899,7 +646,7 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_or_with_rules_instances_in_array()
+    public function test_or__with_rules_instances_in_array()
     {
         // in an array
         $filter = new LogicalFilter();
@@ -912,12 +659,11 @@ trait LogicalFilterTest_rules_descriptions
         ;
 
         $this->assertEquals(
-            (new OrRule([
-                new InRule('field', ['a', 'b', 'c']),
-                new AboveRule('field', 3),
-                new BelowRule('field', 5)
-            ]))
-                ->toArray(),
+            ['or',
+                ['field', 'in', ['a', 'b', 'c']],
+                ['field', '>', 3],
+                ['field', '<', 5],
+            ],
             $filter
                 // ->dump(true)
                 ->toArray()
@@ -926,16 +672,17 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_AboveRule_with_non_scalar()
+    public function test_add_above_with_non_scalar()
     {
-        $filter = (new LogicalFilter([
-            'and',
-            ['field_1', '>', null],
-            ['field_2', '>', 'a'],
-            ['field_5', '>', 3],
-            ['field_5', '>', new \DateTime('2018-06-11')],
-            ['field_5', '>', new \DateTimeImmutable('2018-06-11')],
-        ]));
+        $filter = (new LogicalFilter(
+            ['and',
+                ['field_1', '>', null],
+                ['field_2', '>', 'a'],
+                ['field_5', '>', 3],
+                ['field_5', '>', new \DateTime('2018-06-11')],
+                ['field_5', '>', new \DateTimeImmutable('2018-06-11')],
+            ]
+        ));
 
         try {
             $filter = (new LogicalFilter(
@@ -951,16 +698,17 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_BelowRule_with_non_scalar()
+    public function test_add_below_with_non_scalar()
     {
-        $filter = (new LogicalFilter([
-            'and',
-            ['field_1', '<', null],
-            ['field_2', '<', 'a'],
-            ['field_5', '<', 3],
-            ['field_5', '<', new \DateTime('2018-06-11')],
-            ['field_5', '<', new \DateTimeImmutable('2018-06-11')],
-        ]));
+        $filter = (new LogicalFilter(
+            ['and',
+                ['field_1', '<', null],
+                ['field_2', '<', 'a'],
+                ['field_5', '<', 3],
+                ['field_5', '<', new \DateTime('2018-06-11')],
+                ['field_5', '<', new \DateTimeImmutable('2018-06-11')],
+            ]
+        ));
 
         try {
             $filter = (new LogicalFilter(
@@ -976,19 +724,18 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_and_of_LogicalFilter()
+    public function test_and__of_LogicalFilter()
     {
-        $filter  = new LogicalFilter( ['field_1', '=', 3] );
-        $filter2 = new LogicalFilter( ['field_2', '=', 12] );
+        $filter  = new LogicalFilter(['field_1', '=', 3]);
+        $filter2 = new LogicalFilter(['field_2', '=', 12]);
 
         $this->assertEquals(
-            [
-                'and',
+            ['and',
                 ['field_1', '=', 3],
                 ['field_2', '=', 12],
             ],
             $filter
-                ->and_( $filter2 )
+                ->and_($filter2)
                 // ->dump()
                 ->toArray()
         );
@@ -996,21 +743,20 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_and_of_AbstractRules()
+    public function test_and__of_rule_instances()
     {
-        $filter = new LogicalFilter( ['field_1', '=', 3] );
-        $rule1  = new EqualRule( 'field_2', 12 );
-        $rule2  = new AboveRule( 'field_3', 'abc' );
+        $filter = new LogicalFilter(['field_1', '=', 3]);
+        $rule1  = new EqualRule('field_2', 12);
+        $rule2  = new AboveRule('field_3', 'abc');
 
         $this->assertEquals(
-            [
-                'and',
+            ['and',
                 ['field_1', '=', 3],
                 ['field_2', '=', 12],
                 ['field_3', '>', 'abc'],
             ],
             $filter
-                ->and_( $rule1, $rule2 )
+                ->and_($rule1, $rule2)
                 // ->dump()
                 ->toArray()
         );
@@ -1018,9 +764,9 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_and_of_invalid_rules_description_throws_exception()
+    public function test_and__of_invalid_rules_description_throws_exception()
     {
-        $filter = new LogicalFilter( ['field_1', '=', 3] );
+        $filter = new LogicalFilter(['field_1', '=', 3]);
 
         try {
             $filter->and_('a', '=', '3', 'lalalalala');
@@ -1037,10 +783,10 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_and_of_invalid_rules_description_containing_unhandled_operation()
+    public function test_and__of_invalid_rules_description_containing_unhandled_operation()
     {
         try {
-            $filter = new LogicalFilter( ['operator_of_unhandled_operation', ['filed_1', '=', 3]] );
+            $filter = new LogicalFilter(['operator_of_unhandled_operation', ['filed_1', '=', 3]]);
             $this->assertTrue(
                 false,
                 "An exception claiming that an unhandled operation is described "
@@ -1054,52 +800,7 @@ trait LogicalFilterTest_rules_descriptions
 
     /**
      */
-    public function test_action_on_value()
-    {
-        $filter = (new LogicalFilter(
-            [
-                [value()['col_1'], '=', 'lololo'],
-                'or',
-                [key(), '=', 'key_1'],
-            ]
-        ))
-        // ->dump(true)
-        ;
-
-        $array = [
-            'key_0' => [
-                'col_1' => 'lelele',
-                'col_2' => 'lylyly',
-            ],
-            'key_1' => [
-                'col_1' => 'lalala',
-                'col_2' => 'lilili',
-            ],
-            'key_2' => [
-                'col_1' => 'lololo',
-                'col_2' => 'lululu',
-            ],
-        ];
-
-        $this->assertEquals(
-            [
-                'key_1' => [
-                    'col_1' => 'lalala',
-                    'col_2' => 'lilili',
-                ],
-                'key_2' => [
-                    'col_1' => 'lololo',
-                    'col_2' => 'lululu',
-                ],
-            ],
-            $filter
-                ->applyOn($array)
-        );
-    }
-
-    /**
-     */
-    public function test_addRules_with_operands_indexed_by_semantic_ids()
+    public function test_add_rules_with_operands_indexed_by_semantic_ids()
     {
         $filter = (new LogicalFilter(
             ['and',
