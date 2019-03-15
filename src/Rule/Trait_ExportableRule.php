@@ -14,7 +14,7 @@ trait Trait_ExportableRule
      *
      * @see https://secure.php.net/manual/en/jsonserializable.jsonserialize.php
      */
-    public final function jsonSerialize()
+    final public function jsonSerialize()
     {
         return $this->toArray();
     }
@@ -22,7 +22,7 @@ trait Trait_ExportableRule
     /**
      * @return string
      */
-    public final function __toString()
+    final public function __toString()
     {
         return $this->toString();
     }
@@ -33,7 +33,7 @@ trait Trait_ExportableRule
      *
      * @return bool If the rule can have a solution or not.
      */
-    public final function toBool()
+    final public function toBool()
     {
         return $this->hasSolution();
     }
