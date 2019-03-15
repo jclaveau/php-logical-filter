@@ -13,10 +13,11 @@ trait LogicalFilterTest_simplify_remove_negations
     {
         $filter = new LogicalFilter();
 
-        $filter->and_([
-            'not',
-            ['field_2', 'above', 3],
-        ]);
+        $filter->and_(
+            ['not',
+                ['field_2', 'above', 3],
+            ]
+        );
 
         $filter->simplify();
 

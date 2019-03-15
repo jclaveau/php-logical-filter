@@ -12,7 +12,7 @@
         <testsuite name="all_tests">
             <directory>./tests/unit</directory>
             <!-- /!\ keep the public API after unit tests to ease debug -->
-            <directory>./tests/functionnal</directory>
+            <directory>./tests/integration</directory>
         </testsuite>
         <testsuite name="profiling">
             <directory>./tests/profiling</directory>
