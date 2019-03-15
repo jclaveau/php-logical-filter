@@ -7,6 +7,61 @@ trait LogicalFilterTest_simplify_force_logical_core
 {
     /**
      */
+    public function test_force_logical_core_minimal()
+    {
+        $filter = (new LogicalFilter(
+            ['or',
+                ['field_5', '>', 'a'],
+                ['field_5', '<', 'a'],
+            ]
+        ))
+        ->simplify([
+            'force_logical_core' => true
+        ])
+        // ->dump()
+        ;
+
+        $filter2 = (new LogicalFilter(
+            ['or',
+                ['and',
+                    ['field_5', '>', 'a'],
+                ],
+                ['and',
+                    ['field_5', '<', 'a'],
+                ],
+            ]
+        ))
+        ->simplify([
+            'force_logical_core' => true
+        ])
+        // ->dump()
+        ;
+
+        $this->assertEquals(
+            $filter2->toArray(),
+            $filter->toArray()
+        );
+    }
+
+    /**
+     */
+    public function test_simplify_with_logicalCore()
+    {
+        $filter = (new LogicalFilter(
+            ['field_5', '>', 'a']
+        ))
+        ->simplify(['force_logical_core' => true])
+        // ->dump(false, false)
+        ;
+
+        $this->assertEquals( ['or', ['and', ['field_5', '>', 'a']]], $filter->toArray() );
+        // This second assertion checks that the simplify process went
+        // to its last step
+        $this->assertTrue( $filter->hasSolution() );
+    }
+
+    /**
+     */
     public function test_forceLogicalCore_with_AtomicRule_at_root()
     {
         $filter = new LogicalFilter( ['field_1', '=', 3] );

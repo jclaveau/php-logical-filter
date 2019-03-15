@@ -13,26 +13,29 @@ use JClaveau\LogicalFilter\Rule\AboveRule;
 use JClaveau\LogicalFilter\Rule\BelowRule;
 
 require  __DIR__ . "/LogicalFilterTest_rules_manipulation_trait.php";
-require  __DIR__ . "/simplification/LogicalFilterTest_rules_simplification_trait_leaf_rules.php";
-require  __DIR__ . "/simplification/LogicalFilterTest_rules_simplification_trait_composit_rules.php";
+require  __DIR__ . "/LogicalFilterTest_collection_integration_trait.php";
+require  __DIR__ . "/LogicalFilterTest_rules_descriptions_trait.php";
+
 require  __DIR__ . "/simplification/simplify_same_operands_trait.php";
 require  __DIR__ . "/simplification/simplify_different_operands_trait.php";
 require  __DIR__ . "/simplification/simplify_normalization_trait.php";
 require  __DIR__ . "/simplification/simplify_force_logical_core_trait.php";
-require  __DIR__ . "/LogicalFilterTest_collection_integration_trait.php";
-require  __DIR__ . "/LogicalFilterTest_rules_descriptions_trait.php";
+require  __DIR__ . "/simplification/simplify_clean_trait.php";
+require  __DIR__ . "/simplification/simplify_remove_negations_trait.php";
+require  __DIR__ . "/simplification/simplify_rootify_disjunctions_trait.php";
 
 class LogicalFilterTest extends \AbstractTest
 {
     use LogicalFilterTest_rules_descriptions;
     use LogicalFilterTest_rules_manipulation_trait;
-    use LogicalFilterTest_rules_simplification_leaf_rules;
-    use LogicalFilterTest_rules_simplification_composit_rules;
     use LogicalFilterTest_collection_integration_trait;
     use LogicalFilterTest_simplify_same_operands;
     use LogicalFilterTest_simplify_different_operands;
+    use LogicalFilterTest_simplify_clean;
     use LogicalFilterTest_simplify_normalization;
     use LogicalFilterTest_simplify_force_logical_core;
+    use LogicalFilterTest_simplify_rootify_disjuctions;
+    use LogicalFilterTest_simplify_remove_negations;
 
     /**
      */
@@ -491,6 +494,49 @@ array(3) {
                 // ->dump()
                 ->getSemanticId()
         );
+    }
+
+    /**
+     */
+    public function test_simplify_on_atomic_rule_without_saving()
+    {
+        $filter = new LogicalFilter(["field", "=", true]);
+        $this->assertTrue( $filter->hasSolution(false) );
+    }
+
+    /**
+     */
+    public function test_hasSolution_on_null_filter()
+    {
+        // A filter has all solutions if it contains no rule.
+        $filter = new LogicalFilter;
+        $this->assertTrue( $filter->hasSolution() );
+    }
+
+    /**
+     */
+    public function test_hasSolution_saving_simplification()
+    {
+        $filter = new LogicalFilter(
+            ['and',
+                ['field_1', '=', 'a'],
+                ['field_1', '=', 'b'],
+            ]
+        );
+
+        // don't save simplifications
+        $this->assertFalse( $filter->hasSolution(false) );
+        $this->assertEquals(
+            ['and',
+                ['field_1', '=', 'a'],
+                ['field_1', '=', 'b'],
+            ],
+            $filter->toArray()
+        );
+
+        // saving simplifications
+        $this->assertFalse( $filter->hasSolution() );
+        $this->assertEquals( ['and'], $filter->toArray() );
     }
 
     /**/

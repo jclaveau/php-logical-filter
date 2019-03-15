@@ -621,8 +621,9 @@ trait LogicalFilterTest_simplify_normalization
     }
 
     /**
+     * @todo implement normalization option and change this test to do it
      */
-    public function test_add_BetweenRule()
+    public function test_simplify_between()
     {
         $filter = new LogicalFilter(
             ['field_1', '><', [2, 3]]
