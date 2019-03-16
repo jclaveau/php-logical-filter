@@ -41,6 +41,17 @@ class RuleFilterer extends Filterer
     const description = 'description';
     const path        = 'path';
 
+    /** @var array $handled_properties */
+    protected static $handled_properties = [
+        self::field,
+        self::operator,
+        self::value,
+        self::depth,
+        self::description,
+        self::children,
+        self::path,
+    ];
+
     /**
      * Retrieves the children of the current rule to seek during the
      * recursive scanning of the rule tree.
@@ -151,15 +162,7 @@ class RuleFilterer extends Filterer
         else {
             throw new \InvalidArgumentException(
                 "Rule filters must belong to ["
-                . implode(', ', [
-                    self::field,
-                    self::operator,
-                    self::value,
-                    self::depth,
-                    self::description,
-                    self::children,
-                    self::path,
-                ])
+                . implode(', ', static::$handled_properties)
                 ."] contrary to : ".var_export($field, true)
             );
         }
