@@ -23,7 +23,7 @@ class NotInRule extends NotRule
     public function isNormalizationAllowed(array $contextual_options=[])
     {
         $operand = $this->getOperandAt(0);
-        if ( ! $operand->getPossibilities()) {
+        if (! $operand->getPossibilities()) {
             return false;
         }
 
@@ -34,11 +34,11 @@ class NotInRule extends NotRule
      */
     public function getField()
     {
-        if ( ! $this->getOperandAt(0)) {
+        if (! $this->getOperandAt(0)) {
             // TODO a NotRule with no operand should be simplified as
             //      a TrueRule
             throw new \LogicException(
-                "Trying to get the field of a negation missing its operand"
+                "Trying to get the field of an InRule negation missing its operand"
             );
         }
 
@@ -49,15 +49,15 @@ class NotInRule extends NotRule
      */
     public function setField($field)
     {
-        if ( ! $this->getOperandAt(0)) {
+        if (! $this->getOperandAt(0)) {
             // TODO a NotRule with no operand should be simplified as
             //      a TrueRule
             throw new \LogicException(
-                "Trying to get the field of a negation missing its operand"
+                "Trying to set the field of an InRule negation missing its operand"
             );
         }
 
-        return $this->getOperandAt(0)->getField($field);
+        return $this->getOperandAt(0)->setField($field);
     }
 
     /**
@@ -79,7 +79,6 @@ class NotInRule extends NotRule
     public function setPossibilities($possibilities)
     {
         if (    is_object($possibilities)
-            && $possibilities instanceof \IteratorAggregate
             && method_exists($possibilities, 'toArray')
         ) {
             $possibilities = $possibilities->toArray();
