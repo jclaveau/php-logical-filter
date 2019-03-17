@@ -7,6 +7,9 @@
  */
 namespace JClaveau\LogicalFilter\Rule;
 
+use JClaveau\LogicalFilter\FilteredKey;
+use JClaveau\LogicalFilter\FilteredValue;
+
 trait Trait_RuleFactory
 {
     /** @var  array $ruleAliases */
@@ -24,7 +27,47 @@ trait Trait_RuleFactory
         '!='   => 'not_equal',
         'in'   => 'in',
         '!in'  => 'not_in',
+        'regexp'  => 'regexp',
     ];
+
+    /**
+     * Checks if a variable contains a rule operator.
+     *
+     * @param  string $operator
+     * @return bool
+     */
+    public static function isOperator($operator)
+    {
+        if (! is_string($operator)) {
+            return false;
+        }
+
+        if (isset(self::$ruleAliases[ $operator ])) {
+            return true;
+        }
+
+        $association = array_flip( self::$ruleAliases );
+        if (isset($association[ $operator ])) {
+            return $association[ $operator ];
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if a variable contains a value which can be considered
+     * as a left value of a rule.
+     *
+     * @param  scalar|FilteredKey|FilteredValue $operator
+     * @return bool
+     */
+    public static function isLeftOperand($left_operand)
+    {
+        return  is_scalar($left_operand)
+            ||  $left_operand instanceof FilteredKey
+            ||  $left_operand instanceof FilteredValue
+            ;
+    }
 
     /**
      * @param  string $english_operator

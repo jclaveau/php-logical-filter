@@ -193,14 +193,23 @@ class RuleFilterer extends Filterer
             $out = $value_to_compare >= $value;
         }
         elseif (RegexpRule::operator === $operator) {
-            // TODO support optionnal parameters
-            $out = preg_match($value, $value_to_compare);
-            if (false === $out) {
-                throw new \InvalidArgumentEXception(
-                    "Error while calling preg_match( $value ) on: \n"
+            $out = false;
+
+            try {
+                // TODO support optionnal parameters (offest mainly) ?
+                $out = preg_match($value, $value_to_compare);
+            }
+            catch (\Exception $e) {
+                // The documentation of preg_match() is wrong and preg_last_error()
+                // is useless as preg_match returns 0 instead of false
+                // and then throws an exception with PHP 5.6
+                throw new \InvalidArgumentException(
+                    "PCRE error ".var_export($e->getMessage(), true).
+                    " while applying the regexp ".var_export($value, true)." to "
                     .var_export($value_to_compare, true)
                 );
             }
+
             $out = (bool) $out;
         }
         elseif (NotEqualRule::operator === $operator) {

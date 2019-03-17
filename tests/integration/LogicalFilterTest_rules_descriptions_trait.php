@@ -910,5 +910,20 @@ trait LogicalFilterTest_rules_descriptions
         );
     }
 
+    /**
+     */
+    public function test_with_an_operator_as_value()
+    {
+        // Throws: InvalidArgumentException: Mixing different operations in the same rule level not implemented:
+        $filter = new LogicalFilter(
+            ['operator', '=', 'and']
+        );
+
+        $this->assertEquals(
+            ['operator', '=', 'and'],
+            $filter->toArray()
+        );
+    }
+
     /**/
 }
