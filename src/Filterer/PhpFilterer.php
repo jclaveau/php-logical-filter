@@ -16,6 +16,7 @@ use JClaveau\LogicalFilter\Rule\AboveOrEqualRule;
 use JClaveau\LogicalFilter\Rule\NotEqualRule;
 use JClaveau\LogicalFilter\Rule\InRule;
 use JClaveau\LogicalFilter\Rule\NotInRule;
+use JClaveau\LogicalFilter\Rule\RegexpRule;
 use JClaveau\LogicalFilter\FilteredKey;
 use JClaveau\LogicalFilter\FilteredValue;
 
@@ -33,7 +34,7 @@ class PhpFilterer extends Filterer
         elseif ($field instanceof FilteredKey) {
             $value_to_validate = $field( array_pop($path) );
         }
-        elseif ( ! isset($row[(string) $field])) {
+        elseif (! isset($row[(string) $field])) {
             $value_to_validate = null;
         }
         else {
@@ -41,7 +42,7 @@ class PhpFilterer extends Filterer
         }
 
         if (EqualRule::operator === $operator) {
-            if ( ! isset($value_to_validate)) {
+            if (! isset($value_to_validate)) {
                 // ['field', '=', null] <=> isset($row['field'])
                 // [row, '=', null] <=> $row !== null
                 $result = null === $value;
@@ -52,15 +53,13 @@ class PhpFilterer extends Filterer
             }
         }
         elseif (InRule::operator === $operator) {
-            if ( ! isset($value_to_validate)) {
-                $result = false;
-            }
-            else {
-                $result = in_array($value_to_validate, $value);
-            }
+            $result = in_array(
+                isset($value_to_validate) ? $value_to_validate : null,
+                $value
+            );
         }
         elseif (BelowRule::operator === $operator) {
-            if ( ! isset($value_to_validate)) {
+            if (! isset($value_to_validate)) {
                 $result = false;
             }
             else {
@@ -68,7 +67,7 @@ class PhpFilterer extends Filterer
             }
         }
         elseif (AboveRule::operator === $operator) {
-            if ( ! isset($value_to_validate)) {
+            if (! isset($value_to_validate)) {
                 $result = false;
             }
             else {
@@ -84,15 +83,13 @@ class PhpFilterer extends Filterer
             }
         }
         elseif (NotInRule::operator === $operator) {
-            if ( ! isset($value_to_validate)) {
-                $result = true;
-            }
-            else {
-                $result = ! in_array($value_to_validate, $value);
-            }
+            $result = ! in_array(
+                isset($value_to_validate) ? $value_to_validate : null,
+                $value
+            );
         }
         elseif (AboveOrEqualRule::operator === $operator) {
-            if ( ! isset($value_to_validate)) {
+            if (! isset($value_to_validate)) {
                 $result = false;
             }
             else {
@@ -100,11 +97,34 @@ class PhpFilterer extends Filterer
             }
         }
         elseif (BelowOrEqualRule::operator === $operator) {
-            if ( ! isset($value_to_validate)) {
+            if (! isset($value_to_validate)) {
                 $result = false;
             }
             else {
                 $result = $value_to_validate <= $value;
+            }
+        }
+        elseif (RegexpRule::operator === $operator) {
+            if (! isset($value_to_validate)) {
+                $result = false;
+            }
+            else {
+                try {
+                    // TODO support optionnal parameters (offest mainly) ?
+                    $result = preg_match($value, $value_to_validate);
+                }
+                catch (\Exception $e) {
+                    // The documentation of preg_match() is wrong and preg_last_error()
+                    // is useless as preg_match returns 0 instead of false
+                    // and then throws an exception with PHP 5.6
+                    throw new \InvalidArgumentException(
+                        "PCRE error ".var_export($e->getMessage(), true).
+                        " while applying the regexp ".var_export($value, true)." to "
+                        .var_export($value_to_validate, true)
+                    );
+                }
+
+                $result = (bool) $result;
             }
         }
         else {

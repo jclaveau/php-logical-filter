@@ -120,7 +120,7 @@ class RuleFilterer extends Filterer
             }
 
             try {
-                $value_to_compare = $rule->getField();
+                $value_to_validate = $rule->getField();
             }
             catch (\LogicException $e) {
                 // This is due to NotInRule.
@@ -129,7 +129,7 @@ class RuleFilterer extends Filterer
             }
         }
         elseif (self::operator === $field) {
-            $value_to_compare = $rule::operator;
+            $value_to_validate = $rule::operator;
         }
         elseif (self::value === $field) {
             $description = $rule->toArray();
@@ -137,14 +137,14 @@ class RuleFilterer extends Filterer
             if (    3 === count($description)
                 && is_string($description[0])
                 && is_string($description[1]) ) {
-                $value_to_compare = $description[2];
+                $value_to_validate = $description[2];
             }
             else {
                 return null; // The filter cannot be applied to this rule
             }
         }
         elseif (self::description === $field) {
-            $value_to_compare = $rule->toArray();
+            $value_to_validate = $rule->toArray();
         }
         elseif (self::depth === $field) {
             // original $depth is lost once the filter is simplified
@@ -158,7 +158,7 @@ class RuleFilterer extends Filterer
             if (! method_exists($rule, 'getOperands')) {
                 return null; // The filter cannot be applied to this rule
             }
-            $value_to_compare = count($rule->getOperands());
+            $value_to_validate = count($rule->getOperands());
         }
         else {
             throw new \InvalidArgumentException(
@@ -170,34 +170,32 @@ class RuleFilterer extends Filterer
 
         if (EqualRule::operator === $operator) {
             if (null === $value) {
-                $out = is_null($value_to_compare);
+                $out = is_null($value_to_validate);
             }
             else {
                 // TODO support strict comparisons
-                $out = $value_to_compare == $value;
+                $out = $value_to_validate == $value;
             }
         }
         elseif (InRule::operator === $operator) {
-            $out = in_array($value_to_compare, $value);
+            $out = in_array($value_to_validate, $value);
         }
         elseif (BelowRule::operator === $operator) {
-            $out = $value_to_compare < $value;
+            $out = $value_to_validate < $value;
         }
         elseif (AboveRule::operator === $operator) {
-            $out = $value_to_compare > $value;
+            $out = $value_to_validate > $value;
         }
         elseif (BelowOrEqualRule::operator === $operator) {
-            $out = $value_to_compare <= $value;
+            $out = $value_to_validate <= $value;
         }
         elseif (AboveOrEqualRule::operator === $operator) {
-            $out = $value_to_compare >= $value;
+            $out = $value_to_validate >= $value;
         }
         elseif (RegexpRule::operator === $operator) {
-            $out = false;
-
             try {
                 // TODO support optionnal parameters (offest mainly) ?
-                $out = preg_match($value, $value_to_compare);
+                $out = preg_match($value, $value_to_validate);
             }
             catch (\Exception $e) {
                 // The documentation of preg_match() is wrong and preg_last_error()
@@ -206,7 +204,7 @@ class RuleFilterer extends Filterer
                 throw new \InvalidArgumentException(
                     "PCRE error ".var_export($e->getMessage(), true).
                     " while applying the regexp ".var_export($value, true)." to "
-                    .var_export($value_to_compare, true)
+                    .var_export($value_to_validate, true)
                 );
             }
 
@@ -214,14 +212,14 @@ class RuleFilterer extends Filterer
         }
         elseif (NotEqualRule::operator === $operator) {
             if (null === $value) {
-                $out = ! is_null($value_to_compare);
+                $out = ! is_null($value_to_validate);
             }
             else {
-                $out = $value != $value_to_compare;
+                $out = $value != $value_to_validate;
             }
         }
         elseif (NotInRule::operator === $operator) {
-            $out = ! in_array($value_to_compare, $value);
+            $out = ! in_array($value_to_validate, $value);
         }
         else {
             throw new \InvalidArgumentException(
@@ -232,7 +230,7 @@ class RuleFilterer extends Filterer
         if (! empty($options['debug'])) {
             var_dump(
                 "$field, $operator, " . var_export($value, true)
-                 . ' ||  '. $value_to_compare . ' => ' . var_export($out, true)
+                 . ' ||  '. $value_to_validate . ' => ' . var_export($out, true)
                  . "\n" . get_class($rule)
                  . "\n" . var_export($options, true)
             );
