@@ -1,6 +1,9 @@
 <?php
-namespace JClaveau\LogicalFilter;
-use       DusanKasan\Knapsack\Collection;
+namespace JClaveau\LogicalFilter\Tests;
+
+use JClaveau\LogicalFilter\LogicalFilter;
+use DusanKasan\Knapsack\Collection;
+use function JClaveau\LogicalFilter\key;
 
 trait LogicalFilterTest_collection_integration_trait
 {

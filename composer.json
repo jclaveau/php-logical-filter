@@ -20,6 +20,11 @@
               "src/polyfills.php"
         ]
     },
+    "autoload-dev": {
+        "psr-4" : {
+            "JClaveau\\LogicalFilter\\Tests\\" : "tests"
+        }
+    },
     "repositories": [
         {
             "type": "vcs",

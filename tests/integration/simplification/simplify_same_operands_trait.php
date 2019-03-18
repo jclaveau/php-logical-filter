@@ -1,5 +1,7 @@
 <?php
-namespace JClaveau\LogicalFilter;
+namespace JClaveau\LogicalFilter\Tests;
+
+use JClaveau\LogicalFilter\LogicalFilter;
 
 trait LogicalFilterTest_simplify_same_operands
 {

@@ -1,9 +1,13 @@
 <?php
-namespace JClaveau\LogicalFilter;
-use       JClaveau\LogicalFilter\Filterer\RuleFilterer;
-use       JClaveau\LogicalFilter\Rule\InRule;
-use       JClaveau\LogicalFilter\Rule\AbstractRule;
+namespace JClaveau\LogicalFilter\Tests;
 
+use JClaveau\LogicalFilter\LogicalFilter;
+use function JClaveau\LogicalFilter\value;
+use function JClaveau\LogicalFilter\key;
+use JClaveau\LogicalFilter\Filterer\RuleFilterer;
+use JClaveau\LogicalFilter\Rule\InRule;
+use JClaveau\LogicalFilter\Rule\AbstractRule;
+use JClaveau\LogicalFilter\Rule\AndRule;
 
 trait LogicalFilterTest_rules_manipulation_trait
 {
@@ -605,7 +609,7 @@ trait LogicalFilterTest_rules_manipulation_trait
         ;
 
         $cases = [];
-        $filter->onEachCase(function (Rule\AndRule $case) use (&$cases) {
+        $filter->onEachCase(function (AndRule $case) use (&$cases) {
             $cases[] = $case->toArray();
             // Modifying cases
             $case->addOperand(

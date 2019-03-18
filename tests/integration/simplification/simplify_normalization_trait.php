@@ -1,5 +1,8 @@
 <?php
-namespace JClaveau\LogicalFilter;
+namespace JClaveau\LogicalFilter\Tests;
+
+use JClaveau\LogicalFilter\LogicalFilter;
+use JClaveau\LogicalFilter\Rule\InRule;
 
 trait LogicalFilterTest_simplify_normalization
 {
@@ -404,7 +407,7 @@ trait LogicalFilterTest_simplify_normalization
                 ['operator', '=', 'in'],
                 ['field', '=', 'field_2'],
             ],
-            function (Rule\InRule $rule, $key, array &$siblings) {
+            function (InRule $rule, $key, array &$siblings) {
                 $rule->setOptions(['in.normalization_threshold' => 10]);
             }
         );

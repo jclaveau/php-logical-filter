@@ -1,8 +1,11 @@
 <?php
-namespace JClaveau\LogicalFilter;
+namespace JClaveau\LogicalFilter\Tests;
 
 use JClaveau\VisibilityViolator\VisibilityViolator;
 
+use JClaveau\LogicalFilter\LogicalFilter;
+use function JClaveau\LogicalFilter\value;
+use function JClaveau\LogicalFilter\key;
 use JClaveau\LogicalFilter\Rule\AbstractOperationRule;
 use JClaveau\LogicalFilter\Rule\OrRule;
 use JClaveau\LogicalFilter\Rule\AndRule;

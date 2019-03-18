@@ -1,7 +1,9 @@
 <?php
-namespace JClaveau\LogicalFilter;
+namespace JClaveau\LogicalFilter\Tests;
 
 use JClaveau\VisibilityViolator\VisibilityViolator;
+
+use JClaveau\LogicalFilter\LogicalFilter;
 
 /**
  */

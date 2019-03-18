@@ -1,8 +1,9 @@
 <?php
-namespace JClaveau\LogicalFilter;
+namespace JClaveau\LogicalFilter\Tests;
 
 use JClaveau\VisibilityViolator\VisibilityViolator;
 
+use JClaveau\LogicalFilter\LogicalFilter;
 use JClaveau\LogicalFilter\Rule\AbstractOperationRule;
 use JClaveau\LogicalFilter\Rule\OrRule;
 use JClaveau\LogicalFilter\Rule\AndRule;
@@ -16,34 +17,7 @@ trait LogicalFilterTest_rules_descriptions
 {
     public function validMinimalisticRulesProvider()
     {
-        $valid_rule_descriptions = [
-            ['field_1', '=', 2],
-            ['field_1', '=', null],
-            ['field_1', '<', 2],
-            ['field_1', '>', 2],
-            ['and',
-                ['field', '>', 3],
-                ['field', '<', 5],
-            ],
-            ['or',
-                ['field', '>', 3],
-                ['field', '<', 5],
-            ],
-            ['not',
-                ['field', '>', 3],
-            ],
-            ['field_1', 'in', ['a', 'b', 'c', null]],
-            ['field_1', '>=', 2],
-            ['field_1', '<=', 2],
-            ['field_1', '!=', 'a'],
-            ['field_1', '!=', null],
-            ['field_1', '!in', [2, 3]],
-            ['field_1', '><', [2, 3]],
-            ['field_1', '=><', [2, 3]],
-            ['field_1', '><=', [2, 3]],
-            ['field_1', '=><=', [2, 3]],
-            ['field_1', 'regexp', '/^lalala*/'],
-        ];
+        $valid_rule_descriptions = RuleDescriptions::listValidMinimalistic();
 
         $out = [];
         foreach ($valid_rule_descriptions as $valid_rule_description) {
