@@ -360,7 +360,14 @@ $filter->toString() == (new LogicalFilter($filter->toString()))->toString();
 
 ## Related
 
+### Interesting implementations
 + https://github.com/keboola/php-filter
 + https://github.com/hollodotme/FluidValidator (intersesting validators by type)
 + https://github.com/Respect/Validation (most popular?)
 + https://packagist.org/packages/kuria/options (same purpose?)
+
+### Theory
++ https://en.wikipedia.org/wiki/Logical_disjunction
++ https://en.wikipedia.org/wiki/First-order_logic
++ https://en.wikipedia.org/wiki/Higher-order_logic
++ https://en.wikipedia.org/wiki/Model_theory
