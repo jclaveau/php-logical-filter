@@ -132,7 +132,7 @@ abstract class Filterer implements FiltererInterface
         if (! isset($options['recurse'])) {
             $options['recurse'] = 'before';
         }
-        elseif ( ! in_array($options['recurse'], ['before', 'after', null])) {
+        elseif (! in_array($options['recurse'], ['before', 'after', null])) {
             throw new \InvalidArgumentException(
                 "Invalid value for 'recurse' option: "
                 .var_export($options['recurse'], true)
@@ -229,13 +229,13 @@ abstract class Filterer implements FiltererInterface
     {
         $operands_validation_row_cache = [];
 
-        if ( ! $root_cases) {
+        if (! $root_cases) {
             $matching_case = true;
         }
         else {
             $matching_case = null;
             foreach ($root_cases as $and_case_index => $and_case) {
-                if ( ! empty($options['debug'])) {
+                if (! empty($options['debug'])) {
                     var_dump("Case $and_case_index: ".$and_case);
                 }
 
@@ -261,7 +261,7 @@ abstract class Filterer implements FiltererInterface
 
                     $cache_key = $and_case_index.'~|~'.$field.'~|~'.$operator;
 
-                    if ( ! empty($operands_validation_row_cache[ $cache_key ])) {
+                    if (! empty($operands_validation_row_cache[ $cache_key ])) {
                         $is_valid = $operands_validation_row_cache[ $cache_key ];
                     }
                     else {
