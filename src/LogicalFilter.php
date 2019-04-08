@@ -120,305 +120,13 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
-     * This method parses different ways to define the rules of a LogicalFilter.
-     * + You can add N already instanciated Rules.
-     * + You can provide 3 arguments: $field, $operator, $value
-     * + You can provide a tree of rules:
-     * [
-     *      'or',
-     *      [
-     *          'and',
-     *          ['field_5', 'above', 'a'],
-     *          ['field_5', 'below', 'a'],
-     *      ],
-     *      ['field_6', 'equal', 'b'],
-     *  ]
-     *
-     * @param  string        $operation         and | or
-     * @param  array         $rules_description Rules description
-     * @return LogicalFilter $this
-     */
-    protected function addRules($operation, array $rules_description)
-    {
-        if ($rules_description == [null]) {
-            // TODO this is due to the bad design of using "Null" instead of
-            // TrueRule when a Filter "has no rule". So it's the equivalent of
-            // "and true" or "or true".
-            // Remove it while fixing https://github.com/jclaveau/php-logical-filter/issues/59
-            if (AndRule::operator == $operation) {
-                // A && True <=> A
-                return $this;
-            }
-            elseif (OrRule::operator == $operation) {
-                // A || True <=> True
-                $this->rules = null;
-                return $this;
-            }
-            else {
-                throw new InvalidArgumentException(
-                    "Unhandled operation '$operation'"
-                );
-            }
-        }
-
-        if (   3 == count($rules_description)
-            && is_string($rules_description[0])
-            && is_string($rules_description[1])
-        ) {
-            // Atomic rules
-            $new_rule = AbstractRule::generateSimpleRule(
-                $rules_description[0], // field
-                $rules_description[1], // operator
-                $rules_description[2], // value
-                $this->getOptions()
-            );
-
-            $this->addRule($new_rule, $operation);
-        }
-        elseif (count($rules_description) == count(array_filter($rules_description, function($arg) {
-            return $arg instanceof LogicalFilter;
-        })) ) {
-            // Already instanciated rules
-            foreach ($rules_description as $i => $filter) {
-                $rules = $filter->getRules();
-                if (null !== $rules) {
-                    $this->addRule( $rules, $operation);
-                }
-            }
-        }
-        elseif (count($rules_description) == count(array_filter($rules_description, function($arg) {
-            return $arg instanceof AbstractRule;
-        })) ) {
-            // Already instanciated rules
-            foreach ($rules_description as $i => $new_rule) {
-                $this->addRule( $new_rule, $operation);
-            }
-        }
-        elseif (1 == count($rules_description) && is_array($rules_description[0])) {
-            if (count($rules_description[0]) == count(array_filter($rules_description[0], function($arg) {
-                return $arg instanceof AbstractRule;
-            })) ) {
-                // Case of $filter->or_([AbstractRule, AbstractRule, AbstractRule, ...])
-                foreach ($rules_description[0] as $i => $new_rule) {
-                    $this->addRule( $new_rule, $operation );
-                }
-            }
-            else {
-                $fake_root = new AndRule;
-
-                $this->addCompositeRule_recursion(
-                    $rules_description[0],
-                    $fake_root
-                );
-
-                $this->addRule($fake_root->getOperands()[0], $operation);
-            }
-        }
-        else {
-            throw new \InvalidArgumentException(
-                "Bad set of arguments provided for rules addition: "
-                .var_export($rules_description, true)
-            );
-        }
-
-        return $this;
-    }
-
-    /**
-     * Add one rule object to the filter
-     *
-     * @param AbstractRule $rule
-     * @param string       $operation
-     *
-     * @return $this
-     */
-    protected function addRule( AbstractRule $rule, $operation=AndRule::operator )
-    {
-        if ($this->rules && in_array( get_class($this->rules), [AndRule::class, OrRule::class])
-            && ! $this->rules->getOperands() ) {
-            throw new \LogicException(
-                 "You are trying to add rules to a LogicalFilter which had "
-                ."only contradictory rules that have already been simplified: "
-                .$this->rules
-            );
-        }
-
-        if (null === $this->rules) {
-            $this->rules = $rule;
-        }
-        elseif (($tmp_rules = $this->rules) // $this->rules::operator not supported in PHP 5.6
-            && ($tmp_rules::operator != $operation)
-        ) {
-            if (AndRule::operator == $operation) {
-                $this->rules = new AndRule([$this->rules, $rule]);
-            }
-            elseif (OrRule::operator == $operation) {
-                $this->rules = new OrRule([$this->rules, $rule]);
-            }
-            else {
-                throw new \InvalidArgumentException(
-                    "\$operation must be '".AndRule::operator."' or '".OrRule::operator
-                    ."' instead of: ".var_export($operation, true)
-                );
-            }
-        }
-        else {
-            $this->rules->addOperand($rule);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Recursion auxiliary of addCompositeRule.
-     *
-     * @param array                 $rules_composition  The description of the
-     *                                                  rules to add.
-     * @param AbstractOperationRule $recursion_position The position in the
-     *                                                  tree where rules must
-     *                                                  be added.
-     *
-     * @return $this
-     */
-    protected function addCompositeRule_recursion(
-        array $rules_composition,
-        AbstractOperationRule $recursion_position
-    ) {
-        if (! array_filter($rules_composition, function ($rule_composition_part) {
-            return is_string($rule_composition_part);
-        })) {
-            // at least one operator is required for operation rules
-            throw new \InvalidArgumentException(
-                "Please provide an operator for the operation: \n"
-                .var_export($rules_composition, true)
-            );
-        }
-        elseif ( 3 == count($rules_composition)
-            && AbstractRule::isLeftOperand($rules_composition[0])
-            && AbstractRule::isOperator($rules_composition[1])
-        ) {
-            // atomic or composit rules
-            $operand_left  = $rules_composition[0];
-            $operation     = $rules_composition[1];
-            $operand_right = $rules_composition[2];
-
-            $rule = AbstractRule::generateSimpleRule(
-                $operand_left, $operation, $operand_right, $this->getOptions()
-            );
-            $recursion_position->addOperand( $rule );
-        }
-        else {
-            // operations
-            if (   NotRule::operator == $rules_composition[0]
-                || $rules_composition[0] == AbstractRule::findSymbolicOperator( NotRule::operator ) ) {
-                $rule = new NotRule();
-            }
-            elseif (in_array( AndRule::operator, $rules_composition )
-                || in_array( AbstractRule::findSymbolicOperator( AndRule::operator ), $rules_composition )) {
-                $rule = new AndRule();
-            }
-            elseif (in_array( OrRule::operator, $rules_composition )
-                || in_array( AbstractRule::findSymbolicOperator( OrRule::operator ), $rules_composition ) ) {
-                $rule = new OrRule();
-            }
-            else {
-                throw new \InvalidArgumentException(
-                    "A rule description seems to be an operation but do "
-                    ."not contains a valid operator: ".var_export($rules_composition, true)
-                );
-            }
-
-            $operator = $rule::operator;
-
-            $operands_descriptions = array_filter(
-                $rules_composition,
-                function ($operand) use ($operator) {
-                    return ! in_array($operand, [$operator, AbstractRule::findSymbolicOperator( $operator )]);
-                }
-            );
-
-            $non_true_rule_descriptions = array_filter(
-                $operands_descriptions,
-                function($operand) {
-                    return null !== $operand  // no rule <=> true
-                        || true !== $operand
-                        ;
-                }
-            );
-
-            foreach ($operands_descriptions as $i => $operands_description) {
-                if (false === $operands_description) {
-                    $operands_descriptions[ $i ] = ['and']; // FalseRule hack
-                }
-                elseif (null === $operands_description || true === $operands_description) {
-                    $operands_description = ['and'];
-                    if (empty($non_true_rule_descriptions)) {
-                        throw new \LogicException(
-                            "TrueRules are not implemented. Please add "
-                            ."them to operations having other type of rules"
-                        );
-                    }
-
-                    unset($operands_descriptions[ $i ]);
-                }
-            }
-
-            $remaining_operations = array_filter(
-                $operands_descriptions,
-                function($operand) {
-                    return ! is_array($operand)
-                        && ! $operand instanceof AbstractRule
-                        && ! $operand instanceof LogicalFilter
-                        ;
-                }
-            );
-
-            if (! empty($remaining_operations)) {
-                throw new \InvalidArgumentException(
-                    "Mixing different operations in the same rule level not implemented: \n["
-                    . implode(', ', $remaining_operations)."]\n"
-                    . 'in ' . var_export($rules_composition, true)
-                );
-            }
-
-            if (NotRule::operator == $operator && 1 != count($operands_descriptions)) {
-                throw new \InvalidArgumentException(
-                    "Negations can have only one operand: \n"
-                    .var_export($rules_composition, true)
-                );
-            }
-
-            foreach ($operands_descriptions as $operands_description) {
-                if ($operands_description instanceof AbstractRule) {
-                    $rule->addOperand($operands_description);
-                }
-                elseif ($operands_description instanceof LogicalFilter) {
-                    $rule->addOperand($operands_description->getRules());
-                }
-                else {
-                    $this->addCompositeRule_recursion(
-                        $operands_description,
-                        $rule
-                    );
-                }
-            }
-
-            $recursion_position->addOperand( $rule );
-        }
-
-        return $this;
-    }
-
-    /**
      * This method parses different ways to define the rules of a LogicalFilter
      * and add them as a new And part of the filter.
      * + You can add N already instanciated Rules.
      * + You can provide 3 arguments: $field, $operator, $value
      * + You can provide a tree of rules:
-     * [
-     *      'or',
-     *      [
-     *          'and',
+     * ['or',
+     *      ['and',
      *          ['field_5', 'above', 'a'],
      *          ['field_5', 'below', 'a'],
      *      ],
@@ -432,7 +140,12 @@ class LogicalFilter implements \JsonSerializable
      */
     public function and_()
     {
-        $this->addRules( AndRule::operator, func_get_args());
+        $this->rules = RuleDescriptionParser::updateRuleTreeFromDescription(
+            AndRule::operator,
+            func_get_args(),
+            $this->rules,
+            $this->getOptions()
+        );
         return $this;
     }
 
@@ -442,10 +155,8 @@ class LogicalFilter implements \JsonSerializable
      * + You can add N already instanciated Rules.
      * + You can provide 3 arguments: $field, $operator, $value
      * + You can provide a tree of rules:
-     * [
-     *      'or',
-     *      [
-     *          'and',
+     * ['or',
+     *      ['and',
      *          ['field_5', 'above', 'a'],
      *          ['field_5', 'below', 'a'],
      *      ],
@@ -460,7 +171,12 @@ class LogicalFilter implements \JsonSerializable
      */
     public function or_()
     {
-        $this->addRules( OrRule::operator, func_get_args());
+        $this->rules = RuleDescriptionParser::updateRuleTreeFromDescription(
+            OrRule::operator,
+            func_get_args(),
+            $this->rules,
+            $this->getOptions()
+        );
         return $this;
     }
 
@@ -703,14 +419,18 @@ class LogicalFilter implements \JsonSerializable
     /**
      * Apply a "RuleFilter" on the rules of the current instance.
      *
-     * @param  array|LogicalFilter  $rule_filter
-     * @param  array|callable       $options
+     * @param  array|LogicalFilter|AbstractRule $rules
+     * @param  array|callable                   $options
      *
      * @return array The rules matching the filter
      */
-    public function filterRules($rule_filter=[], array $options=[])
+    public function filterRules($rules=[], array $options=[])
     {
-        $filter = (new LogicalFilter($rule_filter, new RuleFilterer))
+        if ($rules instanceof LogicalFilter) {
+            $rules = $rules->getRules();
+        }
+
+        $filter = (new LogicalFilter($rules, new RuleFilterer))
         // ->dump()
         ;
 
@@ -1107,8 +827,8 @@ class LogicalFilter implements \JsonSerializable
         }
 
         if ($data_to_filter instanceof LogicalFilter) {
-            $filtered_rules = $filterer->apply( $this, $data_to_filter->getRules() );
-            return $data_to_filter->flushRules()->addRule( $filtered_rules );
+            $filtered_rules = $filterer->apply($this, $data_to_filter->getRules());
+            return $data_to_filter->flushRules()->and_($filtered_rules);
         }
         else {
             return $filterer->apply($this, $data_to_filter);
