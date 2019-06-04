@@ -144,7 +144,6 @@ class RuleDescriptionParser
      */
     protected static function addRule( AbstractRule $rule, $operation=AndRule::operator, AbstractRule $filter_rules=null)
     {
-
         if ($filter_rules && in_array( get_class($filter_rules), [AndRule::class, OrRule::class])
             && ! $filter_rules->getOperands()) {
             throw new \LogicException(
@@ -189,7 +188,7 @@ class RuleDescriptionParser
      *                                                  tree where rules must
      *                                                  be added.
      */
-    protected static  function addCompositeRule_recursion(
+    protected static function addCompositeRule_recursion(
         array $rules_composition,
         AbstractOperationRule $recursion_position,
         $options

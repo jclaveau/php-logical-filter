@@ -165,6 +165,10 @@ class AndRule extends AbstractOperationRule
     }
 
     /**
+     * Generates a string description of the rule.
+     *
+     * @param  array  $options indent_unit
+     * @return string The rule description
      */
     public function toString(array $options=[])
     {
@@ -220,6 +224,7 @@ class AndRule extends AbstractOperationRule
      * Removes rule branches that cannot produce result like:
      * A = 1 || (B < 2 && B > 3) <=> A = 1
      *
+     * @param  array   $simplification_options Contextual options of the simplification
      * @return AndRule $this
      */
     public function removeInvalidBranches(array $simplification_options)
@@ -323,6 +328,8 @@ class AndRule extends AbstractOperationRule
      * + a = 3 && a < 2
      * + a > 3 && a < 2
      *
+     * @param  array $contextual_options Contextual options to pass to the
+     *               simplification
      * @return bool If the AndRule can have a solution or not
      */
     public function hasSolution(array $contextual_options=[])
@@ -345,8 +352,11 @@ class AndRule extends AbstractOperationRule
     }
 
     /**
-     * + if A > 2 && A > 1 <=> A > 2
-     * + if A < 2 && A < 1 <=> A < 1
+     * if A > 2 && A > 1 <=> A > 2
+     * if A < 2 && A < 1 <=> A < 1
+     *
+     * @param  array  $operandsByFields Operands indexed by their field
+     * @return array                    The operands indexed by field simplified
      */
     protected static function simplifySameOperands(array $operandsByFields)
     {
