@@ -4,6 +4,9 @@ namespace JClaveau\LogicalFilter\Tests;
 use JClaveau\VisibilityViolator\VisibilityViolator;
 
 use JClaveau\LogicalFilter\LogicalFilter;
+use JClaveau\LogicalFilter\Rule\AndRule;
+use JClaveau\LogicalFilter\Rule\OrRule;
+use JClaveau\LogicalFilter\Converter\InlineSqlMinimalConverter;
 
 trait LogicalFilterTest_simplify_force_logical_core
 {
@@ -221,6 +224,31 @@ trait LogicalFilterTest_simplify_force_logical_core
             ],
             $result->toArray()
         );
+    }
+
+    /**
+     * Provokes bad simplification step in OrRule::hasSolution() and
+     * then AndRule::hasSolution().
+     * 
+     * This bug seems due to double call of addMinimalCase() but the 
+     * current fix doesn't seem 100% robust
+     */
+    public function test_hasSolution_after_addMinimalCase()
+    {
+        $filter = (new LogicalFilter(
+            ['and',
+                ['field_2', 'in', [12, 99]],
+            ]
+        ));
+        
+        $rootOr = $filter
+            ->simplify(['force_logical_core' => true])
+            // ->dump()
+            ->getRules();
+
+        $rootOr->hasSolution();
+
+        $this->assertTrue(true, "No LogicException: hasSolution has no sens if the rule is not simplified instead of being at: 'unify_atomic_operands' thrown");
     }
 
     /**/

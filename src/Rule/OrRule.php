@@ -278,7 +278,9 @@ class OrRule extends AbstractOperationRule
             return true;
         }
 
-        if ( ! $this->simplicationStepReached(self::simplified)) {
+        $operands = $this->getOperands();
+        if (    (count($operands) == 1 && ! reset($operands)->hasSolution()) // skip simplification case after call of addMinimalCase() (which seems to have unwanted side effect)
+            && ! $this->simplicationStepReached(self::simplified)) {
             throw new \LogicException(
                 "hasSolution has no sens if the rule is not simplified instead of being at: "
                 .var_export($this->current_simplification_step, true)
@@ -287,7 +289,7 @@ class OrRule extends AbstractOperationRule
 
         // If there is no remaining operand in an OrRule, it means it has
         // no solution.
-        return ! empty($this->getOperands());
+        return ! empty($operands);
     }
 
     /**

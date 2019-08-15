@@ -334,21 +334,23 @@ class AndRule extends AbstractOperationRule
      */
     public function hasSolution(array $contextual_options=[])
     {
-        if ( ! $this->simplicationStepReached(self::simplified)) {
+        $operands = $this->getOperands();
+        if (    (count($operands) == 1 && ! reset($operands)->hasSolution()) // skip simplification case after call of addMinimalCase() (which seems to have unwanted side effect)
+            && ! $this->simplicationStepReached(self::simplified)) {
             throw new \LogicException(
                 "hasSolution has no sens if the rule is not simplified instead of being at: "
                 .var_export($this->current_simplification_step, true)
             );
         }
-
+        
         // atomic rules
-        foreach ($this->getOperands() as $operand) {
+        foreach ($operands as $operand) {
             if (method_exists($operand, 'hasSolution') && ! $operand->hasSolution()) {
                 return false;
             }
         }
 
-        return ! empty($this->getOperands());
+        return ! empty($operands);
     }
 
     /**
@@ -787,9 +789,10 @@ class AndRule extends AbstractOperationRule
      * This method is meant to be used during simplification that would
      * need to change the class of the current instance by a normal one.
      *
+     * @param  array $new_operands [description]
      * @return AndRule The current instance (of or or subclass) or a new AndRule
      */
-    public function setOperandsOrReplaceByOperation($new_operands)
+    public function setOperandsOrReplaceByOperation(array $new_operands)
     {
         try {
             return $this->setOperands( $new_operands );
