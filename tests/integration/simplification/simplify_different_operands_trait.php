@@ -9,7 +9,7 @@ trait LogicalFilterTest_simplify_different_operands
     public function test_simplify_different_operands_dataProvider()
     {
         $cases = [];
-        $cases["= vs <"] = [
+        $cases["< vs ="] = [
             "with solution" => [
                 'before' =>
                     ['and',
@@ -47,12 +47,13 @@ trait LogicalFilterTest_simplify_different_operands
                         ['field_1', '<', 3],
                     ],
                 'after' => [
-                    [], ['and']
+                    [],
+                    ['and'], // TODO sure?
                 ]
             ],
         ];
 
-        $cases["= vs >"] = [
+        $cases["> vs ="] = [
             "with solution" => [
                 'before' =>
                     ['and',
@@ -95,7 +96,7 @@ trait LogicalFilterTest_simplify_different_operands
             ],
         ];
 
-        $cases["< vs >"] = [
+        $cases["> vs <"] = [
             "with solution" => [
                 'before' =>
                     ['and',
@@ -370,7 +371,7 @@ trait LogicalFilterTest_simplify_different_operands
             ],
         ];
 
-        $cases["= vs in"] = [
+        $cases["in vs ="] = [
             "with solution" => [
                 'before' =>
                     ["and",
@@ -405,7 +406,7 @@ trait LogicalFilterTest_simplify_different_operands
             ],
         ];
 
-        $cases["> vs in"] = [
+        $cases["in vs >"] = [
             "with solution" => [
                 'before' =>
                     ["and",
@@ -442,7 +443,7 @@ trait LogicalFilterTest_simplify_different_operands
             ],
         ];
 
-        $cases["< vs in"] = [
+        $cases["in vs <"] = [
             "with solution" => [
                 'before' =>
                     ["and",
@@ -479,7 +480,7 @@ trait LogicalFilterTest_simplify_different_operands
             ],
         ];
 
-        $cases["!= vs in"] = [
+        $cases["in vs !="] = [
             "simplifiable" => [
                 'before' =>
                     ["and",
@@ -549,7 +550,7 @@ trait LogicalFilterTest_simplify_different_operands
             ],
         ];
 
-        $cases["= vs !in"] = [
+        $cases["!in vs ="] = [
             "with solution" => [
                 'before' =>
                     ["and",
@@ -596,7 +597,69 @@ trait LogicalFilterTest_simplify_different_operands
             ],
         ];
 
-        $cases["!= vs !in"] = [
+        $cases["!in vs >"] = [
+            "simplifiable" => [
+                'before' =>
+                    ["and",
+                        ["type", ">",  3],
+                        ["type", "!in", [null, 1, 2, 3, 4, 5]],
+                    ],
+                'after' => [
+                    [],
+                    ["and",
+                        ["type", ">",  3],
+                        ["type", "!in", [4, 5]],
+                    ],
+                ]
+            ],
+            "not simplifiable" => [
+                'before' =>
+                    ["and",
+                        ["type", ">",  -5],
+                        ["type", "!in", [null, 1, 2, 3, 4, 5]],
+                    ],
+                'after' => [
+                    [],
+                    ["and",
+                        ["type", ">",  -5],
+                        ["type", "!in", [1, 2, 3, 4, 5]],
+                    ],
+                ]
+            ],
+            "simplifiable replacing !in to remove once the next one works" => [
+                'before' =>
+                    ["and",
+                        ["type", ">",  3],
+                        ["type", "!in", [null, 1, 2, 3, 4]],
+                    ],
+                'after' => [
+                    [],
+                    ["and",
+                        ["type", ">",  3],
+                        // ["type", "!=", 4],
+                        ["type", "!in", [4]],
+                    ],
+                ]
+            ],
+            "simplifiable replacing !in working" => [
+                'before' =>
+                    ["and",
+                        ["type", ">",  3],
+                        ["type", "!in", [null, 1, 2, 3, 4]],
+                    ],
+                'after' => [
+                    [],
+                    ["and",
+                        ["type", ">",  3],
+                        ["type", "!=", 4],
+                        // ["type", "!in", [4]],
+                    ],
+                ],
+                'status' => (new DeferredCallChain)->markTestIncomplete('TODO')
+            ],
+        ];
+
+        $cases["!in vs !="] = [
             "with solution" => [
                 'before' =>
                     ["and",
@@ -662,8 +725,8 @@ trait LogicalFilterTest_simplify_different_operands
             ],
         ];
 
-        $cases["in vs !in"] = [
-            "with solution" => [
+        $cases["!in vs in"] = [
+            "simplifiable" => [
                 'before' =>
                     ["and",
                         ["field", "in", [1, 2, 3, 4]],
@@ -674,7 +737,29 @@ trait LogicalFilterTest_simplify_different_operands
                     ["field", "in", [1, 2]],
                 ]
             ],
+            "partially simplifiable" => [
+                'before' =>
+                    ["and",
+                        ["field", "in", [1, 2, 3, 4]],
+                        ["field", "!in", [5, 6]],
+                    ],
+                'after' => [
+                    [],
+                    ["field", "in", [1, 2, 3, 4]],
+                ]
+            ],
         ];
+
+        // list the untested operation combinations
+        $combinations = RuleDescriptions::listStatementRuleCombinations();
+        $tested_combinations = array_keys($cases);
+        $badly_combined_operations = array_diff($tested_combinations, $combinations);
+        if ($badly_combined_operations) {
+            throw new ErrorException(
+                "Some datasets have been badly named: ".var_export($badly_combined_operations, true)
+            );
+        }
+
 
         $named_cases = [];
         foreach ($cases as $vs) {
@@ -689,9 +774,17 @@ trait LogicalFilterTest_simplify_different_operands
             }
         }
 
+        $untested_combinations = array_diff($combinations, $tested_combinations);
+        foreach ($untested_combinations as $combination) {
+            $named_cases[$combination] = [
+                null,
+                null,
+                (new DeferredCallChain)->markTestIncomplete('TODO: '.$combination)
+            ];
+        }
+
         return $named_cases;
     }
-
 
     /**
      * @dataProvider test_simplify_different_operands_dataProvider

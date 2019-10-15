@@ -17,6 +17,9 @@
         <testsuite name="profiling">
             <directory>./tests/profiling</directory>
         </testsuite>
+        <testsuite name="tools">
+            <directory>./tests/tools</directory>
+        </testsuite>
     </testsuites>
 
     <filter>
