@@ -77,6 +77,14 @@ class LogicalFilter implements \JsonSerializable
     }
 
     /**
+     * Constructor in a static way
+     */
+    public static function new_()
+    {
+        return new static(...func_get_args());
+    }
+
+    /**
      */
     protected function getDefaultFilterer()
     {
