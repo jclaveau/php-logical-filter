@@ -2,192 +2,756 @@
 namespace JClaveau\LogicalFilter\Tests;
 
 use JClaveau\LogicalFilter\LogicalFilter;
+use JClaveau\Async\DeferredCallChain;
 
 trait LogicalFilterTest_simplify_different_operands
 {
-    /**
-     */
-    public function test_simplify_between_EqualRule_of_null_and_above_or_below()
+    public function test_simplify_different_operands_dataProvider()
     {
-        $filter = (new LogicalFilter(
-            ['field_1', '=', null]
-        ))
-        ->and_(['field_1', '<', 3])
+        $cases = [];
+        $cases["= vs <"] = [
+            "with solution" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '=', 3],
+                        ['field_1', '<', 4],
+                    ],
+                'after' => [
+                    [], ['field_1', '=', 3]
+                ]
+            ],
+            "without solution" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '=', 3],
+                        ['field_1', '<', 2],
+                    ],
+                'after' => [
+                    [], ['and']
+                ]
+            ],
+            "same value" => [ // checks that the comparison is strict
+                'before' =>
+                    ['and',
+                        ['field_1', '=', 3],
+                        ['field_1', '<', 3],
+                    ],
+                'after' => [
+                    [], ['and']
+                ]
+            ],
+            "equal null" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '=', null],
+                        ['field_1', '<', 3],
+                    ],
+                'after' => [
+                    [], ['and']
+                ]
+            ],
+        ];
+
+        $cases["= vs >"] = [
+            "with solution" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '=', 3],
+                        ['field_1', '>', 2],
+                    ],
+                'after' => [
+                    [], ['field_1', '=', 3]
+                ]
+            ],
+            "without solution" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '=', 3],
+                        ['field_1', '>', 4],
+                    ],
+                'after' => [
+                    [], ['and']
+                ]
+            ],
+            "same value" => [ // checks that the comparison is strict
+                'before' =>
+                    ['and',
+                        ['field_1', '=', 3],
+                        ['field_1', '>', 3],
+                    ],
+                'after' => [
+                    [], ['and']
+                ]
+            ],
+            "equal null" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '=', null],
+                        ['field_1', '>', 3],
+                    ],
+                'after' => [
+                    [], ['and']
+                ]
+            ],
+        ];
+
+        $cases["< vs >"] = [
+            "with solution" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '<', 3],
+                        ['field_1', '>', 2],
+                    ],
+                'after' => [
+                    [],
+                    ['and',
+                        ['field_1', '<', 3],
+                        ['field_1', '>', 2],
+                    ],
+                ]
+            ],
+            "without solution" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '<', 3],
+                        ['field_1', '>', 4],
+                    ],
+                'after' => [
+                    [], ['and']
+                ]
+            ],
+            "same value" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '<', 3],
+                        ['field_1', '>', 3],
+                    ],
+                'after' => [
+                    [], ['and']
+                ]
+            ],
+        ];
+
+
+        $cases["!= vs ="] = [
+            "simplifiable" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '!=', 3],
+                        ['field_1', '=', 4],
+                    ],
+                'after' => [
+                    [],
+                    ['field_1', '=', 4],
+                ]
+            ],
+            "same value" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '!=', 3],
+                        ['field_1', '=', 3],
+                    ],
+                'after' => [
+                    [],
+                    ['and'],
+                ],
+            ],
+            "not equal null simplifiable" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '!=', null],
+                        ['field_1', '=', 3],
+                    ],
+                'after' => [
+                    [],
+                    ['field_1', '=', 3],
+                ]
+            ],
+            "not equal null compared to 0 simplifiable" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '!=', null],
+                        ['field_1', '=', 0],
+                    ],
+                'after' => [
+                    [],
+                    ['field_1', '=', 0],
+                ]
+            ],
+            "not equal null without solution" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '!=', null],
+                        ['field_1', '=', null],
+                    ],
+                'after' => [
+                    [],
+                    ['and'],
+                ]
+            ],
+            "not equal null with all solutions" => [
+                'before' =>
+                    ['or',
+                        ['field_1', '!=', null],
+                        ['field_1', '=', null],
+                    ],
+                'after' => [
+                    [],
+                    [
+                        'or',
+                        true,
+                        // ['field_1', '=', null],
+                        // ['field_1', '!=', null],
+                    ],
+                ],
+                // TODO this filter should just value true as it doesn't filter
+                // anything. @see https://github.com/jclaveau/php-logical-filter/issues/38
+                // to replace the OrRule by a TrueRule
+                'status' => (new DeferredCallChain)->markTestSkipped('Requires the support operands being TRUE or FALSE')
+            ],
+        ];
+
+        $cases["!= vs <"] = [
+            "not simplifiable" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '!=', 3],
+                        ['field_1', '<', 4],
+                    ],
+                'after' => [
+                    [],
+                    ['and',
+                        ['field_1', '!=', 3],
+                        ['field_1', '<', 4],
+                    ],
+                ]
+            ],
+            "simplifiable" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '!=', 3],
+                        ['field_1', '<', 2],
+                    ],
+                'after' => [
+                    [],
+                    ['field_1', '<', 2],
+                ]
+            ],
+            "same value" => [ // checks that the comparison is strict
+                'before' =>
+                    ['and',
+                        ['field_1', '!=', 3],
+                        ['field_1', '<', 3],
+                    ],
+                'after' => [
+                    [],
+                    ['field_1', '<', 3],
+                ],
+            ],
+            "equal null simplifiable" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '!=', null],
+                        ['field_1', '<', -1],
+                    ],
+                'after' => [
+                    [],
+                    ['field_1', '<', -1],
+                ]
+            ],
+            "equal null not simplifiable" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '!=', null],
+                        ['field_1', '<', 3],
+                    ],
+                'after' => [
+                    [],
+                    ['and',
+                        ['field_1', '!=', null],
+                        ['field_1', '<', 3],
+                    ],
+                ],
+                'status' => (new DeferredCallChain)->markTestIncomplete('TODO')
+            ],
+            "not equal null OR below not simplifiable" => [
+                'before' =>
+                    ['or',
+                        ['field_1', '!=', null],
+                        ['field_1', '<', 3],
+                    ],
+                'after' => [
+                    [],
+                    ['or',
+                        ['field_1', '!=', null],
+                        ['field_1', '<', 3],
+                    ],
+                ]
+            ],
+        ];
+
+
+        $cases["!= vs >"] = [
+            "not simplifiable" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '!=', 3],
+                        ['field_1', '>', 2],
+                    ],
+                'after' => [
+                    [],
+                    ['and',
+                        ['field_1', '!=', 3],
+                        ['field_1', '>', 2],
+                    ],
+                ]
+            ],
+            "simplifiable" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '!=', 3],
+                        ['field_1', '>', 4],
+                    ],
+                'after' => [
+                    [],
+                    ['field_1', '>', 4],
+                ]
+            ],
+            "same value" => [ // checks that the comparison is strict
+                'before' =>
+                    ['and',
+                        ['field_1', '!=', 3],
+                        ['field_1', '>', 3],
+                    ],
+                'after' => [
+                    [],
+                    ['field_1', '>', 3],
+                ]
+            ],
+            "not equal null simplifiable" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '!=', null],
+                        ['field_1', '>', 3],
+                    ],
+                'after' => [
+                    [],
+                    ['field_1', '>', 3],
+                ]
+            ],
+            "not equal null not simplifiable" => [
+                'before' =>
+                    ['and',
+                        ['field_1', '!=', null],
+                        ['field_1', '>', -1],
+                    ],
+                'after' => [
+                    [],
+                    ['and',
+                        ['field_1', '!=', null],
+                        ['field_1', '>', -1],
+                    ],
+                ],
+                'status' => (new DeferredCallChain)->markTestIncomplete('TODO')
+            ],
+            "not equal null OR above not simplifiable" => [
+                'before' =>
+                    ['or',
+                        ['field_1', '!=', null],
+                        ['field_1', '>', 3],
+                    ],
+                'after' => [
+                    [],
+                    ['or',
+                        ['field_1', '!=', null],
+                        ['field_1', '>', 3],
+                    ],
+                ]
+            ],
+        ];
+
+        $cases["= vs in"] = [
+            "with solution" => [
+                'before' =>
+                    ["and",
+                        ["type", "=",  "a"],
+                        ["type", "in", ["a", "b", "c", "d", null]],
+                    ],
+                'after' => [
+                    [],
+                    ["type", "=",  "a"],
+                ]
+            ],
+            "without solution" => [
+                'before' =>
+                    ["and",
+                        ["type", "=",  "z"],
+                        ["type", "in", ["a", "b", "c", "d", null]],
+                    ],
+                'after' => [
+                    [], ['or']
+                ]
+            ],
+            "equal null" => [
+                'before' =>
+                    ["and",
+                        ["type", "=",  null],
+                        ["type", "in", ["a", "b", "c", "d", null]],
+                    ],
+                'after' => [
+                    [],
+                    ["type", "=",  null],
+                ]
+            ],
+        ];
+
+        $cases["> vs in"] = [
+            "with solution" => [
+                'before' =>
+                    ["and",
+                        ["field2", ">", 10],
+                        ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                    ],
+                'after' => [
+                    [],
+                    ["field2", "in", [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                ]
+            ],
+            "without solution" => [
+                'before' =>
+                    ["and",
+                        ["field2", ">", 21],
+                        ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                    ],
+                'after' => [
+                    // ['in.normalization_threshold' => 9]
+                    [],
+                    ['or'],
+                ]
+            ],
+            "ordering null" => [
+                'before' =>
+                    ["and",
+                        ["field2", ">", -10],
+                        ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                    ],
+                'after' => [
+                    [],
+                    ["field2", "in", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                ]
+            ],
+        ];
+
+        $cases["< vs in"] = [
+            "with solution" => [
+                'before' =>
+                    ["and",
+                        ["field2", "<", 10],
+                        ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                    ],
+                'after' => [
+                    [],
+                    ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9]],
+                ]
+            ],
+            "without solution" => [
+                'before' =>
+                    ["and",
+                        ["field2", "<", 0],
+                        ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                    ],
+                'after' => [
+                    // ['in.normalization_threshold' => 9]
+                    [],
+                    ['or'],
+                ]
+            ],
+            "ordering null" => [
+                'before' =>
+                    ["and",
+                        ["field2", "<", 30],
+                        ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                    ],
+                'after' => [
+                    [],
+                    ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                ]
+            ],
+        ];
+
+        $cases["!= vs in"] = [
+            "simplifiable" => [
+                'before' =>
+                    ["and",
+                        ["field2", "!=", 10],
+                        ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                    ],
+                'after' => [
+                    [],
+                    ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                    // ["or",
+                        // ["and",
+                            // ["field2", "!=", 10],
+                            // ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                        // ],
+                    // ],
+                ],
+                'status' => (new DeferredCallChain)->markTestIncomplete('TODO')
+            ],
+            "null simplifiable" => [
+                'before' =>
+                    ["and",
+                        ["field2", "!=", null],
+                        ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                    ],
+                'after' => [
+                    [],
+                    ["field2", "in", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                    // ["or",
+                        // ["and",
+                            // ["field2", "!=", null],
+                            // ["field2", "in", [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                        // ],
+                    // ],
+                ],
+                'status' => (new DeferredCallChain)->markTestIncomplete('TODO')
+            ],
+            "simplifiable with no change" => [
+                'before' =>
+                    ["and",
+                        ["field2", "!=", -6],
+                        ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                    ],
+                'after' => [
+                    [],
+                    ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                ],
+                'status' => (new DeferredCallChain)->markTestIncomplete('TODO')
+            ],
+
+            "ordering null" => [
+                'before' =>
+                    ["and",
+                        ["field2", "!=", 30],
+                        ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                    ],
+                'after' => [
+                    [],
+                    ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                    // ["or",
+                        // ["and",
+                            // ["field2", "!=", 30],
+                            // ["field2", "in", [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
+                        // ],
+                    // ],
+                ],
+                'status' => (new DeferredCallChain)->markTestIncomplete('TODO')
+            ],
+        ];
+
+        $cases["= vs !in"] = [
+            "with solution" => [
+                'before' =>
+                    ["and",
+                        ["type", "=",  "a"],
+                        ["type", "!in", ["b", "c", "d", null]],
+                    ],
+                'after' => [
+                    [],
+                    ["type", "=",  "a"],
+                ]
+            ],
+            "without solution" => [
+                'before' =>
+                    ["and",
+                        ["type", "=",  "a"],
+                        ["type", "!in", ["a", "b", "c", "d", null]],
+                    ],
+                'after' => [
+                    [],
+                    ['and'],
+                ]
+            ],
+            "equal null with solution" => [
+                'before' =>
+                    ["and",
+                        ["type", "=",  null],
+                        ["type", "!in", ["a", "b", "c", "d"]],
+                    ],
+                'after' => [
+                    [],
+                    ["type", "=",  null],
+                ]
+            ],
+            "equal null without solution" => [
+                'before' =>
+                    ["and",
+                        ["type", "=",  null],
+                        ["type", "!in", ["a", "b", "c", "d", null]],
+                    ],
+                'after' => [
+                    [],
+                    ['and'],
+                ]
+            ],
+        ];
+
+        $cases["!= vs !in"] = [
+            "with solution" => [
+                'before' =>
+                    ["and",
+                        ["type", "!=",  "a"],
+                        ["type", "!in", ["a", "b", "c", "d"]],
+                    ],
+                'after' => [
+                    [
+                        'in.normalization_threshold' => 4,
+                        'not_equal.normalization'    => true,
+                    ],
+                    ["or",
+                        ["type", ">",  "d"],
+                        ["type", "<",  "a"],
+                        ["and",
+                            ["type", ">",  "c"],
+                            ["type", "<",  "d"],
+                        ],
+                        ["and",
+                            ["type", ">",  "b"],
+                            ["type", "<",  "c"],
+                        ],
+                        ["and",
+                            ["type", ">",  "a"],
+                            ["type", "<",  "b"],
+                        ],
+                    ],
+                ]
+            ],
+            "with solution" => [
+                'before' =>
+                ["and",
+                    ["type", "!=",  "z"],
+                    ["type", "!in", ["a", "b", "c", "d"]],
+                ],
+                'after' => [
+                    [
+                        'in.normalization_threshold' => 5,
+                        'not_equal.normalization'    => true,
+                    ],
+                    ["or",
+                        ["type", ">",  "z"],
+                        // ["type", ">",  "d"],
+                        ["type", "<",  "a"],
+                        ["and",
+                            ["type", ">",  "d"],
+                            ["type", "<",  "z"],
+                        ],
+                        ["and",
+                            ["type", ">",  "c"],
+                            ["type", "<",  "d"],
+                        ],
+                        ["and",
+                            ["type", ">",  "b"],
+                            ["type", "<",  "c"],
+                        ],
+                        ["and",
+                            ["type", ">",  "a"],
+                            ["type", "<",  "b"],
+                        ],
+                    ],
+                ]
+            ],
+        ];
+
+        $cases["in vs !in"] = [
+            "with solution" => [
+                'before' =>
+                    ["and",
+                        ["field", "in", [1, 2, 3, 4]],
+                        ["field", "!in", [3, 4, 5, 6]],
+                    ],
+                'after' => [
+                    [],
+                    ["field", "in", [1, 2]],
+                ]
+            ],
+        ];
+
+        $named_cases = [];
+        foreach ($cases as $vs) {
+            foreach ($vs as $case) {
+                $name =
+                    $case['before'][1][1].' '.var_export($case['before'][1][2], true)
+                    .' vs '.
+                    $case['before'][2][1].' '.var_export($case['before'][2][2], true)
+                    ;
+
+                $named_cases[$name] = $case;
+            }
+        }
+
+        return $named_cases;
+    }
+
+
+    /**
+     * @dataProvider test_simplify_different_operands_dataProvider
+     */
+    public function test_simplify_different_operands($input, $results, $status=null)
+    {
+        if ($status instanceof DeferredCallChain) {
+            $status($this);
+        }
+        elseif ($status != null) {
+            throw new \InvalidArgumentException(
+                "unhandled test status"
+            );
+        }
+
+        $filter = LogicalFilter::new_($input)
+        // ->dump(true)
         ;
 
         $this->assertEquals(
-            ['and'],
+            $results[1],
             $filter
-                ->simplify()
+                ->simplify($results[0])
                 // ->dump(true)
                 ->toArray()
         );
 
-        $filter = (new LogicalFilter(
-            ['field_1', '=', null]
-        ))
-        ->and_(['field_1', '>', 3])
-        ;
-
         $this->assertEquals(
-            ['and'],
+            ! in_array($results[1], [['or'], ['and'], false]),
             $filter
-                ->simplify()
-                // ->dump(true)
-                ->toArray()
+                ->hasSolution($results[0])
         );
     }
 
     /**
-     */
-    public function test_BelowRule_and_AboveRule_are_strictly_compared()
-    {
-        $this->assertFalse(
-            (new LogicalFilter([
-                'and',
-                ['field_1', '=', 3],
-                ['field_1', '<', 3],
-            ]))
-            ->hasSolution()
-        );
-
-        $this->assertFalse(
-            (new LogicalFilter([
-                'and',
-                ['field_1', '=', 3],
-                ['field_1', '>', 3],
-            ]))
-            ->hasSolution()
-        );
-    }
-
-    /**
-     */
+     * /
     public function test_hasSolution()
     {
-        $this->assertFalse(
-            (new LogicalFilter([
-                'and',
-                ['field_5', 'above', 'a'],
-                ['field_5', 'below', 'a'],
-            ]))
-            ->hasSolution()
-        );
-
-        $this->assertFalse(
-            (new LogicalFilter([
-                'and',
-                ['field_5', 'equal', 'a'],
-                ['field_5', 'below', 'a'],
-            ]))
-            ->hasSolution()
-        );
-
-        $this->assertFalse(
-            (new LogicalFilter([
-                'and',
-                ['field_5', 'equal', 'a'],
-                ['field_5', 'above', 'a'],
-            ]))
-            ->hasSolution()
-        );
-
         $this->assertTrue(
-            (new LogicalFilter([
-                'or',
-                [
-                    'and',
-                    ['field_5', 'above', 'a'],
-                    ['field_5', 'below', 'a'],
+            (new LogicalFilter(
+            ['or',
+                ['and',
+                    ['field_5', '>', 'a'],
+                    ['field_5', '<', 'a'],
                 ],
-                ['field_6', 'equal', 'b'],
+                ['field_6', '=', 'b'],
             ]))
             ->hasSolution()
         );
     }
 
     /**
-     */
-    public function test_simplify_simplifyDifferentOperands_equal_and_in()
-    {
-        $filter = (new LogicalFilter(
-            ["and",
-                ["type", "=",  "a"],
-                ["type", "in", ["a", "b", "c", "d"]],
-            ]
-        ))
-        ->simplify()
-        ;
-
-        $this->assertEquals(
-            ["type", "=",  "a"],
-            $filter
-                // ->dump(true)
-                ->toArray()
-        );
-
-        $filter = (new LogicalFilter(
-            ["and",
-                ["type", "=",  "z"],
-                ["type", "in", ["a", "b", "c", "d"]],
-            ]
-        ))
-        ->simplify()
-        ;
-
-        $this->assertEquals(
-            ["or"],
-            $filter
-                // ->dump(true, ['mode' => 'export'])
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_simplify_simplifyDifferentOperands_equal_and_not_in()
-    {
-        $filter = (new LogicalFilter(
-            ["and",
-                ["type", "=",  "a"],
-                ["type", "!in", ["b", "c", "d"]],
-            ]
-        ));
-
-        $this->assertEquals(
-            ["type", "=",  "a"],
-            $filter
-                ->simplify()
-                // ->dump(true)
-                ->toArray()
-        );
-
-        $filter = (new LogicalFilter(
-            ["and",
-                ["type", "=",  "a"],
-                ["type", "!in", ["a", "b", "c", "d"]],
-            ]
-        ));
-
-        $this->assertEquals(
-            ["and"],
-            $filter
-                ->simplify()
-                // ->dump(true)
-                ->toArray()
-        );
-    }
-
-    /**
-     */
+     * /
     public function test_simplify_differentOperands_in_above_below()
     {
         $filter = (new LogicalFilter(
             ["and",
                 ["or",
                     ["field2", "=", 4],
-                    ["field2", ">", 10],
-                    ["field2", "<", 3],
+                    // ["field2", "<", 3],
                 ],
                 ["field2", "in", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]],
             ],
@@ -211,262 +775,7 @@ trait LogicalFilterTest_simplify_different_operands
     }
 
     /**
-     */
-    public function test_simplify_different_operands_in_and_equal()
-    {
-        $filter = (new LogicalFilter(
-            ["and",
-                ["type", "in", ["a", "b", "c", "d"]],
-                ["type", "in", ["b", "c", "d"]],
-                ["type", "=",  "c"],
-            ]
-        ))
-        ->simplify()
-        ;
-
-        $this->assertEquals(
-            ["type", "=",  "c"],
-            $filter
-                // ->dump(!true)
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_simplify_simplifyDifferentOperands_different_and_not_in()
-    {
-        $filter = (new LogicalFilter(
-            ["and",
-                ["type", "!=",  "a"],
-                ["type", "!in", ["a", "b", "c", "d"]],
-            ]
-        ));
-
-        $this->assertEquals(
-            ["or",
-                ["type", ">",  "d"],
-                ["type", "<",  "a"],
-                ["and",
-                    ["type", ">",  "c"],
-                    ["type", "<",  "d"],
-                ],
-                ["and",
-                    ["type", ">",  "b"],
-                    ["type", "<",  "c"],
-                ],
-                ["and",
-                    ["type", ">",  "a"],
-                    ["type", "<",  "b"],
-                ],
-            ],
-            $filter
-                ->simplify([
-                    'in.normalization_threshold' => 4,
-                    'not_equal.normalization'    => true,
-                ])
-                // ->dump(!true)
-                ->toArray()
-        );
-
-        $filter = (new LogicalFilter(
-            ["and",
-                ["type", "!=",  "z"],
-                ["type", "!in", ["a", "b", "c", "d"]],
-            ]
-        ))
-        ->simplify([
-            'in.normalization_threshold' => 5,
-            'not_equal.normalization'    => true,
-        ])
-        ;
-
-        $this->assertEquals(
-            ["or",
-                ["type", ">",  "z"],
-                // ["type", ">",  "d"],
-                ["type", "<",  "a"],
-                ["and",
-                    ["type", ">",  "d"],
-                    ["type", "<",  "z"],
-                ],
-                ["and",
-                    ["type", ">",  "c"],
-                    ["type", "<",  "d"],
-                ],
-                ["and",
-                    ["type", ">",  "b"],
-                    ["type", "<",  "c"],
-                ],
-                ["and",
-                    ["type", ">",  "a"],
-                    ["type", "<",  "b"],
-                ],
-            ],
-            $filter
-                // ->dump(true)
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_simplify_differentOperands_in_with_not_in()
-    {
-        $filter = (new LogicalFilter(
-            ["and",
-                ["field", "in", [1, 2, 3, 4]],
-                ["field", "!in", [3, 4, 5, 6]],
-            ]
-        ));
-
-        $this->assertEquals(
-                ["field", "in", [1, 2]],
-            $filter
-                ->simplify()
-                // ->dump(true)
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_simplify_between_NotEqualRule_of_null_and_equal()
-    {
-        $filter = (new LogicalFilter(
-            ['field_1', '!=', null]
-        ))
-        ->and_(['field_1', '=', 3])
-        ;
-
-        $this->assertEquals(
-            ['field_1', '=', 3],
-            $filter
-                ->simplify()
-                // ->dump(true)
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_simplify_between_NotEqualRule_of_null_and_above_or_below()
-    {
-        $filter = (new LogicalFilter(
-            ['field_1', '!=', null]
-        ))
-        ->and_(['field_1', '<', 3])
-        ;
-
-        $this->assertEquals(
-            ['field_1', '<', 3],
-            $filter
-                ->simplify()
-                // ->dump(true)
-                ->toArray()
-        );
-
-        $filter = (new LogicalFilter(
-            ['field_1', '!=', null]
-        ))
-        ->and_(['field_1', '>', 3])
-        ;
-
-        $this->assertEquals(
-            ['field_1', '>', 3],
-            $filter
-                ->simplify()
-                // ->dump(true)
-                ->toArray()
-        );
-
-        // within OrRule
-        $filter = (new LogicalFilter(
-            ['field_1', '!=', null]
-        ))
-        ->or_(['field_1', '<', 3])
-        ;
-
-        $this->assertEquals(
-            ['or',
-                ['field_1', '!=', null],
-                ['field_1', '<', 3],
-            ],
-            $filter
-                ->simplify()
-                // ->dump(true)
-                ->toArray()
-        );
-
-        $filter = (new LogicalFilter(
-            ['field_1', '!=', null]
-        ))
-        ->or_(['field_1', '>', 3])
-        ;
-
-        $this->assertEquals(
-            ['or',
-                ['field_1', '!=', null],
-                ['field_1', '>', 3],
-            ],
-            $filter
-                ->simplify()
-                // ->dump(true)
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_simplify_between_EqualRule_of_null_and_NotEqualRule_of_null_giving_false()
-    {
-        $filter = (new LogicalFilter(
-            ['field_1', '=', null]
-        ))
-        ->and_(['field_1', '!=', null])
-        ;
-
-        $this->assertEquals(
-            ['and'],
-            $filter
-                // ->dump(true)
-                ->simplify()
-                // ->dump(true)
-                ->toArray()
-        );
-    }
-
-    /**
-     */
-    public function test_simplify_between_EqualRule_of_null_and_NotEqualRule_of_null_giving_true()
-    {
-        $this->markTestSkipped('Requires the support operands being TRUE or FALSE');
-        // TODO this filter should just value true as it doesn't filter
-        // anything. @see https://github.com/jclaveau/php-logical-filter/issues/38
-        // to replace the OrRule by a TrueRule
-        $filter = (new LogicalFilter(
-            ['field_1', '=', null]
-        ))
-        ->or_(['field_1', '!=', null])
-        ;
-
-        $this->assertEquals(
-            [
-                'or',
-                true,
-                // ['field_1', '=', null],
-                // ['field_1', '!=', null],
-            ],
-            $filter
-                // ->dump(true)
-                ->simplify()
-                // ->dump(true)
-                ->toArray()
-        );
-    }
-
-    /**
-     */
+     * /
     public function test_simplify_equal_rules_with_fields_having_different_types()
     {
         // This produced a bug due to comparisons between different fields
