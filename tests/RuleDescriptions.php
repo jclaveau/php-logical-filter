@@ -82,9 +82,9 @@ class RuleDescriptions extends \PHPUnit_Framework_TestCase
         return $out;
     }
 
-
-    /** /
-    public static function listValidMinimalisticAtomics()
+    /**
+     */
+    public static function listValidMinimalistic()
     {
         return [
             ['field_1', '=', 2],
@@ -101,13 +101,7 @@ class RuleDescriptions extends \PHPUnit_Framework_TestCase
             ['field_1', '=><', [2, 3]],
             ['field_1', '><=', [2, 3]],
             ['field_1', '=><=', [2, 3]],
-            // ['field_1', 'regexp', '/^lalala*$/'],
-        ];
-    }
-
-    public static function listValidMinimalisticOperations()
-    {
-        return [
+            ['field_1', 'regexp', '/^lalala*$/'],
             ['and',
                 ['field', '>', 3],
                 ['field', '<', 5],
