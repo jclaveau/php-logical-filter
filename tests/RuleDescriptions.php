@@ -68,15 +68,11 @@ class RuleDescriptions extends \PHPUnit_Framework_TestCase
         $processed_operators = [];
         foreach ($operators as $i => $operator) {
 
-            foreach ($processed_operators as $j => $processed_operator) {
-                if ($operator == $processed_operator) {
-                    continue;
-                }
+            $processed_operators[] = $operator;
 
+            foreach ($processed_operators as $j => $processed_operator) {
                 $out[] = $operator.' vs '.$processed_operator;
             }
-
-            $processed_operators[] = $operator;
         }
 
         return $out;
