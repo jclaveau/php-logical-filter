@@ -24,7 +24,7 @@ class RuleDescriptions extends \PHPUnit_Framework_TestCase
             '=><',
             '><=',
             '=><=',
-            // 'regexp',
+            'regexp',
         ];
     }
 

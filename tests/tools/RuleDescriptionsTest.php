@@ -79,6 +79,18 @@ class RuleDescriptionsTest extends \AbstractTest
               63 => '=><= vs ><',
               64 => '=><= vs =><',
               65 => '=><= vs ><=',
+              66 => 'regexp vs =',
+              67 => 'regexp vs <',
+              68 => 'regexp vs >',
+              69 => 'regexp vs !=',
+              70 => 'regexp vs in',
+              71 => 'regexp vs !in',
+              72 => 'regexp vs >=',
+              73 => 'regexp vs <=',
+              74 => 'regexp vs ><',
+              75 => 'regexp vs =><',
+              76 => 'regexp vs ><=',
+              77 => 'regexp vs =><=',
             ),
             $combinations
         );
